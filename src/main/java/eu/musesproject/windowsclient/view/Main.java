@@ -98,8 +98,7 @@ public class Main extends JFrame{
     }
 	
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
-    	
-        if ( !userNameTextField.getText().trim().equals("") && !passwordTextField.getText().trim().equals("") ) {
+    	if (!userNameTextField.getText().trim().equals("") && !passwordTextField.getText().trim().equals("")) {
         	IUserContextMonitoringController iMonitoringController = new UserContextMonitoringController();
         	iMonitoringController.login(userNameTextField.getText(), passwordTextField.getText());
         }

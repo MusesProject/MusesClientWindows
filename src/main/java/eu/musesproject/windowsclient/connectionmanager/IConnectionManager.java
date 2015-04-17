@@ -1,4 +1,5 @@
 package eu.musesproject.windowsclient.connectionmanager;
+
 /*
  * #%L
  * MUSES Client
@@ -29,6 +30,7 @@ package eu.musesproject.windowsclient.connectionmanager;
 public interface IConnectionManager {
 
 	void connect (String url, String cert, int pollInterval, int sleepPollInterval, IConnectionCallbacks callbacks);
+	void springConnect (String url, String cert, String data, int dataId, int pollInterval, int sleepPollInterval, IConnectionCallbacks callbacks);
 	void setPollTimeOuts (int pollInterval, int sleepPollInterval);
 	void setTimeout(int timeout);
 	void setPolling(int polling);

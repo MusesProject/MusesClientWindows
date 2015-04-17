@@ -1,4 +1,4 @@
-package eu.musesproject.windowsclient.connectionmanager;	
+	package eu.musesproject.windowsclient.connectionmanager;	
 /*
  * #%L
  * MUSES Client
@@ -29,7 +29,6 @@ package eu.musesproject.windowsclient.connectionmanager;
 public class HttpResponseHandler {
 
 	private static final String APP_TAG = "APP_TAG";
-	private static final int MINIMUM_POLL_AFTER_REQUEST = 10000;
 	private String receivedHttpResponseData = null;
 	private HttpResponse httpResponse = null;
 	private boolean isNewSession = false;
@@ -49,6 +48,10 @@ public class HttpResponseHandler {
 
 	public HttpResponseHandler(String requestType) {
 		this.requestType = requestType;
+	}
+	
+	public HttpResponseHandler() {
+
 	}
 
 	/**
@@ -285,6 +288,7 @@ public class HttpResponseHandler {
 	 * @param status
 	 * @return void
 	 */
+	
 	private void setServerStatusAndCallBack(int status, int detailedStatus) {
 		
 		if (status == Statuses.OFFLINE || status == Statuses.ONLINE)
@@ -299,8 +303,7 @@ public class HttpResponseHandler {
 		}
 		
 	}
-	
-	
+		
 	/**
 	 * Get response code from status code
 	 * @param httpResponse
@@ -332,6 +335,14 @@ public class HttpResponseHandler {
 		this.httpResponse = httpResponse;
 	}
 
+	public String getRequestType() {
+		return requestType;
+	}
+	
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
+	}
+	
 	public String getDataLength() {
 		String dataLength = "";
 		if (httpResponse != null) {
@@ -342,6 +353,5 @@ public class HttpResponseHandler {
 		}
 		return dataLength;
 	}
-
 	
 }

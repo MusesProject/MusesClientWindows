@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionManager implements IConnectionManager {
 	
-	private static String IP = "localhost";
+	private static String IP = "sweoffice.mooo.com";
 	public static IConnectionCallbacks callBacks;
 	
 	public static final String CONNECT = "connect";
@@ -64,7 +64,28 @@ public class ConnectionManager implements IConnectionManager {
 		// Set alarm, poll interval, sleep poll interval
 	}
 
+	@Override
+	public void springConnect(String url, String cert, String data, int dataId,
+			int pollInterval, int sleepPollInterval,
+			IConnectionCallbacks iCallbacks) {
 
+		URL = url;
+		this.
+		POLL_INTERVAL = pollInterval;
+		SLEEP_POLL_INTERVAL = sleepPollInterval;
+		callBacks = iCallbacks;
+		
+		if (new NetworkChecker().isInternetConnected()) {
+			System.out.println(APP_TAG + " Internet Connected.");
+		}
+		System.out.println(APP_TAG +  " ConnManager=> connecting to server");
+		Thread httpThread = new Thread(new HttpClient("connect", URL, data, POLL_INTERVAL, true));
+		httpThread.start();
+		
+		// TBD
+		// Set alarm, poll interval, sleep poll interval
+
+	}
 	public void sendData(String data) {
 		System.out.println(APP_TAG +  " ConnManager=> send data to server: "+data);
 		Thread httpThread = new Thread(new HttpClient("data", URL, "", POLL_INTERVAL, true));
