@@ -1,5 +1,13 @@
 package eu.musesproject.windowsclient.view;
 
+import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
 import javax.swing.JFrame;
 
 import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
@@ -30,7 +38,7 @@ public class Main extends JFrame{
 	}
 	
     private void initComponents() {
-
+    	startRMI();
         loginJLabel = new javax.swing.JLabel();
         usernameJLabel = new javax.swing.JLabel();
         userNameTextField = new javax.swing.JTextField();
@@ -93,15 +101,39 @@ public class Main extends JFrame{
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(15, Short.MAX_VALUE))
         );
-
+   
         pack();
     }
 	
-    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void startRMI() {
+    	try {
+    		
+            LocateRegistry.createRegistry(1099); 
+            System.out.println("java RMI registry created.");
+    		
+			RMI rmi = new RMI();
+			Naming.rebind("//localhost/RMI",rmi);
+			System.out.println("Rmi started..");
+		} catch (RemoteException e1) {
+			e1.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}    	
+	}
+
+	private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	if (!userNameTextField.getText().trim().equals("") && !passwordTextField.getText().trim().equals("")) {
         	IUserContextMonitoringController iMonitoringController = new UserContextMonitoringController();
         	iMonitoringController.login(userNameTextField.getText(), passwordTextField.getText());
         }
+    	RMI rmi;
+		try {
+			rmi = new RMI();
+			rmi.sendResponseToMusesAwareApp("accepted");;
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
 }
