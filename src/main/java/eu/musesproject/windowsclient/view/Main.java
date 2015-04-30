@@ -38,7 +38,7 @@ public class Main extends JFrame{
 	}
 	
     private void initComponents() {
-    	startRMI();
+    	RMI.startRMI();
         loginJLabel = new javax.swing.JLabel();
         usernameJLabel = new javax.swing.JLabel();
         userNameTextField = new javax.swing.JTextField();
@@ -105,22 +105,6 @@ public class Main extends JFrame{
         pack();
     }
 	
-    private void startRMI() {
-    	try {
-    		
-            LocateRegistry.createRegistry(1099); 
-            System.out.println("java RMI registry created.");
-    		
-			RMI rmi = new RMI();
-			Naming.rebind("//localhost/RMI",rmi);
-			System.out.println("Rmi started..");
-		} catch (RemoteException e1) {
-			e1.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}    	
-	}
-
 	private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	if (!userNameTextField.getText().trim().equals("") && !passwordTextField.getText().trim().equals("")) {
         	IUserContextMonitoringController iMonitoringController = new UserContextMonitoringController();

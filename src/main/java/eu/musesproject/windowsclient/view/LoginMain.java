@@ -7,19 +7,13 @@ import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
-
-import javax.swing.ImageIcon;
-
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -34,9 +28,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.swing.ImageIcon;
+
 public class LoginMain extends Application {
 
     public static void main(String[] args) {
+    	RMI.startRMI();
         launch(args);
     }
 
@@ -102,10 +99,10 @@ public class LoginMain extends Application {
 
             @Override
             public void handle(ActionEvent e) {
-                actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("Sign in button pressed");
+                //actiontarget.setFill(Color.FIREBRICK);
+                //actiontarget.setText("Sign in button pressed");
                 //showDialog();
-                placeInSystemTray();
+                //placeInSystemTray();
                 
             }
 

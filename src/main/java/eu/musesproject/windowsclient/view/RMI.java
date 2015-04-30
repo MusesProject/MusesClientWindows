@@ -1,7 +1,10 @@
 package eu.musesproject.windowsclient.view;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 import eu.musesproject.awareappinterface.AwareAction;
@@ -50,4 +53,21 @@ public class RMI extends UnicastRemoteObject implements Serializable, IMusesServ
 		}
 	}
 
+    public static void startRMI() {
+    	try {
+    		
+            LocateRegistry.createRegistry(1099); 
+            System.out.println("java RMI registry created.");
+    		
+			RMI rmi = new RMI();
+			Naming.rebind("//localhost/RMI",rmi);
+			System.out.println("Rmi started..");
+		} catch (RemoteException e1) {
+			e1.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}    	
+	}
+
+	
 }
