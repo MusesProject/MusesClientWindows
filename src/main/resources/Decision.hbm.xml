@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-Apr-2015 17:44:10 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="Decision" table="decision" catalog="muses_client">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="name" type="string">
+            <column name="name" length="45" not-null="true" />
+        </property>
+        <property name="condition" type="string">
+            <column name="condition" length="45" />
+        </property>
+        <property name="modification" type="timestamp">
+            <column name="modification" length="19" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="windowsclient">
+		<class>eu.musesproject.windowsclient.model.Action</class>
+		<class>eu.musesproject.windowsclient.model.ActionProperty</class>
+		<class>eu.musesproject.windowsclient.model.AndroidMetadata</class>
+		<class>eu.musesproject.windowsclient.model.Configuration</class>
+		<class>eu.musesproject.windowsclient.model.Contextevent</class>
+		<class>eu.musesproject.windowsclient.model.Decision</class>
+		<class>eu.musesproject.windowsclient.model.Decisiontable</class>
+		<class>eu.musesproject.windowsclient.model.Property</class>
+		<class>eu.musesproject.windowsclient.model.RequiredApp</class>
+		<class>eu.musesproject.windowsclient.model.Resource</class>
+		<class>eu.musesproject.windowsclient.model.ResourceProperty</class>
+		<class>eu.musesproject.windowsclient.model.Resourcetype</class>
+		<class>eu.musesproject.windowsclient.model.Riskcommunication</class>
+		<class>eu.musesproject.windowsclient.model.Risktreatment</class>
+		<class>eu.musesproject.windowsclient.model.Role</class>
+		<class>eu.musesproject.windowsclient.model.SensorConfiguration</class>
+		<class>eu.musesproject.windowsclient.model.Subject</class>
+		<class>eu.musesproject.windowsclient.model.UserCredential</class>
+	</persistence-unit>
+</persistence>

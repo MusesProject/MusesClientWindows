@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-Apr-2015 17:44:10 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="Property" table="property" catalog="muses_client">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="contexteventId" type="int">
+            <column name="contextevent_id" not-null="true" />
+        </property>
+        <property name="key" type="string">
+            <column name="key" length="45" not-null="true" />
+        </property>
+        <property name="value" type="string">
+            <column name="value" length="45" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

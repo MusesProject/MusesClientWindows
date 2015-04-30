@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-Apr-2015 17:44:10 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="Configuration" table="configuration" catalog="muses_client">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="serverIp" type="string">
+            <column name="server_ip" length="45" not-null="true" />
+        </property>
+        <property name="serverPort" type="string">
+            <column name="server_port" length="45" not-null="true" />
+        </property>
+        <property name="serverContextPath" type="string">
+            <column name="server_context_path" length="45" not-null="true" />
+        </property>
+        <property name="serverServletPath" type="string">
+            <column name="server_servlet_path" length="45" not-null="true" />
+        </property>
+        <property name="serverCertificate" type="string">
+            <column name="server_certificate" length="4500" not-null="true" />
+        </property>
+        <property name="clientCertificate" type="string">
+            <column name="client_certificate" length="4500" not-null="true" />
+        </property>
+        <property name="timeout" type="int">
+            <column name="timeout" not-null="true" />
+        </property>
+        <property name="pollTimeout" type="int">
+            <column name="poll_timeout" not-null="true" />
+        </property>
+        <property name="sleepPollTimeout" type="int">
+            <column name="sleep_poll_timeout" not-null="true" />
+        </property>
+        <property name="pollingEnabled" type="int">
+            <column name="polling_enabled" not-null="true" />
+        </property>
+        <property name="loginAttempts" type="int">
+            <column name="login_attempts" not-null="true" />
+        </property>
+        <property name="silentMode" type="int">
+            <column name="silent_mode" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

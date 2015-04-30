@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.password">muses11</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/muses_client</property>
+        <property name="hibernate.connection.username">muses</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+        
+        		<!-- mapping -->
+		<mapping class="eu.musesproject.windowsclient.model.Action" />
+		<mapping class="eu.musesproject.windowsclient.model.ActionProperty" />
+		<mapping class="eu.musesproject.windowsclient.model.Configuration" />
+		<mapping class="eu.musesproject.windowsclient.model.Contextevent" />
+		<mapping class="eu.musesproject.windowsclient.model.Decision" />
+		<mapping class="eu.musesproject.windowsclient.model.Decisiontable" />
+		<mapping class="eu.musesproject.windowsclient.model.Property" />
+		<mapping class="eu.musesproject.windowsclient.model.RequiredApp" />
+		<mapping class="eu.musesproject.windowsclient.model.Resource" />
+		<mapping class="eu.musesproject.windowsclient.model.ResourceProperty" />
+		<mapping class="eu.musesproject.windowsclient.model.Resourcetype" />
+		<mapping class="eu.musesproject.windowsclient.model.Riskcommunication" />
+		<mapping class="eu.musesproject.windowsclient.model.Risktreatment" />
+		<mapping class="eu.musesproject.windowsclient.model.Role" />
+		<mapping class="eu.musesproject.windowsclient.model.SensorConfiguration" />
+		<mapping class="eu.musesproject.windowsclient.model.Subject" />
+		<mapping class="eu.musesproject.windowsclient.model.UserCredential" />
+		<mapping class="eu.musesproject.windowsclient.model.AndroidMetadata" />
+        
+    </session-factory>
+</hibernate-configuration>
