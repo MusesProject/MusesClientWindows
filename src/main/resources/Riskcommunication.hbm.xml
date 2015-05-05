@@ -6,7 +6,7 @@
     <class name="Riskcommunication" table="riskcommunication" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="communicationSequence" type="int">
             <column name="communication_sequence" not-null="true" />

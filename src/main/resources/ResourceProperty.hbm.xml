@@ -6,7 +6,7 @@
     <class name="ResourceProperty" table="resource_property" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="resourceId" type="int">
             <column name="resource_id" not-null="true" />

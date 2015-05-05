@@ -6,7 +6,7 @@
     <class name="ActionProperty" table="action_property" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="actionId" type="int">
             <column name="action_id" not-null="true" />

@@ -6,7 +6,7 @@
     <class name="Property" table="property" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="contexteventId" type="int">
             <column name="contextevent_id" not-null="true" />

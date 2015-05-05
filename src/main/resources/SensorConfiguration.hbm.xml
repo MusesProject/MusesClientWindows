@@ -6,7 +6,7 @@
     <class name="SensorConfiguration" table="sensor_configuration" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="sensorType" type="string">
             <column name="sensor_type" length="45" not-null="true" />

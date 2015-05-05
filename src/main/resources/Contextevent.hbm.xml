@@ -6,7 +6,7 @@
     <class name="Contextevent" table="contextevent" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <timestamp name="timestamp" column="timestamp" />
         <property name="actionId" type="int">

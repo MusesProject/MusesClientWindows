@@ -56,33 +56,33 @@ public class DBManagerTest {
 	@Test
 	public void testGetRequiredAppList() throws Exception {
 		dbmanager.inserRequiredAppList();
-//		if (dbmanager.getRequiredAppList().size() > 0){
-//			assertTrue(true);
-//		}else{
-//			fail("Something went wrong inserting required apps..");
-//		} 
+		if (dbmanager.getRequiredAppList().size() > 0){
+			assertTrue(true);
+		}else{
+			fail("Something went wrong inserting required apps..");
+		} 
 			
 	}
 	
 	@Test
 	public void testIsUserAuthenticated() throws Exception {
-//		dbmanager.insertCredentials("testdeviceid", "test", "test");
-//		if (dbmanager.isUserAuthenticated("testdeviceid", "test", "test")) {
-//			dbmanager.deleteUserCredentials("test");
-//			assertTrue(true);
-//		}else{
-//			fail("user not authenticated..");
-//		}
+		dbmanager.insertCredentials("testdeviceid", "test", "test");
+		if (dbmanager.isUserAuthenticated("testdeviceid", "test", "test")) {
+			dbmanager.deleteUserCredentials("test");
+			assertTrue(true);
+		}else{
+			fail("user not authenticated..");
+		}
 	}
 	
 	@Test
 	public void testgetDeviceId() throws Exception {
-//		String deviceId = dbmanager.getDevId();
-//		if (deviceId != null){
-//			assertNotNull(deviceId);
-//		}else {
-//			fail("Could not retreive device id..");
-//		}
+		String deviceId = dbmanager.getDevId();
+		if (deviceId != null){
+			assertNotNull(deviceId);
+		}else {
+			fail("Could not retreive device id..");
+		}
 	}
 	
 	

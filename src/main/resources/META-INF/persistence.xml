@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="windowsclient">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<class>eu.musesproject.windowsclient.model.Action</class>
 		<class>eu.musesproject.windowsclient.model.ActionProperty</class>
 		<class>eu.musesproject.windowsclient.model.AndroidMetadata</class>
@@ -9,7 +12,7 @@
 		<class>eu.musesproject.windowsclient.model.Decision</class>
 		<class>eu.musesproject.windowsclient.model.Decisiontable</class>
 		<class>eu.musesproject.windowsclient.model.Property</class>
-		<class>eu.musesproject.windowsclient.model.RequiredApp</class>
+		<class>eu.musesproject.windowsclient.model.RequiredApps</class>
 		<class>eu.musesproject.windowsclient.model.Resource</class>
 		<class>eu.musesproject.windowsclient.model.ResourceProperty</class>
 		<class>eu.musesproject.windowsclient.model.Resourcetype</class>
@@ -18,6 +21,14 @@
 		<class>eu.musesproject.windowsclient.model.Role</class>
 		<class>eu.musesproject.windowsclient.model.SensorConfiguration</class>
 		<class>eu.musesproject.windowsclient.model.Subject</class>
-		<class>eu.musesproject.windowsclient.model.UserCredential</class>
+		<class>eu.musesproject.windowsclient.model.UserCredentials</class>
+
+		<properties>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/muses_client" />
+			<property name="javax.persistence.jdbc.user" value="muses" />
+			<property name="javax.persistence.jdbc.password" value="muses11" />
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+		</properties>
+
 	</persistence-unit>
 </persistence>

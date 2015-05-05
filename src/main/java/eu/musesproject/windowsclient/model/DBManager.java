@@ -161,32 +161,31 @@ public class DBManager {
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	RequiredApp avast = new RequiredApp();
-		    	avast.setId(100);
+		    	RequiredApps avast = new RequiredApps();
 		    	avast.setName("Avast");
 		    	avast.setVersion("3.10");
 		    	avast.setUniqueName("com.avast.security.antivirus");
 		    	session.save(avast);
 		        trans.commit();
 		        
-		        RequiredApp anyConnect = new RequiredApp();
-		        anyConnect.setId(200);
+		        trans = session.beginTransaction();
+		        RequiredApps anyConnect = new RequiredApps();
 		        anyConnect.setName("AnyConnect VPN Client");
 		    	anyConnect.setVersion("2.20");
-		    	avast.setUniqueName("com.anyconnect.vpn.client");
+		    	anyConnect.setUniqueName("com.anyconnect.vpn.client");
 		    	session.save(anyConnect);
 		        trans.commit();
 		        
-		        RequiredApp lotus = new RequiredApp();
-		        lotus.setId(300);
+		        trans = session.beginTransaction();
+		        RequiredApps lotus = new RequiredApps();
 		    	lotus.setName("Lotus");
 		    	lotus.setVersion("1.11");
 		    	lotus.setUniqueName("com.lotus.email.client");
 		    	session.save(lotus);
 		        trans.commit();
 		        
-		        RequiredApp encrypt = new RequiredApp();
-		        encrypt.setId(400);
+		        trans = session.beginTransaction();
+		        RequiredApps encrypt = new RequiredApps();
 		    	encrypt.setName("Encrypt Plus");
 		    	encrypt.setVersion("1.08");
 		    	encrypt.setUniqueName("com.secure.encryptplus");
@@ -209,15 +208,15 @@ public class DBManager {
 
 	}
 
-	public List<RequiredApp> getRequiredAppList(){
-		List<RequiredApp> appsList = new ArrayList<RequiredApp>();
+	public List<RequiredApps> getRequiredAppList(){
+		List<RequiredApps> appsList = new ArrayList<RequiredApps>();
 		Query query = null;
 		Session session = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("RequiredApp.findAll");
+			query = session.getNamedQuery("RequiredApps.findAll");
 			if (query != null) {
-				List<RequiredApp> requiredApps = query.list();
+				appsList = query.list();
 				return appsList;
 			} 
 		} catch (HibernateException e) {
@@ -235,7 +234,7 @@ public class DBManager {
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	UserCredential userCredential = new UserCredential();
+		    	UserCredentials userCredential = new UserCredentials();
 		    	userCredential.setId(1000);
 		    	userCredential.setUsername(userName);
 		    	userCredential.setPassword(password);
@@ -262,10 +261,10 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("UserCredential.findByUsername").setString("username", userName);
+			query = session.getNamedQuery("UserCredentials.findByUsername").setString("username", userName);
 			if (query != null) {
 				int noOfRows = query.list().size();
-				if (noOfRows<0){
+				if (noOfRows>0){
 					return true;
 				}
 			}
@@ -282,7 +281,7 @@ public class DBManager {
 		Session session = null;
 		try {
 			session = getSessionFactory().openSession();
-			session.getNamedQuery("UserCredential.deleteByUser").setString("username", userName);
+			session.getNamedQuery("UserCredentials.deleteByUsername").setString("username", userName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -296,10 +295,10 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("UserCredential.findAll");
+			query = session.getNamedQuery("UserCredentials.findAll");
 			if (query != null) {
-				List<UserCredential> userCredList = query.list();
-				for (UserCredential d: userCredList) {
+				List<UserCredentials> userCredList = query.list();
+				for (UserCredentials d: userCredList) {
 					return d.getDeviceId();
 				}	
 			}

@@ -6,7 +6,7 @@
     <class name="Configuration" table="configuration" catalog="muses_client">
         <id name="id" type="int">
             <column name="id" />
-            <generator class="assigned" />
+            <generator class="identity" />
         </id>
         <property name="serverIp" type="string">
             <column name="server_ip" length="45" not-null="true" />
