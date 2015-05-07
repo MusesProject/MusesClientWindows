@@ -51,5 +51,8 @@ public class LabelsAndText {
 	public static final String SERVER_STATUS 		 =  "Server status: ";
 	public static final String ONLINE		 		 =  "Online";
 	public static final String OFFLINE 	 		 =  "Offline";
-
+	public static final String OK 	 		 	 =  "OK I will stop here";
+	public static final String DETAILS 	 		 =  "Details";
+	public static final String CANCEL 	 		 =  "Cancel";
+	public static final String WARNING 	 		 =  "MUSES Policy Warning";
 }
