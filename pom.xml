@@ -65,94 +65,28 @@
 						</execution>
 					</executions>
 				</plugin>
-
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<configuration>
 						<archive>
 							<manifestEntries>
-								<JavaFX-Version>${javafx.version}+</JavaFX-Version>
+								<JavaFX-Version>2.2.3</JavaFX-Version>
 								<Main-Class>eu.musesproject.windowsclient.view.LoginMain</Main-Class>
 								<implementation-version>1.0</implementation-version>
-								<JavaFX-Application-Class>oeu.musesproject.windowsclient.view.LoginMain</JavaFX-Application-Class>
+								<JavaFX-Application-Class>eu.musesproject.windowsclient.view.LoginMain</JavaFX-Application-Class>
 								<JavaFX-Class-Path>
 									<!-- list all your dependencies here -->
 								</JavaFX-Class-Path>
 								<!-- The artifactId (name) of the jfxrt.jar ... see dependency system 
 									scope -->
-								<Class-Path>javafx-${javafx.version}.jar</Class-Path>
+								<Class-Path>${java.home}/lib/jfxrt.jar</Class-Path>
 							</manifestEntries>
 							<manifest>
 								<addClasspath>true</addClasspath>
 							</manifest>
 						</archive>
 					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.6</version>
-					<executions>
-						<execution>
-							<phase>package</phase>
-							<configuration>
-								<target>
-									<!-- define the deploy ANT task -->
-									<taskdef name="jfxdeploy" classname="com.sun.javafx.tools.ant.DeployFXTask"
-										classpathref="maven.plugin.classpath" />
-									<!-- define the JarSing ANT task -->
-									<taskdef name="jfxsignjar" classname="com.sun.javafx.tools.ant.FXSignJarTask"
-										classpathref="maven.plugin.classpath" />
-									<jfxdeploy width="1024" height="768"
-										outdir="${project.build.directory}/deploy" outfile="${build.finalName}"
-										nativeBundles="all">
-										<info title="${project.name}" />
-										<!-- set the main class of your applcation; I had to create a Main.class 
-											(class Main extends MyMain) otherwise it will return an error on start -->
-										<application name="${project.name}" mainClass="com.javafx.main.Main" />
-										<resources>
-											<fileset dir="${project.build.directory}" includes="*.jar" />
-											<fileset dir="${project.build.directory}/dependency"
-												includes="*.jar" />
-										</resources>
-										<!-- set your jvm args -->
-										<platform javafx="${javafx.version}+">
-											<jvmarg value="-Xms512m" />
-											<jvmarg value="-Xmx1024m" />
-										</platform>
-									</jfxdeploy>
-									<!-- you need to generate a key yourself -->
-									<jfxsignjar destdir="${project.build.directory}/deploy"
-										keyStore="path/to/your/keystore" storePass="yourPass" alias="yourAlias"
-										keyPass="keyPass">
-										<fileset dir="${project.build.directory}/deploy"
-											includes="*.jar" />
-									</jfxsignjar>
-								</target>
-							</configuration>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>com.oracle</groupId>
-							<artifactId>ant-javafx</artifactId>
-							<version>${javafx.version}</version>
-							<systemPath>${java.home}/../lib/ant-javafx.jar</systemPath>
-							<scope>system</scope>
-						</dependency>
-						<dependency>
-							<groupId>com.oracle</groupId>
-							<artifactId>javafx</artifactId>
-							<version>${javafx.version}</version>
-							<systemPath>${java.home}/lib/jfxrt.jar</systemPath>
-							<scope>system</scope>
-						</dependency>
-					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -175,11 +109,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.8.1</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20141113</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -241,7 +170,7 @@
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>javafx</artifactId>
-			<version>${javafx.version}</version>
+			<version>2.2.3</version>
 			<systemPath>${java.home}/lib/jfxrt.jar</systemPath>
 			<scope>system</scope>
 		</dependency>

@@ -29,7 +29,7 @@
 public class HttpResponseHandler {
 
 	private static final String APP_TAG = "APP_TAG";
-	private String receivedHttpResponseData = null;
+	private String receivedHttpResponseData = "";
 	private HttpResponse httpResponse = null;
 	private boolean isNewSession = false;
 	private int sessionUpdateReason = 0;
@@ -277,6 +277,7 @@ public class HttpResponseHandler {
 	
 	private boolean isPayloadInData(HttpResponse httpResponse){
 		String data = httpResponse.getResponseMessage();
+		receivedHttpResponseData = data;
 		if ( data == null || data.equalsIgnoreCase("")){
 			return false;
 		}

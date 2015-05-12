@@ -1,9 +1,7 @@
 package eu.musesproject.windowsclient.view;
 
-import java.rmi.RemoteException;
-
-import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
-import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
+import java.util.Observable;
+import java.util.Observer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,6 +22,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
+import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 
 public class LoginMain extends Application {
 	private Stage primaryStage;
@@ -33,10 +33,15 @@ public class LoginMain extends Application {
 	
     public static void main(String[] args) {
     	RMI.startRMI();
+    	regiterCallbacks();
         launch(args);
     }
 
-    @Override
+    private static void regiterCallbacks() {
+    	UserContextMonitoringController.registerCallbacks(new MusesUICallbacksHandler(new Handler()));
+	}
+
+	@Override
     public void start(Stage primaryStage) {
     	this.primaryStage = primaryStage;
         primaryStage.setTitle(LabelsAndText.MUSES_TITLE);
@@ -146,7 +151,7 @@ public class LoginMain extends Application {
 	        if (event.getSource() == loginBtn){
 	        	if (!userTextField.getText().trim().equals("") && !passwordField.getText().trim().equals("")) {
 	            	IUserContextMonitoringController iMonitoringController = new UserContextMonitoringController();
-	            	//iMonitoringController.login(userTextField.getText(), passwordField.getText());
+	            	iMonitoringController.login(userTextField.getText(), passwordField.getText());
 	            }
 //	        	RMI rmi;
 //	    		try {
@@ -185,9 +190,71 @@ public class LoginMain extends Application {
 		});
     	
     }
-	
-	
-	
+	public static class UpdateObserver implements Observer {
+		Observable o;
+		public UpdateObserver(Observable o) {
+			this.o = o;
+		}
+		
+		@Override
+		public void update(Observable o, Object msg) {
+			System.out.println("update received..");	
+			if (this.o == o) {
+				switch (0) {
+				case MusesUICallbacksHandler.LOGIN_SUCCESSFUL:
+					//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
+					//stopProgress();
+					
+					//isLoggedIn = true;
+					//loginView.updateLoginView(true);
+					
+					break;
+				case MusesUICallbacksHandler.LOGIN_UNSUCCESSFUL:
+					//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
+					//stopProgress();
+					
+					break;
+				case MusesUICallbacksHandler.ACTION_RESPONSE_ACCEPTED:
+					System.out.println("Action response accepted ..");
+					// FIXME This action should not be sent here, if action is
+					// granted then it should be sent directly from MusDM
+//				Action action = new Action();
+//				action.setActionType(ActionType.OK);
+//				action.setDescription("OK");
+//				action.setTimestamp(System.currentTimeMillis());
+//				Log.e(TAG, "user pressed ok..");
+//				sendUserDecisionToMusDM(action);
+					// No Pop-up necessary FIXME
+					break;
+				case MusesUICallbacksHandler.ACTION_RESPONSE_DENIED:
+					System.out.println("Action response denied ..");
+					//decisionName = msg.getData().getString("name");
+					//riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//					showResultDialog(riskTextualDecp,
+//							MusesUICallbacksHandler.ACTION_RESPONSE_DENIED);
+					break;
+				case MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE:
+					System.out.println("Action response maybe ..");
+					//decisionName = msg.getData().getString("name");
+					//riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//					showResultDialog(riskTextualDecp,
+//							MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE);
+					break;
+				case MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER:
+					System.out.println("Action response upToUser ..");
+//					decisionName = msg.getData().getString("name");
+//					riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//					showResultDialog(riskTextualDecp,
+//							MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER);
+					break;
+					
+				}
+				
+			}
+
+		}
+		
+	}
 	private void placeInSystemTray() {
 		//Check the SystemTray is supported
 //        if (!SystemTray.isSupported()) {
