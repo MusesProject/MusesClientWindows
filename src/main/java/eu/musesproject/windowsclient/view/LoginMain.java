@@ -2,6 +2,8 @@ package eu.musesproject.windowsclient.view;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Properties;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,22 +27,28 @@ import javafx.stage.Stage;
 import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 
-public class LoginMain extends Application {
+public class LoginMain extends Application implements Observer {
 	private Stage primaryStage;
-	Button loginBtn,logoutBtn;
-	TextField userTextField;
-	PasswordField passwordField;
+	static Button loginBtn,logoutBtn;
+	static TextField userTextField;
+	static PasswordField passwordField;
+	private Observable o;
 	
     public static void main(String[] args) {
     	RMI.startRMI();
-    	regiterCallbacks();
         launch(args);
     }
 
-    private static void regiterCallbacks() {
-    	UserContextMonitoringController.registerCallbacks(new MusesUICallbacksHandler(new Handler()));
+    private void regiterCallbacks() {
+    	MusesUICallbacksHandler uiCallbacksHandler = new MusesUICallbacksHandler();
+    	UserContextMonitoringController.registerCallbacks(uiCallbacksHandler);
+        uiCallbacksHandler.addObserver(this);
+        setObservable(uiCallbacksHandler);
 	}
-
+    public void setObservable(Observable o){
+    	this.o = o;
+    }
+   
 	@Override
     public void start(Stage primaryStage) {
     	this.primaryStage = primaryStage;
@@ -58,9 +66,11 @@ public class LoginMain extends Application {
         loginBtn.setOnAction(actionEventListener);
         logoutBtn.setOnAction(actionEventListener);
         setLoginView();
+    	regiterCallbacks();
+
     }
 
-	protected void setLoginView() {
+	public void setLoginView() {
 		GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
@@ -113,7 +123,7 @@ public class LoginMain extends Application {
         primaryStage.show();
 	}
 	
-	protected void setLogoutView() {
+	public void setLogoutView() {
 		
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -190,73 +200,9 @@ public class LoginMain extends Application {
 		});
     	
     }
-	public static class UpdateObserver implements Observer {
-		Observable o;
-		public UpdateObserver(Observable o) {
-			this.o = o;
-		}
-		
-		@Override
-		public void update(Observable o, Object msg) {
-			System.out.println("update received..");	
-			if (this.o == o) {
-				switch (0) {
-				case MusesUICallbacksHandler.LOGIN_SUCCESSFUL:
-					//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
-					//stopProgress();
-					
-					//isLoggedIn = true;
-					//loginView.updateLoginView(true);
-					
-					break;
-				case MusesUICallbacksHandler.LOGIN_UNSUCCESSFUL:
-					//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
-					//stopProgress();
-					
-					break;
-				case MusesUICallbacksHandler.ACTION_RESPONSE_ACCEPTED:
-					System.out.println("Action response accepted ..");
-					// FIXME This action should not be sent here, if action is
-					// granted then it should be sent directly from MusDM
-//				Action action = new Action();
-//				action.setActionType(ActionType.OK);
-//				action.setDescription("OK");
-//				action.setTimestamp(System.currentTimeMillis());
-//				Log.e(TAG, "user pressed ok..");
-//				sendUserDecisionToMusDM(action);
-					// No Pop-up necessary FIXME
-					break;
-				case MusesUICallbacksHandler.ACTION_RESPONSE_DENIED:
-					System.out.println("Action response denied ..");
-					//decisionName = msg.getData().getString("name");
-					//riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//					showResultDialog(riskTextualDecp,
-//							MusesUICallbacksHandler.ACTION_RESPONSE_DENIED);
-					break;
-				case MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE:
-					System.out.println("Action response maybe ..");
-					//decisionName = msg.getData().getString("name");
-					//riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//					showResultDialog(riskTextualDecp,
-//							MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE);
-					break;
-				case MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER:
-					System.out.println("Action response upToUser ..");
-//					decisionName = msg.getData().getString("name");
-//					riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//					showResultDialog(riskTextualDecp,
-//							MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER);
-					break;
-					
-				}
-				
-			}
-
-		}
-		
-	}
-	private void placeInSystemTray() {
-		//Check the SystemTray is supported
+    
+//	private void placeInSystemTray() {
+//		Check the SystemTray is supported
 //        if (!SystemTray.isSupported()) {
 //            System.out.println("SystemTray is not supported");
 //            return;
@@ -298,6 +244,54 @@ public class LoginMain extends Application {
 //        } catch (AWTException e) {
 //            System.out.println("TrayIcon could not be added.");
 //        }				
+//	}
+    
+    
+    
+	@Override
+	public void update(Observable o, Object msg) {
+		Properties properties = (Properties)msg;
+		int actionResponse = Integer.parseInt( properties.getProperty("action_response") );
+		if (this.o == o) {
+			switch (actionResponse) {
+			case MusesUICallbacksHandler.LOGIN_SUCCESSFUL:
+				System.out.println("Login was successful..");
+				//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
+				//stopProgress();
+				//setLogoutView(); FIXME
+				break;
+			case MusesUICallbacksHandler.LOGIN_UNSUCCESSFUL:
+				System.out.println("Login was successful..");
+				//setLoginView(); FIXME
+				break;
+			case MusesUICallbacksHandler.ACTION_RESPONSE_ACCEPTED:
+				System.out.println("Action response accepted ..");
+				break;
+			case MusesUICallbacksHandler.ACTION_RESPONSE_DENIED:
+				System.out.println("Action response denied ..");
+				//decisionName = msg.getData().getString("name");
+				//riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//				showResultDialog(riskTextualDecp,
+//						MusesUICallbacksHandler.ACTION_RESPONSE_DENIED);
+				break;
+			case MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE:
+				System.out.println("Action response maybe ..");
+				//decisionName = msg.getData().getString("name");
+				//riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//				showResultDialog(riskTextualDecp,
+//						MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE);
+				break;
+			case MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER:
+				System.out.println("Action response upToUser ..");
+//				decisionName = msg.getData().getString("name");
+//				riskTextualDecp = msg.getData().getString("risk_textual_decp");
+//				showResultDialog(riskTextualDecp,
+//						MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER);
+				break;
+				
+			}
+		}	
+		
 	}
 
 

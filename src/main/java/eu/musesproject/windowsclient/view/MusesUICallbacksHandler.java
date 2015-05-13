@@ -7,12 +7,10 @@ import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.client.model.decisiontable.Decision;
 import eu.musesproject.server.risktrust.RiskTreatment;
 import eu.musesproject.windowsclient.contextmonitoring.IUICallback;
-import eu.musesproject.windowsclient.view.LoginMain.UpdateObserver;
 
 public class MusesUICallbacksHandler extends Observable implements IUICallback{
 
 
-	private Handler mHandler;
 	// CallBack messages
 	public static final int LOGIN_SUCCESSFUL = 0;
 	public static final int LOGIN_UNSUCCESSFUL = 1;
@@ -21,17 +19,20 @@ public class MusesUICallbacksHandler extends Observable implements IUICallback{
 	public static final int ACTION_RESPONSE_MAY_BE = 4;
 	public static final int ACTION_RESPONSE_UP_TO_USER = 5;
 	
-	public MusesUICallbacksHandler(Handler handler) {
-		mHandler = handler;
+	public MusesUICallbacksHandler() {
 	}
 	
 	@Override
 	public void onLogin(boolean result, String detailedMsg) {
 		System.out.println("onLogin result: " + result);
-        UpdateObserver msg = new UpdateObserver(this);
-        addObserver(msg);
         Properties bundle = new Properties();
+        if(result){
+        	bundle.setProperty("action_response", Integer.toString(LOGIN_SUCCESSFUL));
+		} else {
+			bundle.setProperty("action_response", Integer.toString(LOGIN_UNSUCCESSFUL));
+		}
         bundle.setProperty(JSONIdentifiers.AUTH_MESSAGE, detailedMsg);
+        setChanged();
         notifyObservers(bundle);
     }
 
