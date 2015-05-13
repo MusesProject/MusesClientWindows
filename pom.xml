@@ -100,11 +100,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>eu.musesproject</groupId>
-            <artifactId>windows.musesawareinterface</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
