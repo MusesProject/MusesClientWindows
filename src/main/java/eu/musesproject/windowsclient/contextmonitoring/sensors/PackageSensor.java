@@ -154,6 +154,7 @@ public class PackageSensor implements ISensor {
     }
 
     private String getInstalledApps() throws IOException {
+        // request for sensor information from sensors REST service
         return RESTController.requestSensorInfo(TYPE).get(PROPERTY_KEY_INSTALLED_APPS);
     }
 

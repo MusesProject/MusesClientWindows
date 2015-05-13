@@ -99,8 +99,9 @@ public class DeviceProtectionSensor implements ISensor {
 	}
 
 	private void createContextEvent() throws IOException {
-		// create context event
+        // request for sensor information from sensors REST service
         Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
+        // create context event
 		ContextEvent contextEvent = new ContextEvent();
 		contextEvent.setType(TYPE);
 		contextEvent.setTimestamp(System.currentTimeMillis());
@@ -147,7 +148,6 @@ public class DeviceProtectionSensor implements ISensor {
 		for (Entry<String, String> set : contextEvent.getProperties().entrySet()) {
 			//Log.d(TAG, set.getKey() + " = " + set.getValue());
 		}
-		//Log.d(TAG, " ");
 	}
 
 	private boolean identicalContextEvent(ContextEvent oldEvent, ContextEvent newEvent) {
@@ -158,9 +158,7 @@ public class DeviceProtectionSensor implements ISensor {
 		for (Entry<String, String> set : newProperties.entrySet()) {
 			String oldValue = oldProperties.get(set.getKey());
 			String newValue = newProperties.get(set.getKey());
-//        	Log.d(TAG, oldValue + " " + newValue);
 			if(!oldValue.equals(newValue)) {
-//            	Log.d(TAG, "FALSE: " + oldValue + " " + newValue);
 				return false;
 			}
 		}

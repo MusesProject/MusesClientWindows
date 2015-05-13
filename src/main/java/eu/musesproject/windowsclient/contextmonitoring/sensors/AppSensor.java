@@ -146,7 +146,7 @@ public class AppSensor implements ISensor {
         	String previousApp = "";
 
             while (sensorEnabled) {
-
+                // request for sensor information from sensors REST service
                 Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
                 String foregroundTaskAppName = sensorInfo.get(PROPERTY_KEY_APP_NAME);
                 String appVersion = sensorInfo.get(PROPERTY_KEY_APP_VERSION);

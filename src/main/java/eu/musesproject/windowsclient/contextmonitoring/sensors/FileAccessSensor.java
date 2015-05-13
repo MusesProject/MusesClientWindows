@@ -110,7 +110,7 @@ public class FileAccessSensor implements ISensor {
         if (!sensorEnabled) {
             //Log.d(TAG, "start app tracking");
             sensorEnabled = true;
-            new AppObserver().backgroundProcess.start();
+            new AccessObserver().backgroundProcess.start();
         }
     }
 
@@ -125,7 +125,7 @@ public class FileAccessSensor implements ISensor {
     /**
      * Observes the users application usage. Creates a context event whenever a new application is started.
      */
-    private class AppObserver {
+    private class AccessObserver {
 
         public Thread backgroundProcess = new Thread(){
             public void run() {
@@ -143,7 +143,7 @@ public class FileAccessSensor implements ISensor {
         	Map<String,String> previousSensorInfo = null;
 
             while (sensorEnabled) {
-
+                // request for sensor information from sensors REST service
                 Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE, new String[]{"C:/"});
 
                 try {

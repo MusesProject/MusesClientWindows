@@ -146,7 +146,7 @@ public class ConnectivitySensor implements ISensor {
 
         private Void doInBackground() throws IOException {
             while (sensorEnabled) {
-
+                // request for sensor information from sensors REST service
                 Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
 
                 // WiFi status

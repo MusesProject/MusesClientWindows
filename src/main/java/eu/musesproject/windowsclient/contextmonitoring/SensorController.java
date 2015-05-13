@@ -93,6 +93,7 @@ public class SensorController {
                 enabledSensor.add("CONTEXT_SENSOR_DEVICE_PROTECTION");
                 enabledSensor.add("CONTEXT_SENSOR_PACKAGE");
                 enabledSensor.add("CONTEXT_SENSOR_FILE_ACCESS");
+                //enabledSensor.add("CONTEXT_SENSOR_DIRECTORY_WATCHER");
                 startAndConfigureSensors(enabledSensor);
 
                 isCollectingData = true;
@@ -148,6 +149,9 @@ public class SensorController {
 		}
 		else if(sensorType.equals(FileAccessSensor.TYPE)) {
 			sensor = new FileAccessSensor();
+		}
+		else if(sensorType.equals(DirectoryWatcherSensor.TYPE)) {
+			sensor = new DirectoryWatcherSensor();
 		}
 
     	return sensor;

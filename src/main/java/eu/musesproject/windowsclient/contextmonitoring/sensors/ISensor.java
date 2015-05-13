@@ -27,6 +27,11 @@ import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
 
 import java.io.IOException;
 import java.util.List;
+/**
+ * @author christophstanik
+ *
+ * Senors Interface
+ */
 
 public interface ISensor {
 	public static String CONFIG_KEY_ENABLED = "enabled"; 
