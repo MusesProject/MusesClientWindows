@@ -44,19 +44,26 @@ public class RESTController {
         BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
         String responseData = "";
         Gson gson=new Gson();
-        //check for
+        //ToDo:check for readLine function
         responseData = rd.readLine();
 
         return gson.fromJson(responseData, new HashMap<String,String>().getClass());
     }
     public static Map<String, String> requestSensorInfo(String sensorType, String[] params) throws IOException {
         HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet("http://localhost:9000/api/"+sensorType+"/"+String.join("/", params));
+
+        // join params
+        String paramsStr = "/";
+        for (String param : params) {
+            paramsStr += param + "/";
+        }
+
+        HttpGet request = new HttpGet("http://localhost:9000/api/" + sensorType + paramsStr);
         HttpResponse response = client.execute(request);
         BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
         String responseData = "";
         Gson gson=new Gson();
-        //check for
+        //ToDo:check for readLine function
         responseData = rd.readLine();
 
         return gson.fromJson(responseData, new HashMap<String,String>().getClass());
