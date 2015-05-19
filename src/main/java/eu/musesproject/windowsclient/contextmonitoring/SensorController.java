@@ -226,9 +226,9 @@ public class SensorController {
 
         @Override
         public void onEvent(ContextEvent contextEvent) {
-//            if(contextEvent.getType().equals(AppSensor.TYPE)) {
-//                System.out.println(contextEvent.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME));
-//            }
+            if(contextEvent.getType().equals(AppSensor.TYPE)) {
+                System.out.println(contextEvent.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME));
+            }
 
             //Log.d(MusesUtils.TEST_TAG, "SC - onEvent(ContextEvent contextEvent)");
         	// if an app is active that should be observed inform the interaction sensor
