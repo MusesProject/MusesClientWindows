@@ -47,8 +47,7 @@ import java.util.*;
  */
 
 public class DirectoryWatcherSensor implements ISensor{
-
-    private static final String TAG = AppSensor.class.getSimpleName();
+    private static final String TAG = DirectoryWatcherSensor.class.getSimpleName();
 
     // sensor identifier
     public static final String TYPE = "CONTEXT_SENSOR_DIRECTORY_WATCHER";
@@ -61,8 +60,8 @@ public class DirectoryWatcherSensor implements ISensor{
 
     // context property keys
     public static final String PROPERTY_KEY_ID 					= "id";
-    public static final String PROPERTY_KEY_EVENT_NAME 			= "appname";
-    public static final String PROPERTY_KEY_EVENT_PATH			= "appversion";
+    public static final String PROPERTY_KEY_EVENT_NAME 			= "eventname";
+    public static final String PROPERTY_KEY_EVENT_PATH			= "eventpath";
 
     private ContextListener listener;
 
@@ -75,7 +74,7 @@ public class DirectoryWatcherSensor implements ISensor{
 
     private WatchService watcher;
     private Map<WatchKey,Path> keys;
-    private boolean trace = false;
+    private boolean trace;
     private boolean recursive;
     private Path dir;
 
@@ -92,16 +91,10 @@ public class DirectoryWatcherSensor implements ISensor{
     public DirectoryWatcherSensor() {
         //default path should be set
         this.dir = Paths.get("C:/tmp/");
+        this.recursive = true;
         init();
     }
 
-    public void setDir(Path dir){
-        this.dir = dir;
-    }
-
-    public void setRecursive(boolean recursive){
-        this.recursive = recursive;
-    }
     // initializes all necessary default values
     private void init() {
         sensorEnabled = false;
@@ -112,8 +105,7 @@ public class DirectoryWatcherSensor implements ISensor{
     public void enable() throws IOException {
         if (!sensorEnabled) {
             sensorEnabled = true;
-            buildWatchService(this.dir, this.recursive);
-            new EventObserver().backgroundProcess.run();
+            new EventObserver().backgroundProcess.start();
         }
     }
 
@@ -137,7 +129,7 @@ public class DirectoryWatcherSensor implements ISensor{
         contextEvent.setType(TYPE);
         contextEvent.setTimestamp(System.currentTimeMillis());
         contextEvent.addProperty(PROPERTY_KEY_EVENT_NAME, eventName);
-        contextEvent.addProperty(PROPERTY_KEY_EVENT_PATH, String.valueOf(eventPath));
+        contextEvent.addProperty(PROPERTY_KEY_EVENT_PATH, eventPath);
         contextEvent.generateId();
 
         // add context event to the context event history
@@ -147,6 +139,92 @@ public class DirectoryWatcherSensor implements ISensor{
         }
         if(listener != null) {
             listener.onEvent(contextEvent);
+        }
+    }
+
+    private class EventObserver {
+
+        public Thread backgroundProcess = new Thread(){
+            public void run() {
+                processEvents();
+            }
+        };
+
+        /**
+         * Process all events for keys queued to the watcher
+         */
+        private Void processEvents()  {
+            try {
+               buildWatchService(dir, recursive);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (sensorEnabled) {
+                // wait for key to be signalled
+                WatchKey key;
+                try {
+                    key = watcher.take();
+                } catch (InterruptedException x) {
+                    return null;
+                }
+
+                Path dir = keys.get(key);
+                if (dir == null) {
+                    System.err.println("WatchKey not recognized!!");
+                    continue;
+                }
+
+                for (WatchEvent<?> event: key.pollEvents()) {
+                    WatchEvent.Kind kind = event.kind();
+
+                    // TBD - provide example of how OVERFLOW event is handled
+                    if (kind == OVERFLOW) {
+                        continue;
+                    }
+
+                    // Context for directory entry event is the file name of entry
+                    WatchEvent<Path> ev = cast(event);
+                    Path name = ev.context();
+                    Path child = dir.resolve(name);
+
+                    String eventName = event.kind().name().toString();
+                    String eventPath = child.toString();
+                    // print out event
+                    //System.out.format("%s: %s\n", eventName, eventPath);
+
+                    // create a context event
+                    createContextEvent(eventName, eventPath);
+
+                    // if directory is created, and watching recursively, then
+                    // register it and its sub-directories
+                    if (recursive && (kind == ENTRY_CREATE)) {
+                        try {
+                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
+                                registerAll(child);
+                            }
+                        } catch (IOException x) {
+                            // ignore
+                        }
+                    }
+                }
+
+                // reset key and remove from set if directory no longer accessible
+                boolean valid = key.reset();
+                if (!valid) {
+                    keys.remove(key);
+
+                    // all directories are inaccessible
+                    if (keys.isEmpty()) {
+                        break;
+                    }
+                }
+                try {
+                    Thread.sleep(OBSERVATION_INTERVALL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
     }
 
@@ -163,10 +241,10 @@ public class DirectoryWatcherSensor implements ISensor{
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
-                System.out.format("register: %s\n", dir);
+                //System.out.format("register: %s\n", dir);
             } else {
                 if (!dir.equals(prev)) {
-                    System.out.format("update: %s -> %s\n", prev, dir);
+                   //System.out.format("update: %s -> %s\n", prev, dir);
                 }
             }
         }
@@ -212,85 +290,12 @@ public class DirectoryWatcherSensor implements ISensor{
         this.trace = true;
     }
 
-    private class EventObserver {
+    public void setDir(Path dir){
+        this.dir = dir;
+    }
 
-        public Thread backgroundProcess = new Thread(){
-            public void run() {
-                processEvents();
-            }
-        };
-
-        /**
-         * Process all events for keys queued to the watcher
-         */
-        private Void processEvents()  {
-            while (sensorEnabled) {
-                // wait for key to be signalled
-                WatchKey key;
-                try {
-                    key = watcher.take();
-                } catch (InterruptedException x) {
-                    return null;
-                }
-
-                Path dir = keys.get(key);
-                if (dir == null) {
-                    System.err.println("WatchKey not recognized!!");
-                    continue;
-                }
-
-                for (WatchEvent<?> event: key.pollEvents()) {
-                    WatchEvent.Kind kind = event.kind();
-
-                    // TBD - provide example of how OVERFLOW event is handled
-                    if (kind == OVERFLOW) {
-                        continue;
-                    }
-
-                    // Context for directory entry event is the file name of entry
-                    WatchEvent<Path> ev = cast(event);
-                    Path name = ev.context();
-                    Path child = dir.resolve(name);
-
-                    String eventName = event.kind().name().toString();
-                    String eventPath = child.toString();
-                    // print out event
-                    System.out.format("%s: %s\n", eventName, eventPath);
-
-                    // create a context event
-                    createContextEvent(eventName, eventPath);
-
-                    // if directory is created, and watching recursively, then
-                    // register it and its sub-directories
-                    if (recursive && (kind == ENTRY_CREATE)) {
-                        try {
-                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                                registerAll(child);
-                            }
-                        } catch (IOException x) {
-                            // ignore
-                        }
-                    }
-                }
-
-                // reset key and remove from set if directory no longer accessible
-                boolean valid = key.reset();
-                if (!valid) {
-                    keys.remove(key);
-
-                    // all directories are inaccessible
-                    if (keys.isEmpty()) {
-                        break;
-                    }
-                }
-                try {
-                    Thread.sleep(OBSERVATION_INTERVALL);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
+    public void setRecursive(boolean recursive){
+        this.recursive = recursive;
     }
 
     @Override
