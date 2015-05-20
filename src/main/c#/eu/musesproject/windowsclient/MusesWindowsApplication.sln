@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sensors", "Sensors\Sensors.csproj", "{F2652233-2863-4DE7-8C38-85BC43B1011D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorsMonitoring", "SensorsMonitoring\SensorsMonitoring.csproj", "{2EF2AC3B-1C02-4363-A227-D34ED3F76543}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContextEntities", "ContextEntities\ContextEntities.csproj", "{618D2E6B-C08B-4210-ADB0-21A4B18AD7EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sensors.Service", "Senors.Service\Sensors.Service.csproj", "{652BA7D5-079C-4596-A039-4BDD481F1F87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusesSensorsWindowsService", "MusesSensorsWindowsService\MusesSensorsWindowsService.csproj", "{F64E0013-EB0B-4A66-91EA-427E9CB939D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedWifi", "ManagedWifi\ManagedWifi.csproj", "{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2652233-2863-4DE7-8C38-85BC43B1011D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2652233-2863-4DE7-8C38-85BC43B1011D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2652233-2863-4DE7-8C38-85BC43B1011D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2652233-2863-4DE7-8C38-85BC43B1011D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EF2AC3B-1C02-4363-A227-D34ED3F76543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF2AC3B-1C02-4363-A227-D34ED3F76543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF2AC3B-1C02-4363-A227-D34ED3F76543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF2AC3B-1C02-4363-A227-D34ED3F76543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{618D2E6B-C08B-4210-ADB0-21A4B18AD7EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{618D2E6B-C08B-4210-ADB0-21A4B18AD7EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{618D2E6B-C08B-4210-ADB0-21A4B18AD7EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{618D2E6B-C08B-4210-ADB0-21A4B18AD7EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{652BA7D5-079C-4596-A039-4BDD481F1F87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{652BA7D5-079C-4596-A039-4BDD481F1F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{652BA7D5-079C-4596-A039-4BDD481F1F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{652BA7D5-079C-4596-A039-4BDD481F1F87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F64E0013-EB0B-4A66-91EA-427E9CB939D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F64E0013-EB0B-4A66-91EA-427E9CB939D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F64E0013-EB0B-4A66-91EA-427E9CB939D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F64E0013-EB0B-4A66-91EA-427E9CB939D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
