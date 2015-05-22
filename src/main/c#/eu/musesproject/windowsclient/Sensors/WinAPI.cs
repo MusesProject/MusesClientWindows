@@ -26,6 +26,7 @@ namespace Sensors
     internal static class WinAPI
     {
         public const int SPI_GETSCREENSAVETIMEOUT = 0x000E;
+        public const int DESKTOP_SWITCHDESKTOP = 256;
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
@@ -41,6 +42,25 @@ namespace Sensors
             int uiParam,
             ref int pvParam,
             int fWinIni);
+
+        [DllImport("user32", EntryPoint = "OpenDesktopA",
+                     CharSet = CharSet.Ansi,
+                     SetLastError = true,
+                     ExactSpelling = true)]
+        public static extern Int32 OpenDesktop(string lpszDesktop,
+                                                Int32 dwFlags,
+                                                bool fInherit,
+                                                Int32 dwDesiredAccess);
+
+        [DllImport("user32", CharSet = CharSet.Ansi,
+                             SetLastError = true,
+                             ExactSpelling = true)]
+        public static extern Int32 CloseDesktop(Int32 hDesktop);
+
+        [DllImport("user32", CharSet = CharSet.Ansi,
+                             SetLastError = true,
+                             ExactSpelling = true)]
+        public static extern Int32 SwitchDesktop(Int32 hDesktop);
 
         [DllImport("PowrProf.dll")]
         public static extern uint PowerGetActiveScheme(
@@ -64,7 +84,8 @@ namespace Sensors
 
         [DllImport("kernel32.dll")]
         public static extern bool CloseHandle(IntPtr token);
-        
+
+
         public enum LogonType
         {
             Interactive = 2,

@@ -51,13 +51,14 @@ public class DeviceProtectionSensor implements ISensor {
 	public static final String TYPE = "CONTEXT_SENSOR_DEVICE_PROTECTION";
 
 	// time in milliseconds when the sensor polls information
-	private static int OBSERVATION_INTERVALL = 10000;
+	private static int OBSERVATION_INTERVALL = 1000;
 
 	// context property keys
 	public static final String PROPERTY_KEY_ID 							    = "id";
     public static final String PROPERTY_KEY_IS_PASSWORD_PROTECTED 		    = "ispasswordprotected";
     public static final String PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED 	    = "istrustedantivirusinstalled";
     public static final String PROPERTY_KEY_SCREEN_TIMEOUT_IN_SECONDS 	    = "screentimeoutinseconds";
+    public static final String PROPERTY_KEY_IS_SCREEN_LOCKED         	    = "isscreanlocked";
 	//public static final String PROPERTY_KEY_IS_ROOTED 					= "isrooted";
 	//public static final String PROPERTY_KEY_IS_ROOT_PERMISSION_GIVEN 	    = "isrootpermissiongiven";
 	//public static final String PROPERTY_KEY_IP_ADRESS 					= "ipaddress";
@@ -108,6 +109,7 @@ public class DeviceProtectionSensor implements ISensor {
 		contextEvent.addProperty(PROPERTY_KEY_ID, String.valueOf(contextEventHistory != null ? (contextEventHistory .size() + 1) : -1));
         contextEvent.addProperty(PROPERTY_KEY_IS_PASSWORD_PROTECTED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_PASSWORD_PROTECTED)));
         contextEvent.addProperty(PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED)));
+        contextEvent.addProperty(PROPERTY_KEY_IS_SCREEN_LOCKED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_SCREEN_LOCKED)));
 
 //      contextEvent.addProperty(PROPERTY_KEY_IS_ROOTED, String.valueOf(checkDeviceRooted()));
 //		contextEvent.addProperty(PROPERTY_KEY_IS_ROOT_PERMISSION_GIVEN, String.valueOf(checkRootPermissionGiven()));

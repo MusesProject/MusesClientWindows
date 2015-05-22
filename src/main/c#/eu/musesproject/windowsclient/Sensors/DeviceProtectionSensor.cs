@@ -34,12 +34,14 @@ namespace Sensors
         public bool ispasswordprotected { get; set; }
         public bool istrustedantivirusinstalled { get; set; }
         public int screentimeoutinseconds { get; set; }
+        public bool isscreanlocked { get; set; }
 
         public void Update()
         {
             istrustedantivirusinstalled = IsAntivirusInstalled();
             screentimeoutinseconds = GetScreenTimeout();
             ispasswordprotected = IsPasswordProtected();
+            isscreanlocked = IsScreanLocked();
         }
 
         private bool IsPasswordProtected()
@@ -112,7 +114,7 @@ namespace Sensors
             return false;
         }
 
-        public static Guid GetCurrentPowerScheme()
+        public Guid GetCurrentPowerScheme()
         {
             IntPtr pCurrentSchemeGuid = IntPtr.Zero;
 
@@ -121,6 +123,28 @@ namespace Sensors
             var currentSchemeGuid = (Guid)Marshal.PtrToStructure(pCurrentSchemeGuid, typeof(Guid));
 
             return currentSchemeGuid;
+        }
+
+        private bool IsScreanLocked()
+        {
+            var hwnd = -1;
+            var rtn = -1;
+
+            hwnd = WinAPI.OpenDesktop("Default", 0, false, WinAPI.DESKTOP_SWITCHDESKTOP);
+
+            if (hwnd != 0)
+            {
+                rtn = WinAPI.SwitchDesktop(hwnd);
+                if (rtn == 0)
+                {
+                    // Locked
+                    WinAPI.CloseDesktop(hwnd);
+                    return true;
+                }
+                // Not locked
+                WinAPI.CloseDesktop(hwnd);
+            }
+            return false;
         }
 
     }
