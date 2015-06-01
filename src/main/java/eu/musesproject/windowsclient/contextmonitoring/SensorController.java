@@ -94,6 +94,7 @@ public class SensorController {
                 enabledSensor.add("CONTEXT_SENSOR_PACKAGE");
                 enabledSensor.add("CONTEXT_SENSOR_FILE_ACCESS");
                 enabledSensor.add("CONTEXT_SENSOR_DIRECTORY_WATCHER");
+                enabledSensor.add("CONTEXT_SENSOR_EMAIL");
                 startAndConfigureSensors(enabledSensor);
 
                 isCollectingData = true;
@@ -152,6 +153,9 @@ public class SensorController {
 		}
 		else if(sensorType.equals(DirectoryWatcherSensor.TYPE)) {
 			sensor = new DirectoryWatcherSensor();
+		}
+		else if(sensorType.equals(EmailSensor.TYPE)) {
+			sensor = new EmailSensor();
 		}
 
     	return sensor;

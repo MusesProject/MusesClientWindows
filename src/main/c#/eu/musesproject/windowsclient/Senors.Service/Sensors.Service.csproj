@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CONTEXT_SENSOR_EMAILController.cs" />
     <Compile Include="Controllers\CONTEXT_SENSOR_PACKAGEController.cs" />
     <Compile Include="Controllers\CONTEXT_SENSOR_FILE_ACCESSController.cs" />
     <Compile Include="Controllers\CONTEXT_SENSOR_DEVICE_PROTECTIONController.cs" />

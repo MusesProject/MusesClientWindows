@@ -45,6 +45,7 @@
     <Compile Include="AppSensor.cs" />
     <Compile Include="ConnectivitySensor.cs" />
     <Compile Include="DeviceProtectionSensor.cs" />
+    <Compile Include="EmailSensor.cs" />
     <Compile Include="FilesAccessSensor.cs" />
     <Compile Include="ISensor.cs" />
     <Compile Include="PackageManagerSensor.cs" />

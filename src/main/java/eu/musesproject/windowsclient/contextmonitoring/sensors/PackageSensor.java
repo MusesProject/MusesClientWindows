@@ -223,7 +223,7 @@ public class PackageSensor implements ISensor {
                     }
                 }
                 try {
-                    TimeUnit.MILLISECONDS.sleep(OBSERVATION_INTERVALL);
+                    Thread.sleep(OBSERVATION_INTERVALL);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

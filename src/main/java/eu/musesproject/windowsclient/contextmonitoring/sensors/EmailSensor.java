@@ -20,8 +20,6 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
  * #L%
  */
 
-//import eu.musesproject.client.contextmonitoring.ContextListener;
-//import eu.musesproject.client.db.entity.SensorConfiguration;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
 
@@ -33,14 +31,21 @@ import java.util.Map;
 /**
  * @author alirezaalizadeh
  *
- * Class to collect information about the user's permissions on a file or a directory.
+ * Class to collect information about sent email by IBM Notes Client.
+ * The class collects information about:
+ *  - email sunject
+ *  - email recievers
+ *  - email cc list
+ *  - email bcc list
+ *  - email attachments list
+ *
  */
 
-public class FileAccessSensor implements ISensor {
-    private static final String TAG = FileAccessSensor.class.getSimpleName();
+public class EmailSensor implements ISensor {
+    private static final String TAG = EmailSensor.class.getSimpleName();
 
     // sensor identifier
-    public static final String TYPE = "CONTEXT_SENSOR_FILE_ACCESS";
+    public static final String TYPE = "CONTEXT_SENSOR_EMAIL";
 
     // time in milliseconds when the sensor polls information
     private static int OBSERVATION_INTERVALL = 1000;
@@ -50,11 +55,11 @@ public class FileAccessSensor implements ISensor {
 
     // context property keys
     public static final String PROPERTY_KEY_ID 					= "id";
-    public static final String PROPERTY_KEY_CAN_CREATE			= "cancreate";
-    public static final String PROPERTY_KEY_CAN_READ 			= "canread";
-    public static final String PROPERTY_KEY_CAN_MODIFY 			= "canmodify";
-    public static final String PROPERTY_KEY_CAN_DELETE 			= "candelete";
-    public static final String PROPERTY_KEY_CAN_EXECUTE 		= "canexecute";
+    public static final String PROPERTY_KEY_SUBJECT    		    = "subject";
+    public static final String PROPERTY_KEY_RECEIVERS    		= "receivers";
+    public static final String PROPERTY_KEY_CC		        	= "cc";
+    public static final String PROPERTY_KEY_BCC                 = "bcc";
+    public static final String PROPERTY_KEY_ATTACHMENTS         = "attachments";
 
     private ContextListener listener;
 
@@ -65,7 +70,7 @@ public class FileAccessSensor implements ISensor {
     // holds a value that indicates if the sensor is enabled or disabled
     private boolean sensorEnabled;
 
-    public FileAccessSensor() {
+    public EmailSensor() {
         init();
     }
 
@@ -78,18 +83,18 @@ public class FileAccessSensor implements ISensor {
     /**
      * creates the context event for this sensor and saves it in the
      * context event history
-     * @param sensorInfo received sensor information from the server
+     * @param emailInfo new sensed sent email information
      */
-    private void createContextEvent(Map<String, String> sensorInfo) {
-         // create the context event
+    private void createContextEvent( Map<String, String> emailInfo) {
+        // create the context event
         ContextEvent contextEvent = new ContextEvent();
         contextEvent.setType(TYPE);
         contextEvent.setTimestamp(System.currentTimeMillis());
-        contextEvent.addProperty(PROPERTY_KEY_CAN_CREATE, String.valueOf(sensorInfo.get(PROPERTY_KEY_CAN_CREATE)));
-        contextEvent.addProperty(PROPERTY_KEY_CAN_READ, String.valueOf(sensorInfo.get(PROPERTY_KEY_CAN_READ)));
-        contextEvent.addProperty(PROPERTY_KEY_CAN_MODIFY, String.valueOf(sensorInfo.get(PROPERTY_KEY_CAN_MODIFY)));
-        contextEvent.addProperty(PROPERTY_KEY_CAN_DELETE, String.valueOf(sensorInfo.get(PROPERTY_KEY_CAN_DELETE)));
-        contextEvent.addProperty(PROPERTY_KEY_CAN_EXECUTE, String.valueOf(sensorInfo.get(PROPERTY_KEY_CAN_EXECUTE)));
+        contextEvent.addProperty(PROPERTY_KEY_SUBJECT, emailInfo.get(PROPERTY_KEY_SUBJECT));
+        contextEvent.addProperty(PROPERTY_KEY_RECEIVERS, emailInfo.get(PROPERTY_KEY_RECEIVERS));
+        contextEvent.addProperty(PROPERTY_KEY_CC, emailInfo.get(PROPERTY_KEY_CC));
+        contextEvent.addProperty(PROPERTY_KEY_BCC, emailInfo.get(PROPERTY_KEY_BCC));
+        contextEvent.addProperty(PROPERTY_KEY_ATTACHMENTS, emailInfo.get(PROPERTY_KEY_ATTACHMENTS));
         contextEvent.generateId();
 
         // add context event to the context event history
@@ -99,25 +104,21 @@ public class FileAccessSensor implements ISensor {
         }
 
         if(listener != null) {
-//            Log.d(TAG, "called: listener.onEvent(contextEvent); app name: " + appName);
             listener.onEvent(contextEvent);
         }
     }
 
     @Override
     public void enable() throws IOException {
-        //Log.d(TAG, "app sensor enable");
         if (!sensorEnabled) {
-            //Log.d(TAG, "start app tracking");
             sensorEnabled = true;
-            new AccessObserver().backgroundProcess.start();
+            new EmailObserver().backgroundProcess.start();
         }
     }
 
     @Override
     public void disable() {
         if(sensorEnabled) {
-            //Log.d(TAG, "stop app tracking");
             sensorEnabled = false;
         }
     }
@@ -125,7 +126,7 @@ public class FileAccessSensor implements ISensor {
     /**
      * Observes the users application usage. Creates a context event whenever a new application is started.
      */
-    private class AccessObserver {
+    private class EmailObserver {
 
         public Thread backgroundProcess = new Thread(){
             public void run() {
@@ -140,17 +141,17 @@ public class FileAccessSensor implements ISensor {
         private Void doInBackground() throws IOException {
 
 
-        	Map<String,String> previousSensorInfo = null;
+            Map<String,String> previousEmailInfo = null;
 
             while (sensorEnabled) {
                 // request for sensor information from sensors REST service
-                Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE, new String[]{"C:/"});
+                Map<String, String> emailInfo = RESTController.requestSensorInfo(TYPE);
 
                 try {
-                    // if the access policy changed, create a context event
-                    if(!sensorInfo.equals(previousSensorInfo)) {
-                        createContextEvent(sensorInfo);
-                        previousSensorInfo = sensorInfo;
+                    // create a context event when new sent email sensed
+                    if(!emailInfo.equals(previousEmailInfo)) {
+                        createContextEvent(emailInfo);
+                        previousEmailInfo = emailInfo;
                     }
 
                     Thread.sleep(OBSERVATION_INTERVALL);
