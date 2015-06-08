@@ -21,15 +21,20 @@ package eu.musesproject.windowsclient.contextmonitoring;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import org.json.JSONException;
-import org.json.JSONObject;
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.client.model.RequestType;
 import eu.musesproject.client.model.decisiontable.Action;
 import eu.musesproject.contextmodel.ContextEvent;
+import eu.musesproject.windowsclient.model.Configuration;
+import eu.musesproject.windowsclient.model.SensorConfiguration;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author christophstanik
@@ -38,12 +43,12 @@ import eu.musesproject.contextmodel.ContextEvent;
  */
 public class JSONManager {
 	/**
-	 * creates the JSON object that will be sent to the server via the {@link eu.musesproject.client.connectionmanager.ConnectionManager}
-	 * @param requestType {@link eu.musesproject.client.model.RequestType}
-     * @param action {@link eu.musesproject.client.model.decisiontable.Action}
-	 * @param properties {@link java.util.Map} < String ,  String >
-	 * @param contextEvents {@link eu.musesproject.contextmodel.ContextEvent}
-	 * @return {@link org.json.JSONObject}
+	 * creates the JSON object that will be sent to the server via the {@link eu.musesproject.windowsclient.connectionmanager.ConnectionManager}
+	 * @param requestType {@link RequestType}
+     * @param action {@link Action}
+	 * @param properties {@link Map} < String ,  String >
+	 * @param contextEvents {@link ContextEvent}
+	 * @return {@link JSONObject}
 	 */
 	public static JSONObject createJSON(String deviceId, String userName, int requestId, String requestType, Action action, Map<String, String> properties, List<ContextEvent> contextEvents) {
 		JSONObject root = new JSONObject();
@@ -114,9 +119,9 @@ public class JSONManager {
 
 	/**
 	 * creates a JSON object for the action properties
-	 * @param properties {@link java.util.Map < String ,  String >}
-	 * @return {@link org.json.JSONObject}
-	 * @throws org.json.JSONException
+	 * @param properties {@link Map < String ,  String >}
+	 * @return {@link JSONObject}
+	 * @throws JSONException
 	 */
 	private static JSONObject createPropertiesJSONObject(Map<String, String> properties) throws JSONException {
 		JSONObject propertiesJSONObject = new JSONObject();
@@ -130,9 +135,9 @@ public class JSONManager {
 
 	/**
 	 * creates a JSON object for a Sensor.
-	 * @param contextEvent {@link eu.musesproject.contextmodel.ContextEvent}
-	 * @return {@link org.json.JSONObject}
-	 * @throws org.json.JSONException
+	 * @param contextEvent {@link ContextEvent}
+	 * @return {@link JSONObject}
+	 * @throws JSONException
 	 */
 	private static JSONObject createSensorJSONObject(ContextEvent contextEvent) throws JSONException {
 		JSONObject sensorJSONObject = new JSONObject();
@@ -271,9 +276,9 @@ public class JSONManager {
     }
 
     /**
-     * Method to get a String that contains the {@link eu.musesproject.client.model.RequestType} from the server
+     * Method to get a String that contains the {@link RequestType} from the server
      * @param jsonString String. JSON string from the server
-     * @return String that contains a {@link eu.musesproject.client.model.RequestType}
+     * @return String that contains a {@link RequestType}
      */
     public static String getRequestType(String jsonString) {
         String requestType = null;
@@ -327,33 +332,33 @@ public class JSONManager {
     }
     
 
-//	/**
-//	 * Method that returns all received config items of each sensor
-//	 * 
-//	 * @param jsonString response from server
-//	 * @return List of config items
-//	 */
-//	public static List<SensorConfiguration>  getSensorConfig(String jsonString) {
-//		List<SensorConfiguration> configList = new ArrayList<SensorConfiguration>();
-//		try {
-//			JSONObject responseJSON = new JSONObject(jsonString);
-//			JSONObject sensorConfigJSON = responseJSON.getJSONObject("sensor-configuration");
-//			JSONArray configProperties = sensorConfigJSON.getJSONArray("sensor-property");
-//			for (int i = 0; i < configProperties.length(); i++) {
-//				JSONObject item = configProperties.getJSONObject(i);
-//				String sensorType = item.getString("sensor-type");
-//				String value = item.getString("value");
-//				String key = item.getString("key");
-//				
-//				configList.add(new SensorConfiguration(sensorType, key, value));
-//			}
-//			
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		return configList;
-//	}
-//	
+	/**
+	 * Method that returns all received config items of each sensor
+	 *
+	 * @param jsonString response from server
+	 * @return List of config items
+	 */
+	public static List<SensorConfiguration>  getSensorConfig(String jsonString) {
+		List<SensorConfiguration> configList = new ArrayList<SensorConfiguration>();
+		try {
+			JSONObject responseJSON = new JSONObject(jsonString);
+			JSONObject sensorConfigJSON = responseJSON.getJSONObject("sensor-configuration");
+			JSONArray configProperties = sensorConfigJSON.getJSONArray("sensor-property");
+			for (int i = 0; i < configProperties.length(); i++) {
+				JSONObject item = configProperties.getJSONObject(i);
+				String sensorType = item.getString("sensor-type");
+				String value = item.getString("value");
+				String key = item.getString("key");
+
+				configList.add(new SensorConfiguration(sensorType, key, value));
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return configList;
+	}
+
 	/**
 	 * Method that returns the id of the request that was sent to the server.
 	 * 
@@ -373,35 +378,35 @@ public class JSONManager {
 		return isSilentModeActive;
 	}
 	
-//	/**
-//	 * Method that returns the id of the request that was sent to the server.
-//	 * 
-//	 * @param jsonString response from server
-//	 * @return true or false whether the silent mode should be active
-//	 */
-//	public static Configuration getConnectionConfiguration(String jsonString, Context context) {
-//		Configuration connectionConfig = new Configuration();
-//		try {
-//			JSONObject responseJSON = new JSONObject(jsonString);
-//			JSONObject connectionConfigJSON = responseJSON.getJSONObject("connection-config");
-//			
+	/**
+	 * Method that returns the id of the request that was sent to the server.
+	 *
+	 * @param jsonString response from server
+	 * @return true or false whether the silent mode should be active
+	 */
+	public static Configuration getConnectionConfiguration(String jsonString) {
+		Configuration connectionConfig = new Configuration();
+		try {
+			JSONObject responseJSON = new JSONObject(jsonString);
+			JSONObject connectionConfigJSON = responseJSON.getJSONObject("connection-config");
+
 //        	connectionConfig.setServerIP(MusesUtils.getMusesConf());
-//        	connectionConfig.setServerPort(8443);
-//        	connectionConfig.setServerServletPath("/commain");
-//        	connectionConfig.setServerContextPath("/server");
-//        	connectionConfig.setServerCertificate(MusesUtils.getCertificateFromSDCard(context));
-//        	connectionConfig.setClientCertificate("");
-//        	connectionConfig.setTimeout(connectionConfigJSON.getInt("timeout"));
-//        	connectionConfig.setPollTimeout(connectionConfigJSON.getInt("poll_timeout"));
-//        	connectionConfig.setSleepPollTimeout(connectionConfigJSON.getInt("sleep_poll_timeout"));
-//        	connectionConfig.setPollingEnabled(connectionConfigJSON.getInt("polling_enabled"));
-//        	connectionConfig.setLoginAttempts(connectionConfigJSON.getInt("login_attempts"));
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		return connectionConfig;
-//	}
-//	
+        	connectionConfig.setServerPort("8443");
+        	connectionConfig.setServerServletPath("/commain");
+        	connectionConfig.setServerContextPath("/server");
+//        	connectionConfig.setServerCertificate(MusesUtils.getCertificateFromSDCard());
+        	connectionConfig.setClientCertificate("");
+        	connectionConfig.setTimeout(connectionConfigJSON.getInt("timeout"));
+        	connectionConfig.setPollTimeout(connectionConfigJSON.getInt("poll_timeout"));
+        	connectionConfig.setSleepPollTimeout(connectionConfigJSON.getInt("sleep_poll_timeout"));
+        	connectionConfig.setPollingEnabled(connectionConfigJSON.getInt("polling_enabled"));
+        	connectionConfig.setLoginAttempts(connectionConfigJSON.getInt("login_attempts"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return connectionConfig;
+	}
+
 	/**
 	 * Method that returns the condition in the policy 
 	 * 

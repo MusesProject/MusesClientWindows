@@ -27,31 +27,31 @@ import java.util.Map;
 
 public interface IUserContextMonitoringController {
     /**
-     * Method that takes an {@link eu.musesproject.client.model.decisiontable.Action} and the
+     * Method that takes an {@link Action} and the
      * related properties of that action from a MUSES aware application. This method sends all information
-     * to the {@link eu.musesproject.client.usercontexteventhandler.UserContextEventHandler}.
-     * @param action {@link eu.musesproject.client.model.decisiontable.Action}. action received from a MUSES aware app
-     * @param properties {@link java.util.Map}. properties related to the action
+     * to the {@link eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler}.
+     * @param action {@link Action}. action received from a MUSES aware app
+     * @param properties {@link Map}. properties related to the action
      */
     void sendUserAction(UISource src, Action action, Map<String, String> properties);
     
     /**
-     * Method that takes an {@link eu.musesproject.client.model.decisiontable.Action} 
+     * Method that takes an {@link Action}
 	 * which contains the decision taken by the user on the MUSES UI.
-     * @param action {@link eu.musesproject.client.model.decisiontable.Action}. action received from a MUSES aware app
+     * @param action {@link Action}. action received from a MUSES aware app
      */
     void sendUserBehavior(Action action);
 
     /**
      * Method to change the settings / configuration of the sensors
-     * ({@link eu.musesproject.client.contextmonitoring.sensors.ISensor})
+     * ({@link eu.musesproject.windowsclient.contextmonitoring.sensors.ISensor})
      * 
      * loads sensor configuration from the database
      */
     void onSensorConfigurationChanged();
 
     /**
-     * Method to forward the login data to the {@link eu.musesproject.client.usercontexteventhandler.UserContextEventHandler}
+     * Method to forward the login data to the {@link eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler}
      * @param userName String. user name
      * @param password String. password
      */

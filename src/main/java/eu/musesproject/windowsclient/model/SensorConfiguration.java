@@ -52,6 +52,19 @@ public class SensorConfiguration implements Serializable {
 	public SensorConfiguration() {
 	}
 
+	public SensorConfiguration(String sensorType, String key, String value) {
+		setSensorType(sensorType);
+		setKey(key);
+		setValue(value);
+	}
+
+	public SensorConfiguration(int id, String sensorType, String key, String value) {
+		setId(id);
+		setSensorType(sensorType);
+		setKey(key);
+		setValue(value);
+	}
+
 	public int getId() {
 		return this.id;
 	}
