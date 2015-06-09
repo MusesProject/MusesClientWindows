@@ -23,13 +23,15 @@ package eu.musesproject.windowsclient.view;
 public class LabelsAndText {
 	
 	public static final String MUSES_TITLE 		    = "MUSES";
-	public static final String TITLE_SUBTEXT          = "MUSES aims at engaging and motivating you in keeping organizational information secure.";
+	public static final String TITLE_SUBTEXT        = "MUSES aims at engaging and motivating you in keeping organizational information secure.";
 	public static final String LOGIN_LABEL		    = "Login";
 	public static final String USERNAME    		    = "Username:";
 	public static final String PASSWORD    		    = "Password:";
-	public static final String REMEMBER_MY_LOGIN      = "Remember my login"; 
-	public static final String PRIVACY_POLICY_LABEL   = "Privacy Policy";
-	public static final String PRIVACY_POLICY         = "This privacy policy describes the privacy considerations made by MUSES for those whose mobile devices are monitored "
+	public static final String PROMT_TXT_USERNAME   = "Enter your username ..";
+	public static final String PROMT_TXT_PASSWORD   = "Enter your password ..";
+	public static final String REMEMBER_MY_LOGIN    = "Remember my login"; 
+	public static final String PRIVACY_POLICY_LABEL = "Privacy Policy";
+	public static final String PRIVACY_POLICY       = "This privacy policy describes the privacy considerations made by MUSES for those whose mobile devices are monitored "
 												+ "(further referred to individuals/you). With this policy we want to make sure you understand how MUSES works, and how we use your personal "
 												+ "information gathered through our software and by our services. We want you to feel secure that your privacy interests are being respected within "
 												+ "the bounds of this policy. This privacy policy applies to all our software and services."

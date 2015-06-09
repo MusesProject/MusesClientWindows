@@ -23,6 +23,7 @@ package eu.musesproject.windowsclient.view;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -41,6 +42,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.control.CheckBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
@@ -113,7 +115,7 @@ public class LoginMain extends Application implements Observer {
         grid.add(userName, 0, 2);
 
         userTextField = new TextField();
-        userTextField.setPromptText("Enter your username here..");
+        userTextField.setPromptText(LabelsAndText.PROMT_TXT_USERNAME);
         userTextField.setMinHeight(20);;
         grid.add(userTextField, 0, 3);
 
@@ -122,24 +124,31 @@ public class LoginMain extends Application implements Observer {
         grid.add(password, 0, 4);
 
         passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password here..");
+        passwordField.setPromptText(LabelsAndText.PROMT_TXT_PASSWORD);
         passwordField.setMinHeight(20);
         grid.add(passwordField, 0, 5);
 
+        CheckBox rememberCredentialsBox = new CheckBox(LabelsAndText.REMEMBER_MY_LOGIN);
+        grid.add(rememberCredentialsBox, 0, 6);
+        
         Text privacyPolicy = new Text(LabelsAndText.PRIVACY_POLICY_LABEL);
         privacyPolicy.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
-        grid.add(privacyPolicy, 0, 6);
+        grid.add(privacyPolicy, 0, 7);
 
         Label policy = new Label(LabelsAndText.PRIVACY_POLICY);
         policy.setWrapText(true);
-        grid.add(policy, 0, 7);
+        grid.add(policy, 0, 8);
 
+        CheckBox agreeTermBox = new CheckBox(LabelsAndText.AGREE_TO_POLICY);
+        grid.add(agreeTermBox, 0, 9);
+
+        
         HBox hbBtn = new HBox(15);
         hbBtn.setAlignment(Pos.CENTER);
         hbBtn.getChildren().add(loginBtn);
-        grid.add(hbBtn, 0, 8);
+        grid.add(hbBtn, 0, 10);
         
-        Scene loginScene = new Scene(grid, 600, 550);
+        Scene loginScene = new Scene(grid, 600, 650);
         primaryStage.setScene(loginScene);
         primaryStage.show();
 	}
