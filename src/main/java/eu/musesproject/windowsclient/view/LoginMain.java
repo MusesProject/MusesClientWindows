@@ -54,6 +54,8 @@ public class LoginMain extends Application implements Observer {
 	static Button loginBtn,logoutBtn;
 	static TextField userTextField;
 	static PasswordField passwordField;
+	static CheckBox rememberCredentialsBox, agreeTermBox;
+	
 	private Observable o;
 	
     public static void main(String[] args) {
@@ -128,7 +130,9 @@ public class LoginMain extends Application implements Observer {
         passwordField.setMinHeight(20);
         grid.add(passwordField, 0, 5);
 
-        CheckBox rememberCredentialsBox = new CheckBox(LabelsAndText.REMEMBER_MY_LOGIN);
+        rememberCredentialsBox = new CheckBox(LabelsAndText.REMEMBER_MY_LOGIN);
+        rememberCredentialsBox.setOnAction(actionEventListener);
+        
         grid.add(rememberCredentialsBox, 0, 6);
         
         Text privacyPolicy = new Text(LabelsAndText.PRIVACY_POLICY_LABEL);
@@ -139,7 +143,8 @@ public class LoginMain extends Application implements Observer {
         policy.setWrapText(true);
         grid.add(policy, 0, 8);
 
-        CheckBox agreeTermBox = new CheckBox(LabelsAndText.AGREE_TO_POLICY);
+        agreeTermBox = new CheckBox(LabelsAndText.AGREE_TO_POLICY);
+        agreeTermBox.setOnAction(actionEventListener);
         grid.add(agreeTermBox, 0, 9);
 
         
@@ -205,6 +210,10 @@ public class LoginMain extends Application implements Observer {
 	        	setLogoutView();
 	        } else if(event.getSource() == logoutBtn) {
 	        	setLoginView();
+	        } else if (event.getSource() == rememberCredentialsBox) {
+	        	System.out.println("Remember CheckBox clicked.");
+	        } else if (event.getSource() == agreeTermBox) {
+	        	System.out.println("Agree CheckBox clicked.");
 	        }
 	    }
 	};
