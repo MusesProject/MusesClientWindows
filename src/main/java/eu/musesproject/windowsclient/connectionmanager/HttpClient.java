@@ -27,30 +27,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Date;
-import java.util.List;
-
 import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.codec.binary.Base64;
 
 public class HttpClient implements Runnable {
 
-	private String type;
-	private String url;
-	private HttpsURLConnection con;
-	private String data;
-	private int poll_interval;
-	private boolean keepCookie;
+	private HttpsURLConnection urlConnection;
 	public static String cookieHeader;
+	private Request request;
 
-
-	public HttpClient(String type, String url, String data, int poll_interval, 
-		boolean keepCookie) {
-		this.type = type;
-		this.url = url;
-		this.data = data;
-		this.poll_interval = poll_interval;
-		this.keepCookie = keepCookie;
+	
+	public static int CONNECTION_TIMEOUT = 5500;
+	private static final int SOCKET_TIMEOUT = 5500;
+	private static final int MCC_TIMEOUT = 5500;
+	
+	public HttpClient(Request request) {
+		this.request = request;
 	}
 
 
@@ -71,51 +62,57 @@ public class HttpClient implements Runnable {
 	 * moment so the response will be empty in this case.
 	 */
 	private HttpResponseHandler doPost() {
+		
+		HttpResponse httpResponse = null;
+		HttpResponseHandler serverResponse = new HttpResponseHandler(
+				request.getType(), request.getDataId());
+		
 		int responseCode = 0;
 		String requestMethod = "";
 		String headerResponse = "";
-		HttpResponseHandler serverResponse = new HttpResponseHandler();
 		try {	
-			con = (HttpsURLConnection) new URL(url).openConnection();
-			con.setConnectTimeout(10000);
-			if (type.equalsIgnoreCase("connect")){
-				con.setRequestProperty("connection-type", "data");
-				String authStringEnc = new String(Base64.encodeBase64("muses:muses".getBytes()));
-				con.setRequestProperty("Authorization", "Basic " + authStringEnc);
-				serverResponse.setRequestType("data");
-			}else {
-				con.setRequestProperty("connection-type", type);
-			}
-			con.setRequestProperty("poll-interval", Integer.toString(poll_interval));
+			urlConnection = (HttpsURLConnection) new URL(request.getUrl()).openConnection();
+			urlConnection.setConnectTimeout(CONNECTION_TIMEOUT);
+//			if (request.getType().equalsIgnoreCase("connect")){
+//				urlConnection.setRequestProperty("connection-type", "data");
+//				String authStringEnc = new String(Base64.encodeBase64("muses:muses".getBytes()));
+//				urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+//				serverResponse.setRequestType("data");
+//			}else {
+//				urlConnection.setRequestProperty("connection-type", request.getType());
+//			}
+			urlConnection.setRequestProperty("connection-type", request.getType());
+			urlConnection.setRequestProperty("poll-interval", getInStringSeconds(request.getPollInterval()));
 			if (cookieHeader!=null) {
-				con.setRequestProperty("Cookie", cookieHeader);
+				urlConnection.setRequestProperty("Cookie", cookieHeader);
 				
 			}
-			con.setRequestMethod("POST");
-			con.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(data);
+			urlConnection.setRequestMethod("POST");
+			urlConnection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+			wr.writeBytes(request.getData());
 			wr.flush();
 			wr.close();
-			responseCode = con.getResponseCode();
-			requestMethod = con.getRequestMethod();
+			responseCode = urlConnection.getResponseCode();
+			requestMethod = urlConnection.getRequestMethod();
 			
 			// Retrieve the received payload from server. Usually the HTML/JSP
 			// file
 			StringBuffer payloadResponse = new StringBuffer();
 			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+					urlConnection.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				payloadResponse.append(inputLine);
 			}
 			in.close();
 			
-			boolean isMorePackets = checkIsMorePackets(con);
-			HttpResponse httpResponse = new HttpResponse(responseCode, requestMethod, 
+			boolean isMorePackets = checkIsMorePackets(urlConnection);
+			httpResponse = new HttpResponse(responseCode, requestMethod, 
 														 payloadResponse.toString(), headerResponse, isMorePackets);
 			serverResponse.setResponse(httpResponse);
-			grabCookie(con);
+			serverResponse.setNewSession(true,DetailedStatuses.SUCCESS_NEW_SESSION); // FIXME should be handled with cookie
+			grabCookie(urlConnection);
 			return serverResponse;
 
 		} catch (IOException e) {
@@ -163,20 +160,6 @@ public class HttpClient implements Runnable {
 		      }
 		    }
     }
-		
-//		StringBuilder sb = new StringBuilder();
-//		List<String> cookies = con.getHeaderFields().get("Set-Cookie");
-//		if (cookies != null) {
-//			for (String cookie : cookies) {
-//				if (sb.length() > 0) {
-//					sb.append("; ");
-//				}
-//				String value = cookie.split(";")[0];
-//				sb.append(value);
-//			}
-//		}
-//		cookieHeader = sb.toString();
-
 	
 	private boolean checkIsMorePackets(HttpsURLConnection con) {
 		String headerResponse;
@@ -189,5 +172,8 @@ public class HttpClient implements Runnable {
 		return false;
 	}
 	
-	
+	private static String getInStringSeconds(String pollInterval) {
+		int pollIntervalInSeconds = (Integer.parseInt(pollInterval) / 1000) % 60;
+		return Integer.toString(pollIntervalInSeconds);
+	}
 }

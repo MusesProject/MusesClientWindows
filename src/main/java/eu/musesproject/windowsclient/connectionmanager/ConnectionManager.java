@@ -24,6 +24,12 @@ package eu.musesproject.windowsclient.connectionmanager;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionManager implements IConnectionManager {
+
+	private static String URL;
+	private static String certificate;
+	
+	private int POLL_INTERVAL;
+	private int SLEEP_POLL_INTERVAL;
 	
 	private static String IP = "sweoffice.mooo.com";
 	public static IConnectionCallbacks callBacks;
@@ -34,104 +40,160 @@ public class ConnectionManager implements IConnectionManager {
 	public static final String DISCONNECT = "disconnect";
 	public static final String ACK = "ack";
 	private static final String APP_TAG = "APP_TAG";
+	
+	private static Boolean isServerConnectionSet = false; 
 	private AtomicInteger mCommandOngoing = new AtomicInteger(0);
 	
-	
 	public static int lastSentStatus = Statuses.OFFLINE;
-	private String URL;
-	private int POLL_INTERVAL;
-	private int SLEEP_POLL_INTERVAL;
+
+	public static boolean isNewSession = true;
+	
+	
 	
 	public ConnectionManager() {
-		SelfSignedCertWorkaround();
+		SelfSignedCertWorkaround(); // FIXME Fix this asap
 	}
 
-	public void connect(String url, String cert, int pollInterval,
-			int sleepPollInterval, IConnectionCallbacks iCallbacks) {
+	public void connect(String url, String cert, int pollInterval,	int sleepPollInterval, IConnectionCallbacks iCallbacks) {
+		
+		/* FIXME, temporary fix for dual calls */
+		synchronized (this){
+			if (isServerConnectionSet){
+				System.out.println(APP_TAG+ " connect: More then one more connect call!");
+				return;
+			}
+			isServerConnectionSet = true;
+		}
+		
 		URL = url;
 		POLL_INTERVAL = pollInterval;
 		SLEEP_POLL_INTERVAL = sleepPollInterval;
 		callBacks = iCallbacks;
 		
-		if (new NetworkChecker().isInternetConnected()) {
+		/* Check that cert is ok, spec length */
+		/* FIXME which Length.. */
+		if (cert.isEmpty() || cert.length() < 1000){
+			callBacks.statusCb(Statuses.CONNECTION_FAILED, DetailedStatuses.INCORRECT_CERTIFICATE, 0);
+			System.out.println(APP_TAG+ " Connect: Incorrect certificate!");
+			return;
+		} 
+		
+		if (NetworkChecker.isInternetConnected()) {
 			System.out.println(APP_TAG + " Internet Connected.");
 		}
+		
+        setCommandOngoing();
+		
 		System.out.println(APP_TAG +  " ConnManager=> connecting to server");
-		Thread httpThread = new Thread(new HttpClient("connect", URL, "", POLL_INTERVAL, true));
-		httpThread.start();
+		
+        startHttpThread(CONNECT,URL, pollInterval,"", "");
 		
 		// TBD
 		// Set alarm, poll interval, sleep poll interval
 	}
 
 	@Override
-	public void springConnect(String url, String cert, String data, int dataId,
-			int pollInterval, int sleepPollInterval,
-			IConnectionCallbacks iCallbacks) {
-
+	public void springConnect(String url, String cert, String data, int dataId,int pollInterval, int sleepPollInterval,IConnectionCallbacks iCallbacks) {
+		/* FIXME, temporary fix for dual calls */
+		synchronized (this){
+			if (isServerConnectionSet){
+				System.out.println(APP_TAG+ " connect: More then one more connect call!");
+				return;
+			}
+			isServerConnectionSet = true;
+		}
+		
 		URL = url;
-		this.
 		POLL_INTERVAL = pollInterval;
 		SLEEP_POLL_INTERVAL = sleepPollInterval;
 		callBacks = iCallbacks;
 		
-		if (new NetworkChecker().isInternetConnected()) {
+		/* Check that cert is ok, spec length */
+		/* FIXME which Length.. */
+		// FIXME commented temporarily
+//		if (cert.isEmpty() || cert.length() < 1000){
+//			callBacks.statusCb(Statuses.CONNECTION_FAILED, DetailedStatuses.INCORRECT_CERTIFICATE, 0);
+//			System.out.println(APP_TAG+ " Connect: Incorrect certificate!");
+//			return;
+//		} 
+		
+		if (NetworkChecker.isInternetConnected()) {
 			System.out.println(APP_TAG + " Internet Connected.");
 		}
+		
+        setCommandOngoing();
+		
 		System.out.println(APP_TAG +  " ConnManager=> connecting to server");
-		Thread httpThread = new Thread(new HttpClient("connect", URL, data, POLL_INTERVAL, true));
-		httpThread.start();
+		
+        startHttpThread(CONNECT,URL, pollInterval,"", "");
+		
+		// TBD
+		// Set alarm, poll interval, sleep poll interval
 		
 		// TBD
 		// Set alarm, poll interval, sleep poll interval
 
 	}
-	public void sendData(String data) {
-		System.out.println(APP_TAG +  " ConnManager=> send data to server: "+data);
-		Thread httpThread = new Thread(new HttpClient("data", URL, "", POLL_INTERVAL, true));
-		httpThread.start();
+	
+	@Override
+	public void sendData(String data, int dataId) {
+		String dataIdStr = "";
+		dataIdStr = Integer.toString(dataId);
+		setCommandOngoing();
+		System.out.println(APP_TAG + " ConnManager=> send data to server with request type: "/*+JSONManager.getRequestType(data) FIXME update this after Christoph commit*/);
+		startHttpThread(DATA, URL, 	POLL_INTERVAL, data, dataIdStr); 
 	}
 
+	@Override
 	public void disconnect() {
-		System.out.println(APP_TAG +  "Disconnecting.");
+		// As we are disconnecting we need to stop the polling 
+		System.out.println(APP_TAG+ " Disconnecting ..");
+		synchronized (this){
+			isServerConnectionSet = false;
+		}
+		
+		System.out.println(APP_TAG +  " ConnManager=> disconnecting session to server");
+		startHttpThread(DISCONNECT, URL, POLL_INTERVAL, "", "");
+			
+		//callBacks.statusCb(Statuses.DISCONNECTED, Statuses.DISCONNECTED);  // FIXME
+				
 		// TBD
 		// Cancel alarm
 	}
-
-	public void poll() {
-		// If ongoing command, don't poll FIXME
-		setCommandOngoing();
-		Thread httpThread = new Thread(new HttpClient("poll", URL, "", POLL_INTERVAL, true));
-		httpThread.start();
-	}
 	
-	public void ack() {
-		System.out.println(APP_TAG + "Sending ack..");
-		Thread httpThread = new Thread(new HttpClient("ack", URL, "", POLL_INTERVAL, true));
-		httpThread.start();	
-	}
-	
+	@Override
 	public void setPollTimeOuts(int pollInterval, int sleepPollInterval) {
 		// TBD 
 		// Implement alarm or scheduler and set poll intervals for polling
 	}
 	
+	@Override
 	public void setTimeout(int timeout) {
 		// TBD
 	}
 	
+	@Override
 	public void setPolling(int polling) {
 		// TBD
 	}
 	
-	public static void sendServerStatus(int status, int detailedStatus) {
+	
+	public void poll() {
+		// If ongoing command, don't poll FIXME
+		setCommandOngoing();
+		startHttpThread(POLL, URL, POLL_INTERVAL, "", "");
+	}
+	
+	public void ack() {
+		System.out.println(APP_TAG + "Sending ack..");
+		startHttpThread(ACK, URL, POLL_INTERVAL, "", "");
+	}
+	
+	public static void sendServerStatus(int status, int detailedStatus, int dataId) {
 		if (status == Statuses.OFFLINE || status == Statuses.ONLINE) {
 			if (lastSentStatus != status ){
-				ConnectionManager.callBacks.statusCb(status, detailedStatus);
+				ConnectionManager.callBacks.statusCb(status, detailedStatus, dataId);
 				lastSentStatus = status;
-				// For testing
-				//DBG SweFileLog.write((status==Statuses.ONLINE?"ONLINE,,":"OFFLINE,,"));
-				
 			}
 		}
 		else {
@@ -141,6 +203,13 @@ public class ConnectionManager implements IConnectionManager {
 		
 	}
 
+	private void startHttpThread(String cmd, String url, int pollInterval, String data, String dataId) { /* FIXME Put cert  and dataid here*/
+		Request request = new Request(cmd,url, Integer.toString(pollInterval), data, "", dataId);
+		HttpClient httpClient = new HttpClient(request);
+		Thread httpThread = new Thread(httpClient);
+		httpThread.start();
+	}
+	
 	
 	private void setCommandOngoing() {
 		mCommandOngoing.set(1);	

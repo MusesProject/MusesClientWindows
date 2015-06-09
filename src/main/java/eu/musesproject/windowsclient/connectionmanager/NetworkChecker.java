@@ -23,10 +23,7 @@ package eu.musesproject.windowsclient.connectionmanager;
 
 public class NetworkChecker {
 
-	public NetworkChecker() {
-
-	}
-	public boolean isInternetConnected(){
+	public static boolean isInternetConnected(){
 		// TBD
 		return true;
 	}

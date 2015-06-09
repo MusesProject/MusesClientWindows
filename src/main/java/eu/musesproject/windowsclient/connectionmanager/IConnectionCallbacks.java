@@ -27,5 +27,5 @@ package eu.musesproject.windowsclient.connectionmanager;
 
 public interface IConnectionCallbacks {
     int receiveCb(String receiveData);
-    int statusCb(int status, int detailedStatus); 
+    int statusCb(int status, int detailedStatus, int dataId); 
 }

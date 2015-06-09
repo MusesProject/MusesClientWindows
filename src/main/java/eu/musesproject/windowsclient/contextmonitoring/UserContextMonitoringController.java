@@ -21,21 +21,22 @@ package eu.musesproject.windowsclient.contextmonitoring;
 
 
 import java.util.Map;
-
 import org.json.JSONObject;
-
 import eu.musesproject.client.model.contextmonitoring.UISource;
 import eu.musesproject.client.model.decisiontable.Action;
+import eu.musesproject.windowsclient.actuators.IUICallback;
 import eu.musesproject.windowsclient.connectionmanager.ConnectionManager;
+import eu.musesproject.windowsclient.connectionmanager.DetailedStatuses;
 import eu.musesproject.windowsclient.connectionmanager.IConnectionCallbacks;
 import eu.musesproject.windowsclient.connectionmanager.IConnectionManager;
+import eu.musesproject.windowsclient.connectionmanager.Statuses;
 
 public class UserContextMonitoringController implements IUserContextMonitoringController, IConnectionCallbacks{
 
 	
 	private static final String URL = "https://sweoffice.mooo.com:8443/server/commain";
-	public static final String LOGIN_JSON = "{\"requesttype\":\"login\",\"username\":\"muses\",\"password\":\"muses\",\"device_id\":\"357864056646126\"}";
-	
+	public static final String LOGIN_JSON = "{\"requesttype\":\"login\",\"username\":\"y\",\"password\":\"y\",\"device_id\":\"359521065844450\"}";
+	private static final String APP_TAG = "APP_TAG";
 	static IUICallback callback;
 	public UserContextMonitoringController() {
 
@@ -58,18 +59,18 @@ public class UserContextMonitoringController implements IUserContextMonitoringCo
 	
 	public void login(String userName, String password) {
 		IConnectionManager connectionManager = new ConnectionManager();
-		connectionManager.springConnect(URL, "cert", LOGIN_JSON, 1, 10000, 10000, this);	
+		connectionManager.sendData(LOGIN_JSON,100);	
 	}
 
 	public int receiveCb(String receiveData) {	
 		if ( (receiveData != null) && !receiveData.equals("") ) {
-			if (JSONManager.getAuthResult(receiveData)){
-				callback.onLogin(true, "");
-				if (JSONManager.getAuthResult(receiveData)){
+//			if (JSONManager.getAuthResult(receiveData)){
+				callback.onLogin(true, "", -1);
+//				if (JSONManager.getAuthResult(receiveData)){
 					//sendConfigSyncRequest();
-				}
+//				}
 			}
-		}
+//		}
 		return 0;
 	}
 	
@@ -81,12 +82,15 @@ public class UserContextMonitoringController implements IUserContextMonitoringCo
 		System.out.println("UCEH - sendConfigSyncRequest()");
 		JSONObject configSyncRequest = JSONManager.createConfigSyncJSON("mac address of devive","muses");
 		IConnectionManager connectionManager = new ConnectionManager();
-		connectionManager.sendData(configSyncRequest.toString());	
+		connectionManager.sendData(configSyncRequest.toString(), 1);	
 		
 	}
 
-	public int statusCb(int status, int detailedStatus) {
-		System.out.println("Status received from server: " + ( status == 1 ?  "ONLINE" : "OFFLINE" ) );
+	public int statusCb(int status, int detailedStatus, int dataId) {
+		System.out.println(APP_TAG + " called: statusCb(int status, int detailedStatus)"+status+", "+detailedStatus);
+		if(status == Statuses.NEW_SESSION_CREATED && detailedStatus == DetailedStatuses.SUCCESS_NEW_SESSION) {
+			System.out.println(APP_TAG + " new session created, server online");
+		}
 		return 0;
 	}
 	
@@ -94,4 +98,15 @@ public class UserContextMonitoringController implements IUserContextMonitoringCo
 	public static void registerCallbacks(IUICallback iuiCallback){
 		callback = iuiCallback;
 	}
+	
+	
+	/**
+	 * connects to the MUSES server
+	 */
+	public void connectToServer() {
+		IConnectionManager connectionManager = new ConnectionManager();
+		connectionManager.springConnect(URL, "cert", LOGIN_JSON, 1, 10000, 10000, this);
+	}
+	
+	
 }

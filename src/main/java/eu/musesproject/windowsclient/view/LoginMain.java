@@ -23,7 +23,6 @@ package eu.musesproject.windowsclient.view;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
-
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -48,6 +47,7 @@ import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringCon
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 
 public class LoginMain extends Application implements Observer {
+	private static final String APP_TAG = "APP_TAG";
 	private Stage primaryStage;
 	static Button loginBtn,logoutBtn;
 	static TextField userTextField;
@@ -87,7 +87,8 @@ public class LoginMain extends Application implements Observer {
         logoutBtn.setOnAction(actionEventListener);
         setLoginView();
     	regiterCallbacks();
-
+    	UserContextMonitoringController iMonitoringController = new UserContextMonitoringController(); 
+    	iMonitoringController.connectToServer(); // FIXME Until spring is not imeplemented
     }
 
 	public void setLoginView() {
@@ -221,52 +222,6 @@ public class LoginMain extends Application implements Observer {
     	
     }
     
-//	private void placeInSystemTray() {
-//		Check the SystemTray is supported
-//        if (!SystemTray.isSupported()) {
-//            System.out.println("SystemTray is not supported");
-//            return;
-//        }
-//        final PopupMenu popup = new PopupMenu();
-//        //Image musesImage = Toolkit.getDefaultToolkit().getImage(LoginMain.class.getClassLoader().getResource("muses_icon.png").toString());
-//        Image musesImage = new ImageIcon(LoginMain.class.getClassLoader().getResource("muses_icon.png")).getImage();
-//        final TrayIcon trayIcon = new TrayIcon(musesImage,"muses_icon",popup);
-//        final SystemTray tray = SystemTray.getSystemTray();
-//       
-//        // Create a pop-up menu components
-//        MenuItem aboutItem = new MenuItem("About");
-//        CheckboxMenuItem cb1 = new CheckboxMenuItem("Set auto size");
-//        CheckboxMenuItem cb2 = new CheckboxMenuItem("Set tooltip");
-//        Menu displayMenu = new Menu("Display");
-//        MenuItem errorItem = new MenuItem("Error");
-//        MenuItem warningItem = new MenuItem("Warning");
-//        MenuItem infoItem = new MenuItem("Info");
-//        MenuItem noneItem = new MenuItem("None");
-//        MenuItem exitItem = new MenuItem("Exit");
-//       
-//        //Add components to pop-up menu
-//        popup.add(aboutItem);
-//        popup.addSeparator();
-//        popup.add(cb1);
-//        popup.add(cb2);
-//        popup.addSeparator();
-//        popup.add(displayMenu);
-//        displayMenu.add(errorItem);
-//        displayMenu.add(warningItem);
-//        displayMenu.add(infoItem);
-//        displayMenu.add(noneItem);
-//        popup.add(exitItem);
-//       
-//        trayIcon.setPopupMenu(popup);
-//       
-//        try {
-//            tray.add(trayIcon);
-//        } catch (AWTException e) {
-//            System.out.println("TrayIcon could not be added.");
-//        }				
-//	}
-    
-    
     
 	@Override
 	public void update(Observable o, Object msg) {
@@ -281,32 +236,11 @@ public class LoginMain extends Application implements Observer {
 				//setLogoutView(); FIXME
 				break;
 			case MusesUICallbacksHandler.LOGIN_UNSUCCESSFUL:
-				System.out.println("Login was successful..");
+				System.out.println("Login was unsuccessful..");
 				//setLoginView(); FIXME
 				break;
-			case MusesUICallbacksHandler.ACTION_RESPONSE_ACCEPTED:
-				System.out.println("Action response accepted ..");
-				break;
-			case MusesUICallbacksHandler.ACTION_RESPONSE_DENIED:
-				System.out.println("Action response denied ..");
-				//decisionName = msg.getData().getString("name");
-				//riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//				showResultDialog(riskTextualDecp,
-//						MusesUICallbacksHandler.ACTION_RESPONSE_DENIED);
-				break;
-			case MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE:
-				System.out.println("Action response maybe ..");
-				//decisionName = msg.getData().getString("name");
-				//riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//				showResultDialog(riskTextualDecp,
-//						MusesUICallbacksHandler.ACTION_RESPONSE_MAY_BE);
-				break;
-			case MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER:
-				System.out.println("Action response upToUser ..");
-//				decisionName = msg.getData().getString("name");
-//				riskTextualDecp = msg.getData().getString("risk_textual_decp");
-//				showResultDialog(riskTextualDecp,
-//						MusesUICallbacksHandler.ACTION_RESPONSE_UP_TO_USER);
+			default:
+				System.out.println(APP_TAG+" Unknown Error!, updating prefs..");
 				break;
 				
 			}

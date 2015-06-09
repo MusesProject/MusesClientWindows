@@ -1,4 +1,4 @@
-	package eu.musesproject.windowsclient.connectionmanager;	
+package eu.musesproject.windowsclient.connectionmanager;	
 /*
  * #%L
  * MUSES Client
@@ -29,11 +29,14 @@
 public class HttpResponseHandler {
 
 	private static final String APP_TAG = "APP_TAG";
-	private String receivedHttpResponseData = "";
+	private static final int MINIMUM_POLL_AFTER_REQUEST = 10000;
+	private String receivedHttpResponseData = null;
 	private HttpResponse httpResponse = null;
 	private boolean isNewSession = false;
-	private int sessionUpdateReason = 0;
 	private String requestType;
+	private int dataId;
+	private int sessionUpdateReason = 0;
+	
 
 	/**
 	 * Constructor initialise with httpResponse and request type (connect,data,poll etc)
@@ -41,18 +44,24 @@ public class HttpResponseHandler {
 	 * @param requestType
 	 * @return void
 	 */
-	public HttpResponseHandler(HttpResponse httpResponse, String requestType) {
+	public HttpResponseHandler(HttpResponse httpResponse, String requestType, int dataId) {
 		this.httpResponse = httpResponse;
 		this.requestType = requestType;
-	}
-
-	public HttpResponseHandler(String requestType) {
-		this.requestType = requestType;
+		this.dataId = dataId;
 	}
 	
-	public HttpResponseHandler() {
-
+	
+	/**
+	 * Constructor initialise with httpResponse and request type (connect,data,poll etc)
+	 * @param httpResponse
+	 * @param requestType
+	 * @return void
+	 */
+	public HttpResponseHandler(String requestType, int dataId) {
+		this.requestType = requestType;
+		this.dataId = dataId;
 	}
+	
 
 	/**
 	 * Check response and call appropriate callback methods
@@ -64,21 +73,19 @@ public class HttpResponseHandler {
 			case DetailedStatuses.SUCCESS:
 				// Only send if Success in connection
 				int detailedOnlineStatus = DetailedStatuses.SUCCESS;
-				if (isNewSession ) {
+				Statuses.CURRENT_STATUS = Statuses.ONLINE;
+
+				if (isNewSession){
 					isNewSession = false;
-					if (Statuses.CURRENT_STATUS == Statuses.ONLINE) {
-						setServerStatusAndCallBack(Statuses.NEW_SESSION_CREATED, sessionUpdateReason);
-					}
-					else {
-						// If this is a new session, inform using detailed status
-						detailedOnlineStatus = DetailedStatuses.SUCCESS_NEW_SESSION;
+					if (Statuses.CURRENT_STATUS == Statuses.ONLINE){
+						setServerStatusAndCallBack(Statuses.NEW_SESSION_CREATED, sessionUpdateReason, dataId);
 					}
 				}
 
 				Statuses.CURRENT_STATUS = Statuses.ONLINE;
 				
 				if (isPollRequest(requestType)) {
-					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus);
+					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus,dataId);
 					if (isPayloadInData(httpResponse)) {
 						System.out.println(APP_TAG + " ConnManager=> Server responded with JSON: " + receivedHttpResponseData);
 						sendDataToFunctionalLayer();
@@ -88,8 +95,8 @@ public class HttpResponseHandler {
 						doPollForAnExtraPacket();
 					}
 				} else if (isSendDataRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus);
-					setServerStatusAndCallBack(Statuses.DATA_SEND_OK, DetailedStatuses.SUCCESS);
+					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus, dataId);
+					setServerStatusAndCallBack(Statuses.DATA_SEND_OK, DetailedStatuses.SUCCESS, dataId);
 					if (isPayloadInData(httpResponse)) {
 						System.out.println(APP_TAG+ " ConnManager=> Server responded with JSON: " + receivedHttpResponseData);
 						sendDataToFunctionalLayer();
@@ -99,22 +106,20 @@ public class HttpResponseHandler {
 						doPollForAnExtraPacket();
 					}
 				} else if (isAckRequest(requestType)) {
-					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus);
+					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus, dataId);
 					System.out.println(APP_TAG + " ConnManager=> Server responded with JSON: " + receivedHttpResponseData);
 					System.out.println(APP_TAG+ " Ack by the server");
 				} else if (isConnectRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus);
-					setServerStatusAndCallBack(Statuses.CONNECTION_OK, DetailedStatuses.SUCCESS);
+					setServerStatusAndCallBack(Statuses.ONLINE, detailedOnlineStatus, dataId);
+					setServerStatusAndCallBack(Statuses.CONNECTION_OK, DetailedStatuses.SUCCESS, dataId);
 					if (isPayloadInData(httpResponse)) {
 						System.out.println(APP_TAG+  " ConnManager=> Server responded with JSON: " + receivedHttpResponseData);
-
 						//sendDataToFunctionalLayer();
 					} 
 				} else if (isDisonnectRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.DISCONNECTED, DetailedStatuses.SUCCESS);
+					setServerStatusAndCallBack(Statuses.DISCONNECTED, DetailedStatuses.SUCCESS, dataId);
 					if (isPayloadInData(httpResponse)) {
 						System.out.println(APP_TAG + " ConnManager=> Server responded with JSON: " + receivedHttpResponseData);
-
 						//sendDataToFunctionalLayer();
 					} 
 				}
@@ -126,43 +131,63 @@ public class HttpResponseHandler {
 				System.out.println(APP_TAG + " Server is OFFLINE .. Incorrect URL");
 
 				if (isSendDataRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.INCORRECT_URL);
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.INCORRECT_URL, dataId);
 				}
 				
-				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.INCORRECT_URL);
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.INCORRECT_URL, dataId);
 				
 				/* FIXME AlarmReceiver.increasePollTime(); */
 				break;
-			case DetailedStatuses.NOT_ALLOWED_FROM_SERVER:
+			case DetailedStatuses.NOT_ALLOWED_FROM_SERVER_UNAUTHORIZED:
 				Statuses.CURRENT_STATUS = Statuses.OFFLINE;
 				System.out.println(APP_TAG +  " Server is OFFLINE .. Request not allowed from Server..");
 				
 				if (isSendDataRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.NOT_ALLOWED_FROM_SERVER);
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.NOT_ALLOWED_FROM_SERVER_UNAUTHORIZED, dataId);
 				}
 
-				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.NOT_ALLOWED_FROM_SERVER);
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.NOT_ALLOWED_FROM_SERVER_UNAUTHORIZED, dataId);
 				/* FIXME AlarmReceiver.increasePollTime(); */
 				break;
+			case DetailedStatuses.NOT_FOUND:
+				Statuses.CURRENT_STATUS = Statuses.OFFLINE;
+				System.out.println(APP_TAG + " Server is OFFLINE .. Error: Not found");
+				
+				if (isSendDataRequest(requestType)){
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.NOT_FOUND, dataId);
+				}
+				
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.NOT_FOUND, dataId);
+				/* FIXME AlarmReceiver.increasePollTime(); */
+				break;
+			case DetailedStatuses.INTERNAL_SERVER_ERROR:
+				Statuses.CURRENT_STATUS = Statuses.OFFLINE;
+				System.out.println(APP_TAG + " Server is OFFLINE .. Server not available");
+				if (isSendDataRequest(requestType)){
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.SERVER_NOT_AVAIABLE, dataId);
+				}
+				
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.SERVER_NOT_AVAIABLE, dataId);
+				/* FIXME AlarmReceiver.increasePollTime(); */
+				break;	
 			case DetailedStatuses.SERVER_NOT_AVAIABLE:
 				Statuses.CURRENT_STATUS = Statuses.OFFLINE;
 				System.out.println(APP_TAG + "Server is OFFLINE .. Server not available..");
 				
 				if (isSendDataRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.SERVER_NOT_AVAIABLE);
-					
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.SERVER_NOT_AVAIABLE, dataId);
 				}
 				
-				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.SERVER_NOT_AVAIABLE);
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.SERVER_NOT_AVAIABLE, dataId);
 				/* FIXME AlarmReceiver.increasePollTime(); */
 				break;
 			default:
 				Statuses.CURRENT_STATUS = Statuses.OFFLINE;
 				System.out.println(APP_TAG +  " Server is OFFLINE .. Unknown Error:"+getStatusCodeResponse(httpResponse));
 				if (isSendDataRequest(requestType)){
-					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.UNKNOWN_ERROR);
+					setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.UNKNOWN_ERROR, dataId);
 				}
-				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.UNKNOWN_ERROR);
+				setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.UNKNOWN_ERROR, dataId);
 				/* FIXME AlarmReceiver.increasePollTime(); */
 				break;
 			}
@@ -170,12 +195,12 @@ public class HttpResponseHandler {
 
 		} else {
 			Statuses.CURRENT_STATUS = Statuses.OFFLINE ;
-			setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.UNKNOWN_ERROR);
+			setServerStatusAndCallBack(Statuses.OFFLINE, DetailedStatuses.UNKNOWN_ERROR, dataId);
 			if (isSendDataRequest(requestType)){
-				setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.UNKNOWN_ERROR);
+				setServerStatusAndCallBack(Statuses.DATA_SEND_FAILED, DetailedStatuses.UNKNOWN_ERROR, dataId);
 			} 
 			if (isConnectRequest(requestType)){
-				setServerStatusAndCallBack(Statuses.CONNECTION_FAILED, DetailedStatuses.UNKNOWN_ERROR);
+				setServerStatusAndCallBack(Statuses.CONNECTION_FAILED, DetailedStatuses.UNKNOWN_ERROR, dataId);
 				/* Depending on error Polling shall be stopped, but difficult to know if error is recoverable */
 			}
 			System.out.println(APP_TAG + " Server is OFFLINE, HttpResponse is null, check network connectivity or address of server!");
@@ -183,7 +208,7 @@ public class HttpResponseHandler {
 	}
 
 	private void doPollForAnExtraPacket(){
-		if (new NetworkChecker().isInternetConnected()){
+		if (NetworkChecker.isInternetConnected()){
 			ConnectionManager connectionManager = new ConnectionManager();
 			connectionManager.poll();
 		}
@@ -289,18 +314,17 @@ public class HttpResponseHandler {
 	 * @param status
 	 * @return void
 	 */
-	
-	private void setServerStatusAndCallBack(int status, int detailedStatus) {
+	private void setServerStatusAndCallBack(int status, int detailedStatus, int dataId) {
 		
 		if (status == Statuses.OFFLINE || status == Statuses.ONLINE)
 		{
-			ConnectionManager.sendServerStatus(status, detailedStatus);
+			ConnectionManager.sendServerStatus(status, detailedStatus, dataId);
 			
 			
 		}
 		else
 		{	
-			ConnectionManager.callBacks.statusCb(status, detailedStatus);
+			ConnectionManager.callBacks.statusCb(status, detailedStatus, dataId);
 		}
 		
 	}
@@ -319,16 +343,20 @@ public class HttpResponseHandler {
 		case 400 :
 			return DetailedStatuses.INCORRECT_URL;
 		case 401 :
-			return DetailedStatuses.NOT_ALLOWED_FROM_SERVER;
+			return DetailedStatuses.NOT_ALLOWED_FROM_SERVER_UNAUTHORIZED;
 		case 404 :
+			return DetailedStatuses.NOT_FOUND;
+		case 500 :
+			return DetailedStatuses.INTERNAL_SERVER_ERROR;
+		case 503 :
 			return DetailedStatuses.SERVER_NOT_AVAIABLE;
 		default :
 			return DetailedStatuses.UNKNOWN_ERROR;
 		}
 	}
 
-	public void setNewSession(int reason) {
-		isNewSession = true;
+	public void setNewSession(boolean isNewSession, int reason) {
+		this.isNewSession = isNewSession;
 		sessionUpdateReason = reason;
 	}
 
