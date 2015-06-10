@@ -56,16 +56,18 @@ public class RecursiveFileSensor implements ISensor{
     // sensor identifier
     public static final String TYPE = "CONTEXT_SENSOR_FILEOBSERVER";
 
-    // maximal number of how many background services are stored if a context event is fired
-    private static final int MAX_SHOWN_BACKGROUND_SERVICES = 100;
-
     // time in milliseconds when the sensor polls information
     private static int OBSERVATION_INTERVALL = 100;
 
     // context property keys
-    public static final String PROPERTY_KEY_ID 					= "id";
-    public static final String PROPERTY_KEY_EVENT_NAME 			= "eventname";
-    public static final String PROPERTY_KEY_EVENT_PATH			= "eventpath";
+    public static final String PROPERTY_KEY_FILE_EVENT 	= "fileevent";
+    public static final String PROPERTY_KEY_PATH 		= "path";
+    public static final String PROPERTY_KEY_NAME 		= "resourceName";
+
+    // possible events
+    public static final String CREATE 		 = "create";
+    public static final String DELETE 		 = "delete";
+    public static final String MODIFY 		 = "modify";
 
     private ContextListener listener;
 
@@ -132,8 +134,8 @@ public class RecursiveFileSensor implements ISensor{
         ContextEvent contextEvent = new ContextEvent();
         contextEvent.setType(TYPE);
         contextEvent.setTimestamp(System.currentTimeMillis());
-        contextEvent.addProperty(PROPERTY_KEY_EVENT_NAME, eventName);
-        contextEvent.addProperty(PROPERTY_KEY_EVENT_PATH, eventPath);
+        contextEvent.addProperty(PROPERTY_KEY_NAME, eventName);
+        contextEvent.addProperty(PROPERTY_KEY_PATH, eventPath);
         contextEvent.generateId();
 
         // add context event to the context event history
