@@ -20,13 +20,13 @@ package eu.musesproject.windowsclient.view;
  * #L%
  */
 
-import java.util.Observable;
-import java.util.Properties;
-
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.IUICallback;
 
-public class MusesUICallbacksHandler extends Observable implements IUICallback{
+import java.util.Observable;
+import java.util.Properties;
+
+public class MusesUICallbacksHandler extends Observable implements IUICallback {
 
 
 	// CallBack messages

@@ -42,6 +42,7 @@ import java.util.Map.Entry;
  * Class to transform action and context information to JSON
  */
 public class JSONManager {
+	private static final String TAG = JSONManager.class.getSimpleName();
 	/**
 	 * creates the JSON object that will be sent to the server via the {@link eu.musesproject.windowsclient.connectionmanager.ConnectionManager}
 	 * @param requestType {@link RequestType}
@@ -159,12 +160,13 @@ public class JSONManager {
 	 * @param userBehavior decision of the user from a muses dialog
 	 * @return {@link JSONObject}
 	 */
-	public static JSONObject createUserBehaviorJSON(String deviceId, String userName, String userBehavior) {
+	public static JSONObject createUserBehaviorJSON(String deviceId, String userName, String userBehavior, int decisionId) {
 		JSONObject rootJSONObject = new JSONObject();
 		try {
 			rootJSONObject.put(JSONIdentifiers.REQUEST_TYPE_IDENTIFIER, RequestType.USER_ACTION);
 			rootJSONObject.put(JSONIdentifiers.AUTH_DEVICE_ID, deviceId);
 			rootJSONObject.put(JSONIdentifiers.AUTH_USERNAME, userName);
+			rootJSONObject.put(JSONIdentifiers.DECISION_IDENTIFIER, decisionId);
 			JSONObject userBehaviorJSONObject = new JSONObject();
 			userBehaviorJSONObject.put(JSONIdentifiers.ACTION_IDENTIFIER, userBehavior);
 			rootJSONObject.put(JSONIdentifiers.USER_BEHAVIOR, userBehaviorJSONObject);
@@ -219,15 +221,18 @@ public class JSONManager {
 	/**
 	 * Method to create a JSON object which will be used to request the client configuration
 	 * @param deviceId deviceId (IMEI)
+	 * @param osVersion current android version
 	 * @param userName login user name credential
 	 * @return {@link JSONObject}
 	 */
-	public static JSONObject createConfigSyncJSON(String deviceId, String userName) {
+	public static JSONObject createConfigSyncJSON(String deviceId, String osVersion, String userName) {
 		JSONObject configSyncSONObject = new JSONObject();
 		try {
 			configSyncSONObject.put(JSONIdentifiers.REQUEST_TYPE_IDENTIFIER, RequestType.CONFIG_SYNC);
 			configSyncSONObject.put(JSONIdentifiers.AUTH_USERNAME, userName);
 			configSyncSONObject.put(JSONIdentifiers.AUTH_DEVICE_ID, deviceId);
+			configSyncSONObject.put(JSONIdentifiers.OPERATING_SYSTEM_VERSION, osVersion);
+			configSyncSONObject.put(JSONIdentifiers.OPERATING_SYSTEM, "Android");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -334,7 +339,7 @@ public class JSONManager {
 
 	/**
 	 * Method that returns all received config items of each sensor
-	 *
+	 * 
 	 * @param jsonString response from server
 	 * @return List of config items
 	 */
@@ -347,18 +352,30 @@ public class JSONManager {
 			for (int i = 0; i < configProperties.length(); i++) {
 				JSONObject item = configProperties.getJSONObject(i);
 				String sensorType = item.getString("sensor-type");
-				String value = item.getString("value");
 				String key = item.getString("key");
+				String value = item.getString("value");
 
 				configList.add(new SensorConfiguration(sensorType, key, value));
 			}
 
+			configList.addAll(addZoneConfigIfExists(jsonString));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return configList;
 	}
 
+	/**
+	 * NOT INCLUDED IN THE WINDOWS VERSION
+	 * @param jsonString
+	 * @return
+	 */
+	public static List<SensorConfiguration> addZoneConfigIfExists(String jsonString) {
+		List<SensorConfiguration> zoneConfig = new ArrayList<SensorConfiguration>();
+
+		return zoneConfig;
+	}
+	
 	/**
 	 * Method that returns the id of the request that was sent to the server.
 	 * 
@@ -380,7 +397,7 @@ public class JSONManager {
 	
 	/**
 	 * Method that returns the id of the request that was sent to the server.
-	 *
+	 * 
 	 * @param jsonString response from server
 	 * @return true or false whether the silent mode should be active
 	 */
@@ -389,12 +406,12 @@ public class JSONManager {
 		try {
 			JSONObject responseJSON = new JSONObject(jsonString);
 			JSONObject connectionConfigJSON = responseJSON.getJSONObject("connection-config");
-
-//        	connectionConfig.setServerIP(MusesUtils.getMusesConf());
+			
+        	connectionConfig.setServerIp(""/*MusesUtils.getMusesConf()*/); // TODO where do I get this from?
         	connectionConfig.setServerPort("8443");
         	connectionConfig.setServerServletPath("/commain");
         	connectionConfig.setServerContextPath("/server");
-//        	connectionConfig.setServerCertificate(MusesUtils.getCertificateFromSDCard());
+        	connectionConfig.setServerCertificate(""/*MusesUtils.getCertificateFromSDCard()*/); // TODO where do I get this from?
         	connectionConfig.setClientCertificate("");
         	connectionConfig.setTimeout(connectionConfigJSON.getInt("timeout"));
         	connectionConfig.setPollTimeout(connectionConfigJSON.getInt("poll_timeout"));
@@ -406,7 +423,7 @@ public class JSONManager {
 		}
 		return connectionConfig;
 	}
-
+	
 	/**
 	 * Method that returns the condition in the policy 
 	 * 
@@ -493,7 +510,4 @@ public class JSONManager {
 			return "";
 		}
 	}
-	
-	
-	
 }
