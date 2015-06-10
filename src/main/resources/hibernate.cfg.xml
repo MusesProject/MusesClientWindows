@@ -16,7 +16,7 @@
 		<mapping class="eu.musesproject.windowsclient.model.Action" />
 		<mapping class="eu.musesproject.windowsclient.model.ActionProperty" />
 		<mapping class="eu.musesproject.windowsclient.model.Configuration" />
-		<mapping class="eu.musesproject.windowsclient.model.Contextevent" />
+		<mapping class="eu.musesproject.windowsclient.model.ContextEvent" />
 		<mapping class="eu.musesproject.windowsclient.model.Decision" />
 		<mapping class="eu.musesproject.windowsclient.model.Decisiontable" />
 		<mapping class="eu.musesproject.windowsclient.model.Property" />

@@ -331,7 +331,7 @@ public class DBManager {
 	}
 
 
-	public void insertConfiguration(Configuration configuration){
+	public void insertConfiguration(eu.musesproject.windowsclient.model.Configuration configuration){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -1129,7 +1129,7 @@ public class DBManager {
 
 	// Context Event related queries
 
-	public void addContextEvent(Contextevent event) {
+	public void addContextEvent(ContextEvent event) {
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -1186,14 +1186,14 @@ public class DBManager {
 		return propertyList;
 	}
 
-	public Contextevent getStoredContextEvent(String id) {
+	public ContextEvent getStoredContextEvent(String id) {
 		Session session = null;
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Contextevent.findById").setString("id", id);
 			if (query != null) {
-				return (Contextevent) query.list().get(0);
+				return (ContextEvent) query.list().get(0);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1204,8 +1204,8 @@ public class DBManager {
 
 	}
 
-	public List<Contextevent> getStoredContextEventByActionId(int id) {
-		List<Contextevent> contextEvents = new ArrayList<Contextevent>();
+	public List<ContextEvent> getStoredContextEventByActionId(int id) {
+		List<ContextEvent> contextEvents = new ArrayList<ContextEvent>();
 		Session session = null;
 		Query query = null;
 		try {
@@ -1257,8 +1257,8 @@ public class DBManager {
 		}
 	}
 
-	public List<Contextevent> getAllStoredContextEvents() {
-		List<Contextevent> contextEventsList = new ArrayList<Contextevent>();
+	public List<ContextEvent> getAllStoredContextEvents() {
+		List<ContextEvent> contextEventsList = new ArrayList<ContextEvent>();
 		Session session = null;
 		Query query = null;
 		try {

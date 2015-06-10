@@ -36,7 +36,7 @@ import java.sql.Timestamp;
 	@NamedQuery(name="Contextevent.deleteById", query="delete FROM Contextevent c where c.id = :id"),
 	@NamedQuery(name="Contextevent.findByActionId", query="SELECT c FROM Contextevent c where c.actionId = :actionId")
 })
-public class Contextevent implements Serializable {
+public class ContextEvent implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -50,7 +50,7 @@ public class Contextevent implements Serializable {
 
 	private String type;
 
-	public Contextevent() {
+	public ContextEvent() {
 	}
 
 	public int getId() {

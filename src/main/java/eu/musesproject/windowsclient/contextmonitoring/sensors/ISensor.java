@@ -33,12 +33,12 @@ import java.io.IOException;
  */
 
 public interface ISensor {
-	public static String CONFIG_KEY_ENABLED = "enabled"; 
+	String CONFIG_KEY_ENABLED = "enabled";
 	
     /**
      * max size of the array for the context event history
      */
-    static final int CONTEXT_EVENT_HISTORY_SIZE = 2;
+    int CONTEXT_EVENT_HISTORY_SIZE = 2;
 
 
     /**

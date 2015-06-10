@@ -8,7 +8,7 @@
 		<class>eu.musesproject.windowsclient.model.ActionProperty</class>
 		<class>eu.musesproject.windowsclient.model.AndroidMetadata</class>
 		<class>eu.musesproject.windowsclient.model.Configuration</class>
-		<class>eu.musesproject.windowsclient.model.Contextevent</class>
+		<class>eu.musesproject.windowsclient.model.ContextEvent</class>
 		<class>eu.musesproject.windowsclient.model.Decision</class>
 		<class>eu.musesproject.windowsclient.model.Decisiontable</class>
 		<class>eu.musesproject.windowsclient.model.Property</class>
