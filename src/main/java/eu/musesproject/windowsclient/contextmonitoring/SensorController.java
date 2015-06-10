@@ -20,7 +20,6 @@ package eu.musesproject.windowsclient.contextmonitoring;
  * #L%
  */
 
-import eu.musesproject.client.model.contextmonitoring.InteractionObservedApps;
 import eu.musesproject.client.model.contextmonitoring.UISource;
 import eu.musesproject.client.model.decisiontable.Action;
 import eu.musesproject.contextmodel.ContextEvent;
@@ -69,23 +68,23 @@ public class SensorController {
     }
     
     public void startSensors() throws IOException {
-//        Log.d(MusesUtils.TEST_TAG, "SC - 1. start sensors");
+        System.out.println(TAG + " | SC - 1. start sensors");
         // just start the sensors if they are not already collecting data
         if(!isCollectingData) {
-//            Log.d(MusesUtils.TEST_TAG, "SC - 2. data collection in enabled");
+            System.out.println(TAG + " | SC - 2. data collection in enabled");
             List<String> enabledSensor = new ArrayList<String>();
             boolean sensorConfigExists = false;
-//            dbManager.openDB();
-//            sensorConfigExists = dbManager.hasSensorConfig();
-//            dbManager.closeDB();
+            dbManager.openDB();
+            sensorConfigExists = dbManager.hasSensorConfig();
+            dbManager.closeDB();
 
             // just start the sensors if there is a configuration for them
             // check for sensorConfigExists later
             if(true/*sensorConfigExists*/) {
-//                Log.d(MusesUtils.TEST_TAG, "SC - 3. config exists");
-//                dbManager.openDB();
-//                enabledSensor = dbManager.getAllEnabledSensorTypes();
-//                dbManager.closeDB();
+                System.out.println(TAG + " | SC - 3. config exists");
+                dbManager.openDB();
+                enabledSensor = dbManager.getAllEnabledSensorTypes();
+                dbManager.closeDB();
                 enabledSensor.add("CONTEXT_SENSOR_APP");
                 enabledSensor.add("CONTEXT_SENSOR_CONNECTIVITY");
                 enabledSensor.add("CONTEXT_SENSOR_DEVICE_PROTECTION");
@@ -229,21 +228,6 @@ public class SensorController {
         @Override
         public void onEvent(ContextEvent contextEvent) {
             System.out.println(contextEvent.getType()+" --> "+contextEvent.getProperties());
-
-
-            //Log.d(MusesUtils.TEST_TAG, "SC - onEvent(ContextEvent contextEvent)");
-        	// if an app is active that should be observed inform the interaction sensor
-
-            if(contextEvent != null && contextEvent.getType().equals(AppSensor.TYPE)) {
-        		// if the app is gmail in this case //TODO must be configurable
-        		//Log.d(TAG, contextEvent.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME));
-        		if(contextEvent.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME).equals(InteractionObservedApps.OBSERVED_GMAIL)) {
-        			//if (activeSensors != null && activeSensors.containsKey(InteractionSensor.TYPE)) {
-        				//((InteractionSensor) activeSensors.get(InteractionSensor.TYPE)).setAppName(InteractionObservedApps.OBSERVED_GMAIL);
-        			}
-        		}
-        	}
-            
         	/*
              * Workflow of creating an action and sending it to the server
              *
@@ -254,7 +238,6 @@ public class SensorController {
              * 4. send the action via the {@link eu.musesproject.client.contextmonitoring.UserContextMonitoringController}
              *      to the server
              */
-
             Action userAction = null;
             Map<String, String> properties = null;
             // 1. if lastFiredContextEvents.size() is 0 than it is the initial context event and no further processing
@@ -272,10 +255,9 @@ public class SensorController {
             lastFiredContextEvents.put(contextEvent.getType(), contextEvent);
 
             // 4. send action to the UserContextMonitoringController
-            if(userAction != null && properties!= null) {
-                UserContextMonitoringController.getInstance(context).sendUserAction(UISource.INTERNAL, userAction, properties);
+            if(userAction != null && properties != null) {
+                UserContextMonitoringController.getInstance().sendUserAction(UISource.INTERNAL, userAction, properties);
             }
-
         }
     }
 }
