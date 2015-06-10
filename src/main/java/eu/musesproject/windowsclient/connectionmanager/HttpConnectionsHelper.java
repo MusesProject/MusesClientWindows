@@ -29,7 +29,7 @@ import java.net.URL;
 import java.util.Date;
 import javax.net.ssl.HttpsURLConnection;
 
-public class HttpClient implements Runnable {
+public class HttpConnectionsHelper implements Runnable {
 
 	private HttpsURLConnection urlConnection;
 	public static String cookieHeader;
@@ -39,8 +39,9 @@ public class HttpClient implements Runnable {
 	public static int CONNECTION_TIMEOUT = 5500;
 	private static final int SOCKET_TIMEOUT = 5500;
 	private static final int MCC_TIMEOUT = 5500;
-	
-	public HttpClient(Request request) {
+	public static int POLLING_ENABLED = 1;
+
+	public HttpConnectionsHelper(Request request) {
 		this.request = request;
 	}
 
@@ -129,6 +130,7 @@ public class HttpClient implements Runnable {
 	 */
 	@SuppressWarnings("deprecation")
 	public void grabCookie(HttpsURLConnection con) {
+		System.out.println("grabing cookie..");
 		ResponseCookie responseCookie = new ResponseCookie();
 		for (int i = 0;; i++) {
 		      String headerName = con.getHeaderFieldKey(i);
@@ -142,18 +144,14 @@ public class HttpClient implements Runnable {
 		        for (int j = 1; j < fields.length; j++) {
 		          if ("secure".equalsIgnoreCase(fields[j])) {
 		        	  responseCookie.setSecure(Boolean.parseBoolean(fields[i]));
-		            System.out.println("secure=true");
 		          } else if (fields[j].indexOf('=') > 0) {
 		        	  String[] f = fields[j].split("=");
 		            if ("expires".equalsIgnoreCase(f[0])) {
 		            	responseCookie.setExpires(new Date(f[1]));
-		                System.out.println("expires"+ f[1]);
 		            } else if ("domain".equalsIgnoreCase(f[0])) {
 		            	responseCookie.setDomain(f[1]);
-		                System.out.println("domain"+ f[1]);
 		            } else if ("path".equalsIgnoreCase(f[0])) {
 		            	responseCookie.setPath(f[1]);
-		                System.out.println("path"+ f[1]);
 		            }
 		          }
 		        }
@@ -172,7 +170,7 @@ public class HttpClient implements Runnable {
 		return false;
 	}
 	
-	private static String getInStringSeconds(String pollInterval) {
+	public static String getInStringSeconds(String pollInterval) {
 		int pollIntervalInSeconds = (Integer.parseInt(pollInterval) / 1000) % 60;
 		return Integer.toString(pollIntervalInSeconds);
 	}

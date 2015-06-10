@@ -45,13 +45,15 @@ public class ConnectionManager implements IConnectionManager {
 	private AtomicInteger mCommandOngoing = new AtomicInteger(0);
 	
 	public static int lastSentStatus = Statuses.OFFLINE;
-
+	private AlarmReceiver alarmReceiver;
 	public static boolean isNewSession = true;
 	
 	
 	
 	public ConnectionManager() {
 		SelfSignedCertWorkaround(); // FIXME Fix this asap
+		alarmReceiver = new AlarmReceiver();
+		AlarmReceiver.setManager(this);
 	}
 
 	public void connect(String url, String cert, int pollInterval,	int sleepPollInterval, IConnectionCallbacks iCallbacks) {
@@ -90,6 +92,8 @@ public class ConnectionManager implements IConnectionManager {
 		
 		// TBD
 		// Set alarm, poll interval, sleep poll interval
+		alarmReceiver.setPollInterval(pollInterval, sleepPollInterval);
+		alarmReceiver.setDefaultPollInterval(pollInterval, sleepPollInterval);
 	}
 
 	@Override
@@ -129,9 +133,8 @@ public class ConnectionManager implements IConnectionManager {
 		
 		// TBD
 		// Set alarm, poll interval, sleep poll interval
-		
-		// TBD
-		// Set alarm, poll interval, sleep poll interval
+		alarmReceiver.setPollInterval(pollInterval, sleepPollInterval);
+		alarmReceiver.setDefaultPollInterval(pollInterval, sleepPollInterval);
 
 	}
 	
@@ -158,23 +161,40 @@ public class ConnectionManager implements IConnectionManager {
 		//callBacks.statusCb(Statuses.DISCONNECTED, Statuses.DISCONNECTED);  // FIXME
 				
 		// TBD
-		// Cancel alarm
+		alarmReceiver.cancelAlarm();
 	}
 	
 	@Override
 	public void setPollTimeOuts(int pollInterval, int sleepPollInterval) {
 		// TBD 
 		// Implement alarm or scheduler and set poll intervals for polling
+		alarmReceiver.setPollInterval(pollInterval, sleepPollInterval);
+		alarmReceiver.setDefaultPollInterval(pollInterval, sleepPollInterval);
 	}
 	
 	@Override
 	public void setTimeout(int timeout) {
-		// TBD
+		HttpConnectionsHelper.CONNECTION_TIMEOUT = timeout;
 	}
 	
 	@Override
 	public void setPolling(int polling) {
-		// TBD
+		HttpConnectionsHelper.POLLING_ENABLED = polling;
+	}
+	
+
+	/**
+	 * Starts to poll with the server either in sleep/active mode
+	 * @return void
+	 */
+	
+	public void periodicPoll() {
+		//Log.d(APP_TAG, "Polling !!");
+		// If ongoing command, don't poll
+		if (mCommandOngoing.get()==0){
+			poll();
+		}
+		
 	}
 	
 	
@@ -205,7 +225,7 @@ public class ConnectionManager implements IConnectionManager {
 
 	private void startHttpThread(String cmd, String url, int pollInterval, String data, String dataId) { /* FIXME Put cert  and dataid here*/
 		Request request = new Request(cmd,url, Integer.toString(pollInterval), data, "", dataId);
-		HttpClient httpClient = new HttpClient(request);
+		HttpConnectionsHelper httpClient = new HttpConnectionsHelper(request);
 		Thread httpThread = new Thread(httpClient);
 		httpThread.start();
 	}
@@ -215,7 +235,7 @@ public class ConnectionManager implements IConnectionManager {
 		mCommandOngoing.set(1);	
 	}
 	
-	private void setCommandNotOngoing() {	
+	private void setCommandNotOngoing() {	// FIXME Check how it is done in MusesClient should be called after request
 		mCommandOngoing.set(0);	
 	}
 	
