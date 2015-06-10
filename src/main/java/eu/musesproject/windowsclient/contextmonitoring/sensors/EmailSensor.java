@@ -108,6 +108,20 @@ public class EmailSensor implements ISensor {
         }
     }
 
+//    private void createUserAction(Action action, Map<String, String> actionProperties) {
+//        if(action.getActionType().equalsIgnoreCase(ActionType.FILE_ATTACHED)) {
+//            UserContextMonitoringController.getInstance(this).sendUserAction(UISource.INTERNAL, action, null);
+//        }
+//        else if(action.getActionType().equalsIgnoreCase(ActionType.SEND_MAIL)) {
+//            UserContextMonitoringController.getInstance(this).sendUserAction(UISource.INTERNAL, action, actionProperties);
+//            for(Map.Entry<String, String> entry : actionProperties.entrySet()) {
+//            }
+//        }
+//        else if(action.getActionType().equalsIgnoreCase(ActionType.USER_ENTERED_PASSWORD_FIELD)) {
+//            UserContextMonitoringController.getInstance(this).sendUserAction(UISource.INTERNAL, action, actionProperties);
+//        }
+//    }
+
     @Override
     public void enable() throws IOException {
         if (!sensorEnabled) {

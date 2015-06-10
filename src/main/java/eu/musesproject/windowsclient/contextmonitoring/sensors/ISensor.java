@@ -20,13 +20,12 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
  * #L%
  */
 
-//import eu.musesproject.client.contextmonitoring.ContextListener;
-//import eu.musesproject.client.db.entity.SensorConfiguration;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
+import eu.musesproject.windowsclient.model.SensorConfiguration;
 
 import java.io.IOException;
-import java.util.List;
+
 /**
  * @author christophstanik
  *
@@ -71,7 +70,7 @@ public interface ISensor {
      * Method to setup the configuration of a sensor
      * @param config {@link SensorConfiguration}
      */
-    //void configure(List<SensorConfiguration> config);
+//    void configure(List<SensorConfiguration> config);
 
     /**
      * Method to get the SensorType

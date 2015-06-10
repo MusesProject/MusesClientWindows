@@ -34,26 +34,30 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
 
+import java.io.IOException;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardWatchEventKinds.*;
-import static java.nio.file.LinkOption.*;
-import java.nio.file.attribute.*;
-import java.io.*;
-import java.util.*;
 
 /**
  * @author alirezaalizadeh
  * This class watches a directory (or tree) for changes to files.
  */
 
-public class DirectoryWatcherSensor implements ISensor{
-    private static final String TAG = DirectoryWatcherSensor.class.getSimpleName();
+public class RecursiveFileSensor implements ISensor{
+    private static final String TAG = RecursiveFileSensor.class.getSimpleName();
 
     // sensor identifier
-    public static final String TYPE = "CONTEXT_SENSOR_DIRECTORY_WATCHER";
+    public static final String TYPE = "CONTEXT_SENSOR_FILEOBSERVER";
 
     // maximal number of how many background services are stored if a context event is fired
-    private static final int MAX_SHOWN_BACKGROUND_SERVICES = 1;
+    private static final int MAX_SHOWN_BACKGROUND_SERVICES = 100;
 
     // time in milliseconds when the sensor polls information
     private static int OBSERVATION_INTERVALL = 100;
@@ -82,13 +86,13 @@ public class DirectoryWatcherSensor implements ISensor{
         return (WatchEvent<T>)event;
     }
 
-    public DirectoryWatcherSensor(Path dir, boolean recursive) {
+    public RecursiveFileSensor(Path dir, boolean recursive) {
         this.dir = dir;
         this.recursive = recursive;
         init();
     }
 
-    public DirectoryWatcherSensor() {
+    public RecursiveFileSensor() {
         //default path should be set
         this.dir = Paths.get("C:/tmp/");
         this.recursive = true;
