@@ -59,11 +59,11 @@ public class DBManager {
 	}
 	
 	public void openDB() {
-	
+		// Does not do anything but called by Functional layer
 	}
 	
 	public void closeDB() {
-		
+		// Does not do anything but called by Functional layer
 	}
 	
 	
@@ -468,14 +468,14 @@ public class DBManager {
 	 */
 
 	public long addDecisionTable(Decisiontable decisionTable){
-		
+		long id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	session.save(decisionTable);
+		    	id = (Long) session.save(decisionTable);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -488,7 +488,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
-		return 0;
+		return id;
 	}
 
 	/**
@@ -674,14 +674,15 @@ public class DBManager {
 	}
 
 
-	public void addOfflineAction(Action action){
+	public long addOfflineAction(Action action){
+		long id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	session.save(action);
+		    	id = (Long) session.save(action);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -694,6 +695,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return id;
 	}
 	
 	public void addActionProperty(ActionProperty actionProperty) {
@@ -726,7 +728,7 @@ public class DBManager {
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	id = (Integer) session.save(actionProperty);
+		    	id = (Long) session.save(actionProperty);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -1139,7 +1141,7 @@ public class DBManager {
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	session.save(event);
+		    	id = (Long) session.save(event);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
