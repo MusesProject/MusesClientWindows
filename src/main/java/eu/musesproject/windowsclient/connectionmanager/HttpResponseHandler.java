@@ -238,10 +238,7 @@ public class HttpResponseHandler {
 	 * @return
 	 */
 	private boolean isPollRequest(String requestType) {
-		if (requestType.equalsIgnoreCase(ConnectionManager.POLL)) {
-			return true;
-		}
-		return false;
+		return requestType.equalsIgnoreCase(ConnectionManager.POLL);
 	}
 	
 	/**
@@ -251,10 +248,7 @@ public class HttpResponseHandler {
 	 */
 	
 	private boolean isSendDataRequest(String requestType) {
-		if (requestType.equalsIgnoreCase(ConnectionManager.DATA)) {
-			return true;
-		}
-		return false;
+		return requestType.equalsIgnoreCase(ConnectionManager.DATA);
 	}
 	
 	/**
@@ -264,10 +258,7 @@ public class HttpResponseHandler {
 	 */
 	
 	private boolean isAckRequest(String requestType) {
-		if (requestType.equalsIgnoreCase(ConnectionManager.ACK)) {
-			return true;
-		}
-		return false;
+		return requestType.equalsIgnoreCase(ConnectionManager.ACK);
 	}
 	
 	/**
@@ -276,10 +267,7 @@ public class HttpResponseHandler {
 	 * @return
 	 */
 	private boolean isConnectRequest(String requestType) {
-		if (requestType.equalsIgnoreCase(ConnectionManager.CONNECT)) {
-			return true;
-		}
-		return false;
+		return requestType.equalsIgnoreCase(ConnectionManager.CONNECT);
 	}
 	
 	/**
@@ -288,10 +276,7 @@ public class HttpResponseHandler {
 	 * @return
 	 */
 	private boolean isDisonnectRequest(String requestType) {
-		if (requestType.equalsIgnoreCase(ConnectionManager.DISCONNECT)) {
-			return true;
-		}
-		return false;
+		return requestType.equalsIgnoreCase(ConnectionManager.DISCONNECT);
 	}
 	
 	/**
@@ -303,10 +288,7 @@ public class HttpResponseHandler {
 	private boolean isPayloadInData(HttpResponse httpResponse){
 		String data = httpResponse.getResponseMessage();
 		receivedHttpResponseData = data;
-		if ( data == null || data.equalsIgnoreCase("")){
-			return false;
-		}
-		else return true;
+		return !(data == null || data.equalsIgnoreCase(""));
 	}
 
 	/**

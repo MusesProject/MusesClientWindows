@@ -255,10 +255,7 @@ public class ConnectionManager implements IConnectionManager {
 
 					public boolean verify(String hostname,
 							javax.net.ssl.SSLSession sslSession) {
-						if (hostname.equals(IP)) {
-							return true;
-						}
-						return false;
+						return hostname.equals(IP);
 					}
 				});
 		System.setProperty("javax.net.ssl.trustStore", "./keystore.jks");

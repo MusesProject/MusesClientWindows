@@ -82,9 +82,7 @@ public class RequestHolder {
 				return false;
 		} else if (!contextEvents.equals(other.contextEvents))
 			return false;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 
 	public int getId() {

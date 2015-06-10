@@ -22,8 +22,8 @@ package eu.musesproject.windowsclient.usercontexteventhandler;
  */
 
 import eu.musesproject.client.model.decisiontable.Action;
-import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.model.ActionProperty;
+import eu.musesproject.windowsclient.model.ContextEvent;
 import eu.musesproject.windowsclient.model.Property;
 
 import java.sql.Timestamp;
@@ -46,7 +46,7 @@ public class DBEntityParser {
         contextEvent.setId(0);
         contextEvent.setId(actionId);
         contextEvent.setType(oldEvent.getType());
-        contextEvent.setTimestamp(oldEvent.getTimestamp());
+        contextEvent.setTimestamp(new Timestamp(oldEvent.getTimestamp()));
 
         return contextEvent;
     }
@@ -120,7 +120,7 @@ public class DBEntityParser {
     public static eu.musesproject.contextmodel.ContextEvent transformEntityContextEvent(ContextEvent entityContextEvent) {
         eu.musesproject.contextmodel.ContextEvent contextEvent = new eu.musesproject.contextmodel.ContextEvent();
         contextEvent.setId(entityContextEvent.getId());
-        contextEvent.setTimestamp(entityContextEvent.getTimestamp());
+        contextEvent.setTimestamp(entityContextEvent.getTimestamp().getTime());
         contextEvent.setType(entityContextEvent.getType());
 
         return contextEvent;

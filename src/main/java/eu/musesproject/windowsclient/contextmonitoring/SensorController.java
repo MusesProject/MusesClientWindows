@@ -99,6 +99,16 @@ public class SensorController {
         }
     }
 
+    private void enableMockedSensors() throws IOException {
+        activeSensors.put(MockUpAppSensor.TYPE, new MockUpAppSensor());
+        activeSensors.put(MockUpDeviceProtectionSensor.TYPE, new MockUpDeviceProtectionSensor());
+
+        for (ISensor sensor : activeSensors.values()) {
+            sensor.addContextListener(contextEventBus);
+            sensor.enable();
+        }
+    }
+
     private void startAndConfigureSensors(List<String> enabledSensor) throws IOException {
 //		Log.d(MusesUtils.TEST_TAG, "SC - startAndConfigureSensors");
 		
@@ -118,7 +128,6 @@ public class SensorController {
     		sensor.enable();
     		activeSensors.put(sensorType, sensor);
 		}
-    	
 
         for (ISensor sensor : activeSensors.values()) {
             sensor.addContextListener(contextEventBus);

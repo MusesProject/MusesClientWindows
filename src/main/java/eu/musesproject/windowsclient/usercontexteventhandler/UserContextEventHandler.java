@@ -31,6 +31,7 @@ import eu.musesproject.client.model.decisiontable.Action;
 import eu.musesproject.client.model.decisiontable.Decision;
 import eu.musesproject.client.model.decisiontable.Request;
 import eu.musesproject.client.model.decisiontable.Resource;
+import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.device.musacs.DecisionMaker;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.*;
@@ -38,6 +39,7 @@ import eu.musesproject.windowsclient.contextmonitoring.JSONManager;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.model.*;
+import eu.musesproject.windowsclient.view.LabelsAndText;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -181,14 +183,8 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				// an database update (new policies are sent from the server to the client and stored in the database)
 				// In addition, add a timeout to every request
 				final RequestHolder requestHolder = new RequestHolder(action, properties, contextEvents);
-				// TODO change error in the following code
-//				new Thread(new Runnable() {
-//					@Override
-//					public void run() {
-//						requestHolder.setRequestTimeoutTimer(new RequestTimeoutTimer(UserContextEventHandler.this, requestHolder.getId()));
-//						requestHolder.getRequestTimeoutTimer().start();
-//					}
-//				}, 0);
+				requestHolder.setRequestTimeoutTimer(new RequestTimeoutTimer(UserContextEventHandler.this, requestHolder.getId()));
+				requestHolder.getRequestTimeoutTimer().start();
 				mapOfPendingRequests.put(requestHolder.getId(), requestHolder);
 				// create the JSON request and send it to the server
 				JSONObject requestObject = JSONManager.createJSON(getImei(), getUserName(), requestHolder.getId(), RequestType.ONLINE_DECISION, action, properties, contextEvents);
@@ -286,7 +282,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			dbManager.openDB();
 			isUserAuthenticated = dbManager.isUserAuthenticated(getImei(), tmpLoginUserName, tmpLoginPassword);
 			dbManager.closeDB();
-			ActuatorController.getInstance().sendLoginResponse(isUserAuthenticated, "local login", -1);
+			ActuatorController.getInstance().sendLoginResponse(isUserAuthenticated, LabelsAndText.LOGIN_LOCAL_TOAST, -1);
 			if (isUserAuthenticated){
 				sendConfigSyncRequest();
 			}
@@ -355,7 +351,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		}
 		else {
 			// we cannot logout to the server, so send a logout response for the GUI immediately
-			ActuatorController.getInstance().sendLoginResponse(false, "logged out successfully", -1);
+			ActuatorController.getInstance().sendLoginResponse(false, LabelsAndText.LOGGED_OUT_SUCCESSFULLY_TOAST, -1);
 		}
 
 		isUserAuthenticated = false;
@@ -425,7 +421,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 			// 3. get a list of all stored actions
             dbManager.openDB();
-			for (Action entityAction : dbManager.getOfflineActionList()) {
+			for (eu.musesproject.windowsclient.model.Action entityAction : dbManager.getOfflineActionList()) {
 				Action action = DBEntityParser.transformAction(entityAction);
 
 				//  4.1 get all related properties of that action
@@ -434,7 +430,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 				//4.2 get all context events of that action
 				List<ContextEvent> contextEvents = new ArrayList<ContextEvent>();
-				for(ContextEvent dbContextEvent : dbManager.getStoredContextEventByActionId(entityAction.getId())) {
+				for(eu.musesproject.windowsclient.model.ContextEvent dbContextEvent : dbManager.getStoredContextEventByActionId(entityAction.getId())) {
 					ContextEvent contextEvent = DBEntityParser.transformEntityContextEvent(dbContextEvent);
 
 					// 4.3.1 get all related properties to that action
@@ -469,20 +465,19 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
                 int jsonRequestID = sendData.hashCode();
                 pendingJSONRequest.put(jsonRequestID, requestJSON);
-                connectionManager.sendData(sendData/*, jsonRequestID*/); // TODO mus contain the request ID!
+                connectionManager.sendData(sendData, jsonRequestID);
             }
 		}
 	}
 
 
 	public void updateServerOnlineAndUserAuthenticated() {
-		Log.d(MusesUtils.TEST_TAG, "UCEH - updateServerOnlineAndUserAuthenticated Server="+(serverStatus==Statuses.ONLINE) + " auth=" +isUserAuthenticated);
 		isUserAuthenticated = isAuthenticatedRemotely;
 
-		SharedPreferences.Editor prefEditor = prefs.edit();
-		prefEditor.putBoolean(PREF_KEY_USER_AUTHENTICATED, isUserAuthenticated);
-		prefEditor.putBoolean(PREF_KEY_USER_AUTHENTICATED_REMOTELY, isAuthenticatedRemotely);
-		prefEditor.commit();
+//		SharedPreferences.Editor prefEditor = prefs.edit();
+//		prefEditor.putBoolean(PREF_KEY_USER_AUTHENTICATED, isUserAuthenticated);
+//		prefEditor.putBoolean(PREF_KEY_USER_AUTHENTICATED_REMOTELY, isAuthenticatedRemotely);
+//		prefEditor.commit();
 	}
 
 	private class ConnectionCallback implements IConnectionCallbacks {
@@ -698,7 +693,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
     public String getImei() {
 		if(imei == null || imei.equals("")) {
-			this.imei =""; // TODO how to get an device ID?
+			this.imei ="1337"; // TODO how to get an device ID?
 		}
 		return imei;
 	}
@@ -745,11 +740,5 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		if(decisionMaker == null) {
 			decisionMaker = new DecisionMaker();
 		}
-        // TODO do not show the default policies at this point
-//		Decision decision =  decisionMaker.getDefaultDecision(requestHolder.getAction(), requestHolder.getActionProperties(), requestHolder.getContextEvents());
-//		ActuatorController.getInstance(context).showFeedback(decision);
-//		if(requestHolder.getAction().isRequestedByMusesAwareApp()) {
-//			ActuatorController.getInstance(context).sendFeedbackToMUSESAwareApp(decision);
-//		}
 	}
 }
