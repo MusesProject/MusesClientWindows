@@ -24,7 +24,7 @@ public class MusesUtils {
 
 	public static String serverCertificate = "";
 	public static String getCertificateFromSDCard()  {
-		serverCertificate = "";
+		serverCertificate = ""; // FIXME
 //		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 //		String certificateName = "localhost.crt";
 //		try {
@@ -45,7 +45,7 @@ public class MusesUtils {
 
 	
 	public static  String getMusesConf() {
-		String settings = "192.168.44.101";
+		String settings = "sweoffice.mooo.com";
 //		try {
 //			BufferedReader reader = new BufferedReader(new FileReader(
 //					Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator +"muses.conf"));

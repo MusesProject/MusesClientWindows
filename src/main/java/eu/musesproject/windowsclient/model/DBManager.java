@@ -35,13 +35,15 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+import eu.musesproject.windowsclient.view.MusesUtils;
+
 public class DBManager {
 	
 	private static SessionFactory sessionFactory = null;
 	private static ServiceRegistry serviceRegistry;
 	private static final String MUSES_TAG = "MUSES_TAG";
 	private static Logger logger = Logger.getLogger(DBManager.class.getName());
-
+	
 	public DBManager() {
 
 	}
@@ -330,6 +332,40 @@ public class DBManager {
 		return null;
 	}
 
+	public void insertConnectionProperties() {
+		eu.musesproject.windowsclient.model.Configuration config = new eu.musesproject.windowsclient.model.Configuration();
+		config.setServerIp(MusesUtils.getMusesConf());
+		config.setServerPort("8443");
+		config.setServerContextPath("/server");
+		config.setServerServletPath("/commain");
+		config.setServerCertificate(MusesUtils.getCertificateFromSDCard());
+		config.setClientCertificate("");
+		config.setTimeout(5000);
+		config.setPollTimeout(11000);
+		config.setSleepPollTimeout(55000);
+		config.setPollingEnabled(1);
+		config.setLoginAttempts(5);
+		try {
+			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
+		    Session session = getSessionFactory().openSession();
+		    Transaction trans = null;
+		    try {
+		    	trans = session.beginTransaction();
+		    	session.save(config);
+		        trans.commit();
+		    } catch (Exception e) {
+		        if (trans!=null) trans.rollback();
+		        e.printStackTrace(); 
+		    } finally {
+		    	if (session!=null) session.close();
+		    }
+		    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
+		} catch (RuntimeException re) {
+			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
+			throw re;
+		}
+		
+	}
 
 	public void insertConfiguration(eu.musesproject.windowsclient.model.Configuration configuration){
 		try {

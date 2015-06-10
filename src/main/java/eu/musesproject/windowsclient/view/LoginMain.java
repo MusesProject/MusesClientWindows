@@ -61,6 +61,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
+import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.view.Toast.Style;
@@ -88,7 +89,7 @@ public class LoginMain extends Application implements Observer{
 
 	private void regiterCallbacks() {
 		MusesUICallbacksHandler uiCallbacksHandler = new MusesUICallbacksHandler();
-//    	ActuatorController.getInstance().registerCallback(uiCallbacksHandler);
+    	ActuatorController.getInstance().registerCallback(uiCallbacksHandler);
 		uiCallbacksHandler.addObserver(this);
 		setObservable(uiCallbacksHandler);
 	}
@@ -133,7 +134,7 @@ public class LoginMain extends Application implements Observer{
 		
 		setLoginView();
 		regiterCallbacks();
-//		userContextMonitoringController = new UserContextMonitoringController();
+		userContextMonitoringController = UserContextMonitoringController.getInstance();
 //		userContextMonitoringController.connectToServer(); // FIXME Until spring is not imeplemented
 		initSchedulerForPolling();
 	}
