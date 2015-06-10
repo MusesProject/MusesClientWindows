@@ -718,14 +718,15 @@ public class DBManager {
 		}
 	}
 	
-	public void addOfflineActionProperty(ActionProperty actionProperty) {
+	public long addOfflineActionProperty(ActionProperty actionProperty) {
+		long id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	session.save(actionProperty);
+		    	id = (Integer) session.save(actionProperty);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -738,6 +739,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return id;
 	}
 
 	public List<ActionProperty> getActionPropertyList() {
@@ -1129,7 +1131,8 @@ public class DBManager {
 
 	// Context Event related queries
 
-	public void addContextEvent(ContextEvent event) {
+	public long addContextEvent(ContextEvent event) {
+		long id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -1149,6 +1152,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return id;
 	}
 
 	public int getNoOfContextEventsStored() {
@@ -1191,7 +1195,7 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("Contextevent.findById").setString("id", id);
+			query = session.getNamedQuery("ContextEvent.findById").setString("id", id);
 			if (query != null) {
 				return (ContextEvent) query.list().get(0);
 			}
@@ -1210,7 +1214,7 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("Contextevent.findByActionId").setInteger("actionId", id);
+			query = session.getNamedQuery("ContextEvent.findByActionId").setInteger("actionId", id);
 			if (query != null) {
 				contextEvents = query.list();
 				return contextEvents;
@@ -1227,7 +1231,7 @@ public class DBManager {
     	Session session = null;
 		try {
 			session = getSessionFactory().openSession();
-			session.getNamedQuery("Contextevent.deleteById").setString("id", id);
+			session.getNamedQuery("ContextEvent.deleteById").setString("id", id);
 		} catch (HibernateException e) {
 			e.printStackTrace();
 		} finally {
@@ -1263,7 +1267,7 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("Contextevent.findAll");
+			query = session.getNamedQuery("ContextEvent.findAll");
 			if (query != null) {
 				contextEventsList = query.list();
 				return contextEventsList;

@@ -22,11 +22,13 @@ package eu.musesproject.windowsclient.view;
 
 import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
+
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -46,10 +48,12 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -59,7 +63,10 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
+
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
+import eu.musesproject.windowsclient.model.ActionProperty;
+import eu.musesproject.windowsclient.model.DBManager;
 import eu.musesproject.windowsclient.view.Toast.Style;
 
 public class LoginMain extends Application implements Observer{

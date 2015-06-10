@@ -31,10 +31,10 @@ import java.sql.Timestamp;
  */
 @Entity
 @NamedQueries({
-	@NamedQuery(name="Contextevent.findAll", query="SELECT c FROM Contextevent c"),
-	@NamedQuery(name="Contextevent.findById", query="SELECT c FROM Contextevent c where c.id = :id"),
-	@NamedQuery(name="Contextevent.deleteById", query="delete FROM Contextevent c where c.id = :id"),
-	@NamedQuery(name="Contextevent.findByActionId", query="SELECT c FROM Contextevent c where c.actionId = :actionId")
+	@NamedQuery(name="ContextEvent.findAll", query="SELECT c FROM ContextEvent c"),
+	@NamedQuery(name="ContextEvent.findById", query="SELECT c FROM ContextEvent c where c.id = :id"),
+	@NamedQuery(name="ContextEvent.deleteById", query="delete FROM ContextEvent c where c.id = :id"),
+	@NamedQuery(name="ContextEvent.findByActionId", query="SELECT c FROM ContextEvent c where c.actionId = :actionId")
 })
 public class ContextEvent implements Serializable {
 	private static final long serialVersionUID = 1L;
