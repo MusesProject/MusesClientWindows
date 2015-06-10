@@ -77,4 +77,12 @@ public class LabelsAndText {
 	public static final String DETAILS 	 		 =  "Details";
 	public static final String CANCEL 	 		 =  "Cancel";
 	public static final String WARNING 	 		 =  "MUSES Policy Warning";
+	
+	// Toast msgs
+	public static final String EMPTY_LOGIN_FIELD_TOAST 	 		 =  "You can\'t leave UserID or Password fields empty ..";
+	public static final String UNKNOW_ERROR_TOAST 	 			 	 =  "Unknown Error, Please try later..";
+	public static final String LOGGED_OUT_SUCCESSFULLY_TOAST		 =  "Logged out successfully ..";
+	public static final String LOGIN_FAILED_TOAST	 			     =  "Login Falied..";
+	public static final String LOGIN_SUCCESSFUL_TOAST	 			 =  "Login Successful..";
+	public static final String MAKE_SURE_PRIVACY_POLICY_TOAST	 	 =  "Make sure you have read and understood the privacy policy before logging in.";
 }
