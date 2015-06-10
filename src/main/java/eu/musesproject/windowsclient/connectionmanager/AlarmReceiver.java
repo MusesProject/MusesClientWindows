@@ -138,7 +138,7 @@ public class AlarmReceiver implements Job {
     	int interval = Integer.parseInt(HttpConnectionsHelper.getInStringSeconds(Integer.toString(AlarmReceiver.POLL_INTERVAL)));
     	
 		try {
-			Trigger newTrigger = TriggerBuilder
+			Trigger updateTrigger = TriggerBuilder
 					.newTrigger()
 					.withSchedule(
 							SimpleScheduleBuilder.simpleSchedule()
@@ -146,7 +146,7 @@ public class AlarmReceiver implements Job {
 					.build();
 		    Trigger oldTrigger = jobExecutionContext.getTrigger();
 		    Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		    scheduler.rescheduleJob(oldTrigger.getKey(), newTrigger);
+		    scheduler.rescheduleJob(oldTrigger.getKey(), updateTrigger);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}

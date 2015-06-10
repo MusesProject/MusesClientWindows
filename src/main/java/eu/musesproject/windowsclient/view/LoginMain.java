@@ -20,11 +20,7 @@ package eu.musesproject.windowsclient.view;
  * #L%
  */
 
-import eu.musesproject.windowsclient.contextmonitoring.IUserContextMonitoringController;
-import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
-
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
@@ -37,7 +33,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -49,10 +49,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -65,8 +62,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
-import eu.musesproject.windowsclient.model.ActionProperty;
-import eu.musesproject.windowsclient.model.DBManager;
+import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.view.Toast.Style;
 
 public class LoginMain extends Application implements Observer{
@@ -144,24 +140,18 @@ public class LoginMain extends Application implements Observer{
 
 	private void initSchedulerForPolling() {
 		try {
-
-			// specify the job' s details..
-			JobDetail job = JobBuilder.newJob(AlarmReceiver.class)
+			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
 					.withIdentity("poll_job").build();
-
-			// specify the running period of the job
-			Trigger trigger = TriggerBuilder
+			Trigger pollTrigger = TriggerBuilder
 					.newTrigger()
 					.withSchedule(
 							SimpleScheduleBuilder.simpleSchedule()
 									.withIntervalInSeconds(AlarmReceiver.POLL_INTERVAL).repeatForever())
 					.build();
-
-			// schedule the job
-			SchedulerFactory schFactory = new StdSchedulerFactory();
-			Scheduler sch = schFactory.getScheduler();
-			sch.start();
-			sch.scheduleJob(job, trigger);
+			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+			Scheduler scheduler = schedulerFactory.getScheduler();
+			scheduler.start();
+			scheduler.scheduleJob(pollJob, pollTrigger);
 
 		} catch (SchedulerException e) {
 			e.printStackTrace();
