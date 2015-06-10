@@ -31,6 +31,7 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
 
@@ -123,32 +124,46 @@ public class RecursiveFileSensor implements ISensor{
     }
 
 
-    /**
-     * creates the context event for this sensor and saves it in the
-     * context event history
-     * @param eventName name of the currently active application
-     * @param eventPath version of the currently active application
-     */
-    private void createContextEvent(String eventName, String eventPath) {
-        // create the context event
-        ContextEvent contextEvent = new ContextEvent();
-        contextEvent.setType(TYPE);
-        contextEvent.setTimestamp(System.currentTimeMillis());
-        contextEvent.addProperty(PROPERTY_KEY_NAME, eventName);
-        contextEvent.addProperty(PROPERTY_KEY_PATH, eventPath);
-        contextEvent.generateId();
-
-        // add context event to the context event history
-        contextEventHistory.add(contextEvent);
-        if (contextEventHistory.size() > CONTEXT_EVENT_HISTORY_SIZE) {
-            contextEventHistory.remove(0);
-        }
-        if(listener != null) {
-            listener.onEvent(contextEvent);
-        }
-    }
-
     private class EventObserver {
+
+        /**
+         * creates the context event for this sensor and saves it in the
+         * context event history
+         * @param eventKind kind of the fired event
+         * @param eventPath path of the corresponding event
+         */
+        private void createContextEvent(WatchEvent.Kind<?> eventKind, String eventPath) {
+            // create the context event
+            String fileEvent = "unknown";
+            if (eventKind == ENTRY_CREATE)
+            {
+                fileEvent = CREATE;
+            }
+            else if (eventKind == ENTRY_DELETE)
+            {
+                fileEvent = DELETE;
+            }
+            else if (eventKind == ENTRY_MODIFY)
+            {
+                fileEvent = MODIFY;
+            }
+
+            ContextEvent contextEvent = new ContextEvent();
+            contextEvent.setType(TYPE);
+            contextEvent.setTimestamp(System.currentTimeMillis());
+            contextEvent.addProperty(PROPERTY_KEY_FILE_EVENT, fileEvent);
+            contextEvent.addProperty(PROPERTY_KEY_PATH, eventPath);
+            contextEvent.generateId();
+
+            // add context event to the context event history
+            contextEventHistory.add(contextEvent);
+            if (contextEventHistory.size() > CONTEXT_EVENT_HISTORY_SIZE) {
+                contextEventHistory.remove(0);
+            }
+            if(listener != null) {
+                listener.onEvent(contextEvent);
+            }
+        }
 
         public Thread backgroundProcess = new Thread(){
             public void run() {
@@ -193,13 +208,13 @@ public class RecursiveFileSensor implements ISensor{
                     Path name = ev.context();
                     Path child = dir.resolve(name);
 
-                    String eventName = event.kind().name().toString();
+                    WatchEvent.Kind<?> eventKind = event.kind();
                     String eventPath = child.toString();
                     // print out event
                     //System.out.format("%s: %s\n", eventName, eventPath);
 
                     // create a context event
-                    createContextEvent(eventName, eventPath);
+                    createContextEvent(eventKind, eventPath);
 
                     // if directory is created, and watching recursively, then
                     // register it and its sub-directories
