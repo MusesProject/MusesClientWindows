@@ -22,6 +22,8 @@ package eu.musesproject.windowsclient.actuators;
 
 import eu.musesproject.client.model.actuators.ResponseInfoAP;
 import eu.musesproject.client.model.decisiontable.Decision;
+import eu.musesproject.windowsclient.view.SimpleFeedbackDialog;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -61,21 +63,22 @@ public class FeedbackActuator implements IFeedbackActuator {
 
             // just show a new dialog if there is no other currently displayed
             if (decisionQueue.size() == 1) {
-                createFeedbackDialog(decision);
+                createSimpleFeedbackDialog(decision);
             }
         }
     }
 
     private void showNextFeedback(Decision decision) {
-        createFeedbackDialog(decision);
+        createSimpleFeedbackDialog(decision);
     }
 
-    private void createFeedbackDialog(Decision decision) {
-        int dialogPolicy = -1;
-        int decisionId = decision.hashCode();// todo add real id
-        String dialogTitle = "";
-        String dialogBody = decision.getRiskCommunication().getRiskTreatment()[0].getTextualDescription();
-
+    private void createSimpleFeedbackDialog(Decision decision) {
+        try {
+            String dialogBody = decision.getRiskCommunication().getRiskTreatment()[0].getTextualDescription();
+            new SimpleFeedbackDialog(decision.getName(), dialogBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -115,7 +118,7 @@ public class FeedbackActuator implements IFeedbackActuator {
     @Override
     public void showCurrentTopFeedback() {
         if(decisionQueue != null && decisionQueue.size() > 0) {
-            createFeedbackDialog(decisionQueue.peek());
+            createSimpleFeedbackDialog(decisionQueue.peek());
         }
     }
 
