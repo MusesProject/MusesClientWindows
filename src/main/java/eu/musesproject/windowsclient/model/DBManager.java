@@ -338,8 +338,8 @@ public class DBManager {
 		config.setServerCertificate(MusesUtils.getCertificateFromSDCard());
 		config.setClientCertificate("");
 		config.setTimeout(5000);
-		config.setPollTimeout(11000);
-		config.setSleepPollTimeout(55000);
+		config.setPollTimeout(60000);
+		config.setSleepPollTimeout(60000);
 		config.setPollingEnabled(1);
 		config.setLoginAttempts(5);
 		try {
