@@ -147,10 +147,10 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		dbManager.openDB();
 		Configuration config = dbManager.getConfigurations();
 		/* Check if config is available */
-		if (config.getServerIp() == null) {
+		if (config == null) {
 			/* DB Connection config is empty, set initial config */
 			// TODO not used?
-//			dbManager.insertConnectionProperties();
+			dbManager.insertConnectionProperties();
 		}
 		config = dbManager.getConfigurations();
 		dbManager.closeDB();

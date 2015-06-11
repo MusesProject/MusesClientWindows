@@ -23,7 +23,6 @@ package eu.musesproject.windowsclient.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -32,9 +31,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-
 import eu.musesproject.windowsclient.view.MusesUtils;
 
 public class DBManager {
@@ -50,7 +47,7 @@ public class DBManager {
 
 	private SessionFactory getSessionFactory() {
 		if (sessionFactory == null) {
-			Configuration configuration = new Configuration();
+			org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
 			configuration.configure();
 			serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
 					configuration.getProperties()).build();
@@ -333,7 +330,7 @@ public class DBManager {
 	}
 
 	public void insertConnectionProperties() {
-		eu.musesproject.windowsclient.model.Configuration config = new eu.musesproject.windowsclient.model.Configuration();
+		Configuration config = new Configuration();
 		config.setServerIp(MusesUtils.getMusesConf());
 		config.setServerPort("8443");
 		config.setServerContextPath("/server");
@@ -367,7 +364,7 @@ public class DBManager {
 		
 	}
 
-	public void insertConfiguration(eu.musesproject.windowsclient.model.Configuration configuration){
+	public void insertConfiguration(Configuration configuration){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -408,7 +405,7 @@ public class DBManager {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
 			if (query != null) {
-				eu.musesproject.windowsclient.model.Configuration c = (eu.musesproject.windowsclient.model.Configuration) query.list().get(0);
+				Configuration c = (Configuration) query.list().get(0);
 				return c.getServerCertificate();
 			}
 		} catch (Exception e) {
@@ -427,7 +424,7 @@ public class DBManager {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
 			if (query != null) {
-				eu.musesproject.windowsclient.model.Configuration c = (eu.musesproject.windowsclient.model.Configuration) query.list().get(0);
+				Configuration c = (Configuration) query.list().get(0);
 				return c.getClientCertificate();
 			}
 		} catch (Exception e) {
@@ -438,15 +435,15 @@ public class DBManager {
 		return null;
 	}
 
-	public eu.musesproject.windowsclient.model.Configuration getConfigurations(){
+	public Configuration getConfigurations(){
 		
 		Session session = null;
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
-			if (query != null) {
-				eu.musesproject.windowsclient.model.Configuration c = (eu.musesproject.windowsclient.model.Configuration) query.list().get(0);
+			if (query.list().size() > 0) {
+				Configuration c = (Configuration) query.list().get(0);
 				return c;
 			}
 		} catch (Exception e) {
@@ -458,7 +455,7 @@ public class DBManager {
 
 	}
 
-	public List<eu.musesproject.windowsclient.model.Configuration> getConfiguration(){
+	public List<Configuration> getConfiguration(){
 		Session session = null;
 		Query query = null;
 		try {
@@ -466,7 +463,6 @@ public class DBManager {
 			query = session.getNamedQuery("Configuration.findAll");
 			if (query != null) {
 				return query.list();
-				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -484,7 +480,7 @@ public class DBManager {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
 			if (query != null) {
-				eu.musesproject.windowsclient.model.Configuration c = (eu.musesproject.windowsclient.model.Configuration) query.list().get(0);
+				Configuration c = (Configuration) query.list().get(0);
 				return c.getSilentMode()==1?true:false;
 			}
 		} catch (Exception e) {
