@@ -208,10 +208,8 @@ public class HttpResponseHandler {
 	}
 
 	private void doPollForAnExtraPacket(){
-		if (NetworkChecker.isInternetConnected()){
-			ConnectionManager connectionManager = new ConnectionManager();
-			connectionManager.poll();
-		}
+		ConnectionManager connectionManager = new ConnectionManager();
+		connectionManager.poll();
 	}
 	
 	/**

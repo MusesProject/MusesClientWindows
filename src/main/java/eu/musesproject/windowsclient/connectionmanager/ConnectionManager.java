@@ -79,11 +79,7 @@ public class ConnectionManager implements IConnectionManager {
 			System.out.println(APP_TAG+ " Connect: Incorrect certificate!");
 //			return; FIXME commented until ssl is not fixed
 		} 
-		
-		if (NetworkChecker.isInternetConnected()) {
-			System.out.println(APP_TAG + " Internet Connected.");
-		}
-		
+
         setCommandOngoing();
 		
 		System.out.println(APP_TAG +  " ConnManager=> connecting to server");
@@ -121,10 +117,7 @@ public class ConnectionManager implements IConnectionManager {
 //			return;
 //		} 
 		
-		if (NetworkChecker.isInternetConnected()) {
-			System.out.println(APP_TAG + " Internet Connected.");
-		}
-		
+
         setCommandOngoing();
 		
 		System.out.println(APP_TAG +  " ConnManager=> connecting to server");

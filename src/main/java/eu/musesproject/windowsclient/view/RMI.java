@@ -77,11 +77,8 @@ public class RMI extends UnicastRemoteObject implements Serializable, IMusesServ
     	try {
     		
             LocateRegistry.createRegistry(1099); 
-            System.out.println("java RMI registry created.");
-    		
 			RMI rmi = new RMI();
 			Naming.rebind("//localhost/RMI",rmi);
-			System.out.println("Rmi started..");
 		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		} catch (MalformedURLException e) {
