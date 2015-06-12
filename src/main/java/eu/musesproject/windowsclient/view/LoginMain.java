@@ -52,6 +52,7 @@ import javax.swing.JFrame;
 
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
+import eu.musesproject.windowsclient.connectionmanager.Statuses;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.model.DBManager;
@@ -150,7 +151,9 @@ public class LoginMain extends Application implements Observer{
 			if (event.getSource() == loginBtn) {
 				if (isPrivacyPolicyAgreementChecked){
 					doLogin(userTextField.getText(),passwordField.getText());
-					saveUserPasswordInDB(userTextField.getText(),passwordField.getText());
+					if (isSaveCredentialsChecked){
+						saveUserPasswordInDB(userTextField.getText(),passwordField.getText());
+					}
 				} else {
 					toastMessage(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
 				}
@@ -236,11 +239,17 @@ public class LoginMain extends Application implements Observer{
         scenetitle.setFill(Color.MAGENTA);
         grid.add(scenetitle, 0, 0, 2, 1);
 		
-        Text userName = new Text(LabelsAndText.LOGGED_IN);
+        Text userName = new Text(LabelsAndText.LOGGED_IN + userTextField.getText());
         userName.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
         grid.add(userName, 0, 2);
         
-        Text password = new Text(LabelsAndText.SERVER_STATUS);
+        String serverStatusText = "";
+        if (Statuses.CURRENT_STATUS == Statuses.ONLINE){
+        	serverStatusText = LabelsAndText.SERVER_STATUS + LabelsAndText.ONLINE;
+        }else {
+        	serverStatusText = LabelsAndText.SERVER_STATUS + LabelsAndText.OFFLINE;
+        }
+        Text password = new Text(serverStatusText);
         password.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
         grid.add(password, 0, 4);
         
@@ -264,7 +273,13 @@ public class LoginMain extends Application implements Observer{
 				System.out.println(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				//stopProgress();
 				isLoggedIn = true;
-				//setLogoutView(); FIXME
+				Platform.runLater(new Runnable() {
+			        @Override
+			        public void run() {
+			          //javaFX operations should go here
+			        	setLogoutView();
+			        }
+				});
 				toastMessage(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				
 				break;
