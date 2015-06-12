@@ -9,26 +9,31 @@ public class SimpleFeedbackDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonDetails;
     private JButton buttonCancel;
-    private JLabel dialogBodyView;
+    private JTextArea dialogBodyView;
     private JLabel dialogTitleView;
     private String[] splitBody;
+    private String decisionId;
 
-    public SimpleFeedbackDialog(String title, String body) {
+    public SimpleFeedbackDialog(String title, String body, String decisionId) {
+        this.decisionId = decisionId;
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonDetails);
+        this.setLocationRelativeTo(null);
+        this.setLocation((int) (getLocation().getX() - (100)), (int) (getLocation().getY() - (100)));
 
         buttonDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onDetails();
             }
         });
-
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
+        dialogBodyView.setEditable(false);
+        dialogBodyView.setBackground(dialogTitleView.getBackground());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -65,7 +70,10 @@ public class SimpleFeedbackDialog extends JDialog {
 
     private void onDetails() {
         dialogBodyView.setText(splitBody[1]);
+        dialogBodyView.setLineWrap(true);
         buttonDetails.hide();
+
+        this.setSize(getWidth(), getHeight() * 2);
     }
 
     private void onCancel() {
@@ -75,7 +83,7 @@ public class SimpleFeedbackDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        SimpleFeedbackDialog dialog = new SimpleFeedbackDialog("STRONG_DENY","test text \n test details");
+        SimpleFeedbackDialog dialog = new SimpleFeedbackDialog("Deny", "Insufficient screen lock timeout: seconds\nTime set for screen lock timeout is not sufficient (it should be lower than 30 seconds), while it is an important security mechanism.Without screen lock, other people with access to your device might access to restricted corporate information. MUSES will change this for you. In case you want to change it back, go to Settings > My device (tab) > Automatic screen lock > Restore the desired screen timeout", "-1");
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);

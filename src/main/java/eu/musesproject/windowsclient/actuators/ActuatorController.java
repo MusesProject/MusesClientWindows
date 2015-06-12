@@ -21,6 +21,7 @@ package eu.musesproject.windowsclient.actuators;
  */
 
 import eu.musesproject.client.model.actuators.ActuationInformationHolder;
+import eu.musesproject.client.model.decisiontable.ActionType;
 import eu.musesproject.client.model.decisiontable.Decision;
 import eu.musesproject.windowsclient.model.DBManager;
 import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
@@ -34,6 +35,10 @@ import java.util.Map;
  * Class that manages the lifecycle of the actuators
  */
 public class ActuatorController implements IActuatorController {
+    interface ClickInformationHandler {
+        void registerClick(String decisionId, ActionType type);
+    }
+
     private static final String TAG = ActuatorController.class.getSimpleName();
 
     private static ActuatorController actuatorController = null;

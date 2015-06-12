@@ -75,7 +75,7 @@ public class FeedbackActuator implements IFeedbackActuator {
     private void createSimpleFeedbackDialog(Decision decision) {
         try {
             String dialogBody = decision.getRiskCommunication().getRiskTreatment()[0].getTextualDescription();
-            new SimpleFeedbackDialog(decision.getName(), dialogBody);
+            new SimpleFeedbackDialog(decision.getName(), dialogBody, decision.getDecision_id());
         } catch (Exception e) {
             e.printStackTrace();
         }
