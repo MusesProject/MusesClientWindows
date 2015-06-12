@@ -1426,6 +1426,31 @@ public class DBManager {
 		return decision;
 	}
 
+	/**
+	 * Retrieve decision from id
+	 * @param decision_id
+	 * @return Decision
+	 */
+
+	public List<Decision> getAllDecisionsWithCondition(String condition) {
+		List<Decision> decisionList = new ArrayList<Decision>();
+		Session session = null;
+		Query query = null;
+		try {
+			session = getSessionFactory().openSession();
+			query = session.getNamedQuery("Decision.findByCondition").setString("condition", condition);
+			if (query.list().size() != 0) {
+				decisionList = query.list();
+				return decisionList;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session!=null) session.close();
+		}
+		return decisionList;
+	}
+
 
 
 	/**

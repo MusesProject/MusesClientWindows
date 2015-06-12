@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 @NamedQueries({
 	@NamedQuery(name="Decision.findAll", query="SELECT d FROM Decision d"),
 	@NamedQuery(name="Decision.findById", query="SELECT d FROM Decision d where d.id = :id"),
+	@NamedQuery(name="Decision.findByCondition", query="SELECT d FROM Decision d where d.condition = :condition"),
 	@NamedQuery(name="Decision.findByNameAndCondition", query="SELECT d FROM Decision d where d.name = :name and d.condition = :condition")
 })
 public class Decision implements Serializable {
