@@ -26,6 +26,7 @@ import java.util.Observer;
 import java.util.Properties;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -49,19 +50,8 @@ import javafx.stage.Stage;
 
 import javax.swing.JFrame;
 
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
-
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
-import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.model.DBManager;
@@ -132,7 +122,8 @@ public class LoginMain extends Application implements Observer{
 		
 		setLoginView();
 		regiterCallbacks();
-		initSchedulerForPolling();
+		userContextMonitoringController = UserContextMonitoringController.getInstance();
+//		initSchedulerForPolling();
 		onResume();
 		
 	}
@@ -165,7 +156,6 @@ public class LoginMain extends Application implements Observer{
 				}
 			} else if (event.getSource() == logoutBtn) {
 				UserContextEventHandler.getInstance().logout();
-				//setLoginView(); // FIXME
 			} 
 		}
 
@@ -283,7 +273,14 @@ public class LoginMain extends Application implements Observer{
 				//stopProgress();
 				isLoggedIn = false;
 				//updateLoginInPrefs(false);
-				//setLoginView(); FIXME
+				
+				Platform.runLater(new Runnable() {
+			        @Override
+			        public void run() {
+			          //javaFX operations should go here
+			        	setLoginView();
+			        }
+				});
 				toastMessage(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				break;
 			default:
@@ -291,7 +288,13 @@ public class LoginMain extends Application implements Observer{
 				//stopProgress();
 				isLoggedIn = false;
 				//updateLoginInPrefs(false);
-				setLoginView();
+				Platform.runLater(new Runnable() {
+			        @Override
+			        public void run() {
+			          //javaFX operations should go here
+			        	setLoginView();
+			        }
+				});
 				toastMessage(LabelsAndText.UNKNOW_ERROR_TOAST);
 				break;
 			}
@@ -367,27 +370,6 @@ public class LoginMain extends Application implements Observer{
 		return true;
 	}
 
-	private void initSchedulerForPolling() {
-		try {
-			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
-					.withIdentity("poll_job").build();
-			Trigger pollTrigger = TriggerBuilder
-					.newTrigger()
-					.withSchedule(
-							SimpleScheduleBuilder.simpleSchedule()
-									.withIntervalInSeconds(AlarmReceiver.POLL_INTERVAL).repeatForever())
-					.build();
-			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-			Scheduler scheduler = schedulerFactory.getScheduler();
-			scheduler.start();
-			scheduler.scheduleJob(pollJob, pollTrigger);
-
-		} catch (SchedulerException e) {
-			e.printStackTrace();
-		}
-	}
-
-	
 	
 	public void setUsernamePasswordIfSaved(){
 		DBManager dbManager = new DBManager();

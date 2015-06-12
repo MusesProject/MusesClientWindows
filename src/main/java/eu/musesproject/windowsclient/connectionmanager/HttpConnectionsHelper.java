@@ -144,9 +144,8 @@ public class HttpConnectionsHelper extends ConnectionManager implements Runnable
 			return serverResponse;
 
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
 		}
-		return null;
+		return serverResponse;
 	}
 
 

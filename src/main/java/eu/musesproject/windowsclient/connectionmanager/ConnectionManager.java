@@ -90,6 +90,7 @@ public class ConnectionManager implements IConnectionManager {
 		// Set alarm, poll interval, sleep poll interval
 		alarmReceiver.setPollInterval(pollInterval, sleepPollInterval);
 		alarmReceiver.setDefaultPollInterval(pollInterval, sleepPollInterval);
+		alarmReceiver.setAlarm();
 	}
 
 	@Override

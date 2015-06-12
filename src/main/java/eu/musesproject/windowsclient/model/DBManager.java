@@ -1643,7 +1643,7 @@ public class DBManager {
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("SensorConfiguration.findBykey").setString("key","enabled");
+			query = session.getNamedQuery("SensorConfiguration.findByKey").setString("key","enabled");
 			if (query.list().size() != 0) {
 				List<SensorConfiguration> sensorList = (List<SensorConfiguration>) query.list();
 				for (SensorConfiguration s: sensorList){

@@ -21,10 +21,13 @@ package eu.musesproject.windowsclient.connectionmanager;
  */
 
 import org.quartz.Job;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
@@ -130,22 +133,26 @@ public class AlarmReceiver implements Job {
     	}else {
     		CURRENT_POLL_INTERVAL = POLL_INTERVAL;
     	}
-    	
     	int interval = Integer.parseInt(HttpConnectionsHelper.getInStringSeconds(Integer.toString(AlarmReceiver.POLL_INTERVAL)));
     	
-		try {
-			Trigger updateTrigger = TriggerBuilder
-					.newTrigger()
-					.withSchedule(
-							SimpleScheduleBuilder.simpleSchedule()
-									.withIntervalInSeconds(interval).repeatForever())
-					.build();
-		    Trigger oldTrigger = jobExecutionContext.getTrigger();
-		    Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-		    scheduler.rescheduleJob(oldTrigger.getKey(), updateTrigger);
-		} catch (SchedulerException e) {
-			e.printStackTrace();
-		}
+    	if (jobExecutionContext != null){
+    		try {
+    			Trigger updateTrigger = TriggerBuilder
+    					.newTrigger()
+    					.withSchedule(
+    							SimpleScheduleBuilder.simpleSchedule()
+    							.withIntervalInSeconds(interval).repeatForever())
+    							.build();
+    			Trigger oldTrigger = jobExecutionContext.getTrigger();
+    			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+    			scheduler.rescheduleJob(oldTrigger.getKey(), updateTrigger);
+    		} catch (SchedulerException e) {
+    			e.printStackTrace();
+    		}
+    	} else{
+    		initSchedulerForPolling(interval);
+    	}
+    	
     }
 
     /**
@@ -190,5 +197,25 @@ public class AlarmReceiver implements Job {
 		POLL_INTERVAL_UPDATED = true;
 	}
     
+	
+	private void initSchedulerForPolling(int pollInterval) {
+		try {
+			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
+					.withIdentity("poll_job").build();
+			Trigger pollTrigger = TriggerBuilder
+					.newTrigger()
+					.withSchedule(
+							SimpleScheduleBuilder.simpleSchedule()
+									.withIntervalInSeconds(pollInterval).repeatForever())
+					.build();
+			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+			Scheduler scheduler = schedulerFactory.getScheduler();
+			scheduler.start();
+			scheduler.scheduleJob(pollJob, pollTrigger);
+
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		}
+	}
    
 }
