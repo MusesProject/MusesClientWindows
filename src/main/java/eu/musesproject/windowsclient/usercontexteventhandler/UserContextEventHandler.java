@@ -40,6 +40,7 @@ import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringCont
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.model.*;
 import eu.musesproject.windowsclient.view.LabelsAndText;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -85,6 +86,8 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	private String tmpLoginPassword;
 	private DBManager dbManager;
 
+	private static Logger logger = Logger.getLogger(UserContextEventHandler.class);
+
 	private UserContextEventHandler() {
 		connectionManager = new ConnectionManager();
 		connectionCallback = new ConnectionCallback();
@@ -125,6 +128,8 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * connects to the MUSES server
 	 */
 	public void connectToServer() {
+		logger.debug("connect to server");
+
 		Configuration config = getServerConfigurationFromDB();
 		String url = "https://" + config.getServerIp() + ":" + config.getServerPort() + config.getServerContextPath() + config.getServerServletPath();
 
@@ -140,6 +145,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	}
 
 	private Configuration getServerConfigurationFromDB() {
+		logger.debug("get server configuration from db");
 		if(dbManager == null) {
 			dbManager = new DBManager();
 		}
@@ -169,15 +175,21 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * @param contextEvents {@link ContextEvent}
 	 */
 	public void send(Action action, Map<String, String> properties, List<ContextEvent> contextEvents) {
+		logger.debug("send(Action action, Map<String, String> properties, List<ContextEvent> contextEvents)");
 		Decision decision = retrieveDecision(action, properties, contextEvents);
 
 		if(decision != null) { // local decision found
+			logger.debug("local decision found");
+
 			ActuatorController.getInstance().showFeedback(new ActuationInformationHolder(decision, action, properties));
             if(action.isRequestedByMusesAwareApp() && action.isMusesAwareAppRequiresResponse()) {
+				logger.debug("send feedback to MUSES aware app");
+
 			    ActuatorController.getInstance().sendFeedbackToMUSESAwareApp(decision);
             }
 		}
 		else { // if there is no local decision, send a request to the server
+			logger.debug("no local decision found");
 			if(serverStatus == Statuses.ONLINE && isUserAuthenticated) { // if the server is online, request a decision
 				// temporary store the information so that the decision can be made after the server responded with
 				// an database update (new policies are sent from the server to the client and stored in the database)
@@ -461,6 +473,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	public void sendRequestToServer(JSONObject requestJSON) {
 		if (requestJSON != null && !requestJSON.toString().isEmpty()) {
 			if(serverStatus == Statuses.ONLINE) {
+				logger.debug("send request to server: " + requestJSON.toString());
                 String sendData  = requestJSON.toString();
 
                 int jsonRequestID = sendData.hashCode();
@@ -472,6 +485,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 
 	public void updateServerOnlineAndUserAuthenticated() {
+		logger.debug("update authentication status");
 		isUserAuthenticated = isAuthenticatedRemotely;
 
 //		SharedPreferences.Editor prefEditor = prefs.edit();
@@ -481,11 +495,9 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	}
 
 	private class ConnectionCallback implements IConnectionCallbacks {
-
-
 		@Override
 		public int receiveCb(String receivedData) {
-			System.out.println(TAG + "| called: receiveCb(String receivedData) receivedData:"+receivedData);
+			logger.debug("called: receiveCb(String receivedData) receivedData:"+receivedData);
 			if((receivedData != null) && (!receivedData.equals(""))) {
 				if(dbManager == null) {
 					dbManager = new DBManager();
@@ -493,18 +505,21 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 				// identify the request type
 				String requestType = JSONManager.getRequestType(receivedData);
-				System.out.println(TAG + "| UCEH - receiveCb(); requestType=" + requestType);
+				logger.debug("receiveCb(); requestType=" + requestType);
 
 				if(requestType.equals(RequestType.UPDATE_POLICIES)) {
 //					RemotePolicyReceiver.getInstance().updateJSONPolicy(receivedData, context);
 
 					// look for the related request
 					int requestId = JSONManager.getRequestId(receivedData);
-					System.out.println(TAG + "| request_id from the json is " + requestId);
+					logger.debug("request_id from the json is " + requestId);
+
 					if(mapOfPendingRequests != null && mapOfPendingRequests.containsKey(requestId)) { // this should ne
 						RequestHolder requestHolder = mapOfPendingRequests.get(requestId);
 						requestHolder.getRequestTimeoutTimer().cancel();
 						mapOfPendingRequests.remove(requestId);
+
+						logger.debug("Removing action: " + JSONManager.getActionType(receivedData) + " from the pending requests");
 						System.out.println(TAG + "| Removing action: " + JSONManager.getActionType(receivedData));
 						send(requestHolder.getAction(), requestHolder.getActionProperties(), requestHolder.getContextEvents());
 					}
@@ -593,11 +608,11 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 		@Override
 		public int statusCb(int status, int detailedStatus, int dataId) {
-			System.out.println(TAG + "| called: statusCb(int status, int detailedStatus)" + status + ", " + detailedStatus);
+			logger.debug("called: statusCb(int status, int detailedStatus)" + status + ", " + detailedStatus);
 			// detect if server is back online after an offline status
 			if(status == Statuses.ONLINE && detailedStatus == DetailedStatuses.SUCCESS) {
 				if(serverStatus == Statuses.OFFLINE) {
-					System.out.println(TAG + "| Server back to ONLINE, sending offline stored events to server");
+					logger.debug("Server back to ONLINE, sending offline stored events to server");
                     setServerStatus(status);
                     updateServerOnlineAndUserAuthenticated();
                     sendOfflineStoredContextEventsToServer();
@@ -626,12 +641,12 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
                     dbManager.closeDB();
 
                     pendingJSONRequest.remove(dataId);
-					System.out.println(TAG + "| data send ok.removed item from pendingJSONRequest, size=" + pendingJSONRequest.size());
+					logger.debug("data send ok.removed item from pendingJSONRequest, size=" + pendingJSONRequest.size());
                 }
             }
             else if(status == Statuses.DATA_SEND_FAILED) {
                 failedJSONRequest.put(dataId, pendingJSONRequest.get(dataId));
-				System.out.println(TAG + "| data send failed.failedJSONRequest size=" + failedJSONRequest.size());
+				logger.debug(" data send failed.failedJSONRequest size=" + failedJSONRequest.size());
             }
             else if(status == Statuses.NEW_SESSION_CREATED && detailedStatus == DetailedStatuses.SUCCESS_NEW_SESSION) {
                 isAuthenticatedRemotely = false;
@@ -653,7 +668,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
             }
 
 			if(detailedStatus == DetailedStatuses.UNKNOWN_ERROR) {
-				System.out.println(TAG + "| UCEH - UNKNOWN_ERROR callback");
+				logger.debug("UNKNOWN_ERROR callback");
 				// fires the unknown error feedback
 				ActuatorController.getInstance().showFeedback(new ActuationInformationHolder());
 			}
@@ -683,7 +698,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	}
 
     private void resendFailedJSONRequests() {
-		System.out.println(TAG + "| resendFailedJSONRequests failedJSONRequest, size=" + failedJSONRequest.size());
+		logger.debug("resendFailedJSONRequests failedJSONRequest, size=" + failedJSONRequest.size());
         List<JSONObject> tmpList = new ArrayList<JSONObject>(failedJSONRequest.values());
         failedJSONRequest.clear();
         for (JSONObject jsonObject : tmpList) {
@@ -717,17 +732,17 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	}
 
 	public void removeRequestById(int requestId) {
-		System.out.println(TAG + "| 6. removeRequestById map size: " + mapOfPendingRequests.size());
+		logger.debug(" 6. removeRequestById map size: " + mapOfPendingRequests.size());
 		if(mapOfPendingRequests != null && mapOfPendingRequests.containsKey(requestId)) {
-			System.out.println(TAG + "| Removing action with id: " + requestId);
+			logger.debug("Removing action with id: " + requestId);
 			mapOfPendingRequests.remove(requestId);
-			System.out.println(TAG + "| 7. removeRequestById map size afterwards: " + mapOfPendingRequests.size());
+			logger.debug(" 7. removeRequestById map size afterwards: " + mapOfPendingRequests.size());
 		}
 	}
 
 	@Override
 	public void handleRequestTimeout(int requestId) {
-		System.out.println(TAG + "| 5. handleRequestTimeout to id: " + requestId);
+		logger.debug("5. handleRequestTimeout to id: " + requestId);
 		// 1. store object temporary
 		// 2. remove object from the map that holds all RequestHolder
 		// 3. perform default decision
