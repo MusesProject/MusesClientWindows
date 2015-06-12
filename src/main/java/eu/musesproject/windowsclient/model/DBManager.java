@@ -119,7 +119,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("SensorConfiguration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				int noOfRows = query.list().size();
 				if (noOfRows>0){
 					return true;
@@ -139,7 +139,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("SensorConfiguration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				int noOfRows = query.list().size();
 				if (noOfRows>0){
 					return true;
@@ -161,7 +161,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("SensorConfiguration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				configurationList = query.list();
 				return configurationList;
 			}
@@ -234,7 +234,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("RequiredApps.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				appsList = query.list();
 				return appsList;
 			} 
@@ -250,22 +250,42 @@ public class DBManager {
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
-		    Transaction trans = null;
-		    try {
-		    	trans = session.beginTransaction();
-		    	UserCredentials userCredential = new UserCredentials();
-		    	userCredential.setId(1000);
-		    	userCredential.setUsername(userName);
-		    	userCredential.setPassword(password);
-		    	userCredential.setDeviceId(deviceId);
-		    	session.save(userCredential);
-		        trans.commit();
-		        
-		    } catch (Exception e) {
-		        if (trans!=null) trans.rollback();
-		        e.printStackTrace(); 
-		    } finally {
-		    	if (session!=null) session.close();
+		    boolean isUserAuthenticated = isUserAuthenticated(deviceId, userName, password);
+		    if (!isUserAuthenticated){
+		    	Transaction trans = null;
+		    	try {
+		    		trans = session.beginTransaction();
+		    		UserCredentials userCredential = new UserCredentials();
+		    		userCredential.setUsername(userName);
+		    		userCredential.setPassword(password);
+		    		userCredential.setDeviceId(deviceId);
+		    		session.save(userCredential);
+		    		trans.commit();
+		    		
+		    	} catch (Exception e) {
+		    		if (trans!=null) trans.rollback();
+		    		e.printStackTrace(); 
+		    	} finally {
+		    		if (session!=null) session.close();
+		    	}
+		    } else {
+		    	Transaction trans = null;
+		    	try {
+		    		trans = session.beginTransaction();
+		    		UserCredentials userCredential = new UserCredentials();
+		    		userCredential.setUsername(userName);
+		    		userCredential.setPassword(password);
+		    		userCredential.setDeviceId(deviceId);
+		    		session.merge(userCredential);
+		    		trans.commit();
+		    		
+		    	} catch (Exception e) {
+		    		if (trans!=null) trans.rollback();
+		    		e.printStackTrace(); 
+		    	} finally {
+		    		if (session!=null) session.close();
+		    	}
+
 		    }
 		    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
 		} catch (RuntimeException re) {
@@ -281,7 +301,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("UserCredentials.findByUsername").setString("username", userName);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				int noOfRows = query.list().size();
 				if (noOfRows>0){
 					return true;
@@ -293,9 +313,47 @@ public class DBManager {
 			if (session!=null) session.close();
 		}
 		return false;
-
 	}
 
+	public boolean isUserAuthenticated() {
+		Session session = null;
+		Query query = null;
+		try {
+			session = getSessionFactory().openSession();
+			query = session.getNamedQuery("UserCredentials.findAll");
+			if (query.list().size() != 0) {
+				int noOfRows = query.list().size();
+				if (noOfRows>0){
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session!=null) session.close();
+		}
+		return false;
+	}
+	
+	public UserCredentials getUserCredentials(){
+		Session session = null;
+		Query query = null;
+		UserCredentials userCredentials = null;
+		try {
+			session = getSessionFactory().openSession();
+			query = session.getNamedQuery("UserCredentials.findAll");
+			if (query.list().size() != 0) {
+				userCredentials = (UserCredentials) query.list().get(0);
+				return userCredentials;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session!=null) session.close();
+		}
+		return userCredentials;
+	}
+	
 	public void deleteUserCredentials(String userName) {
 		Session session = null;
 		try {
@@ -315,7 +373,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("UserCredentials.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				List<UserCredentials> userCredList = query.list();
 				for (UserCredentials d: userCredList) {
 					return d.getDeviceId();
@@ -404,7 +462,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				Configuration c = (Configuration) query.list().get(0);
 				return c.getServerCertificate();
 			}
@@ -423,7 +481,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				Configuration c = (Configuration) query.list().get(0);
 				return c.getClientCertificate();
 			}
@@ -461,7 +519,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return query.list();
 			}
 		} catch (Exception e) {
@@ -479,7 +537,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Configuration.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				Configuration c = (Configuration) query.list().get(0);
 				return c.getSilentMode()==1?true:false;
 			}
@@ -536,7 +594,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				decisionTableList = query.list();
 			}
 		} catch (Exception e) {
@@ -560,7 +618,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByActionId").setString("actionId", action_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -585,7 +643,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByActionAndResource").setString("actionId", action_id).setString("resourceId",resource_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -603,7 +661,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByResource").setString("resourceId", resource_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -622,7 +680,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByDecisiontableId").setString("decisionId", decisiontable_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -646,7 +704,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByActionAndSubject").setString("actionId", action_id).setString("subjectId", subject_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -671,7 +729,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decisiontable.findByActionResourceSubject").setString("actionId", action_id).setString("resourceId", resource_id).setString("subjectId", subject_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Decisiontable) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -783,7 +841,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ActionProperty.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				actionPropertyList = query.list();
 				return actionPropertyList;
 			}
@@ -803,7 +861,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ActionProperty.findByActionId").setInteger("actionId", actionId);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				actionPropertyList = query.list();
 				return actionPropertyList;	
 			}
@@ -824,7 +882,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Action.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				actionList = query.list();
 				return actionList;
 			}
@@ -843,7 +901,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Action.findByDescription").setString("description", description);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Action) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -891,7 +949,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Risktreatment.findByDescription").setString("textualdescription", textualdescription);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Risktreatment) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -1032,7 +1090,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Riskcommunication.findByRiskTreatmentId").setInteger("risktreatmentId",risktreatment_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (Riskcommunication) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -1195,7 +1253,7 @@ public class DBManager {
 			try {
 				session = getSessionFactory().openSession();
 				query = session.getNamedQuery("ContextEvent.findAll");
-				if (query != null) {
+				if (query.list().size() != 0) {
 					return query.list().size();
 				}
 			} catch (Exception e) {
@@ -1212,7 +1270,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Property.findByContextEvent").setInteger("contexteventId",contextevent_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				propertyList = query.list();
 				return propertyList;
 			}
@@ -1230,7 +1288,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ContextEvent.findById").setString("id", id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return (ContextEvent) query.list().get(0);
 			}
 		} catch (Exception e) {
@@ -1249,7 +1307,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ContextEvent.findByActionId").setInteger("actionId", id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				contextEvents = query.list();
 				return contextEvents;
 			}
@@ -1302,7 +1360,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ContextEvent.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				contextEventsList = query.list();
 				return contextEventsList;
 			}
@@ -1321,7 +1379,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Property.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				return query.list();
 			}
 		} catch (Exception e) {
@@ -1356,7 +1414,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decision.findById").setString("id", decision_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				decision = (Decision) query.list().get(0);
 				return decision;
 			}
@@ -1383,7 +1441,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Riskcommunication.findById").setString("id", risk_communication_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				comm =  (Riskcommunication) query.list().get(0);
 				return comm;
 			}
@@ -1408,7 +1466,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Risktreatment.findById").setString("id", risk_treatment_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				treatment =  (Risktreatment) query.list().get(0);
 				return treatment;
 			}
@@ -1480,7 +1538,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Decision.findByNameAndCondition").setString("name",name).setString("condition", condition);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				decision =  (Decision) query.list().get(0);
 				return decision;
 			}
@@ -1500,7 +1558,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Resource.findByPath").setString("path", path);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				resource =  (Resource) query.list().get(0);
 				return resource;
 			}
@@ -1522,7 +1580,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Action.findByType").setString("actionType",type);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				action =  (Action) query.list().get(0);
 				return action;
 			}
@@ -1542,7 +1600,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("SensorConfiguration.findByType").setString("sensorType", type);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				configurationList = query.list();
 				return configurationList;
 			}
@@ -1561,7 +1619,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("SensorConfiguration.findBykey").setString("key","enabled");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				List<SensorConfiguration> sensorList = (List<SensorConfiguration>) query.list();
 				for (SensorConfiguration s: sensorList){
 					enabledSensors.add(s.getSensorType());
@@ -1582,7 +1640,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("ResourceProperty.findByResourceId").setString("resourceId", resource_id);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				properties =  query.list();
 				return properties;
 			}
@@ -1601,7 +1659,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Resource.findByCondition").setString("condition", condition);
-			if (query != null) {
+			if (query.list().size() != 0) {
 				resource =  (Resource) query.list().get(0);
 				return resource;
 			}
@@ -1620,7 +1678,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Resource.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				resourceList = query.list();
 				return resourceList;
 			}
@@ -1640,7 +1698,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Resource.findAll");
-			if (query != null) {
+			if (query.list().size() != 0) {
 				resourceList = query.list();
 				return resourceList;
 			}
@@ -1659,7 +1717,7 @@ public class DBManager {
 		try {
 			session = getSessionFactory().openSession();
 			query = session.getNamedQuery("Resource.findByPathAndCondition").setString("path", path).setString("condition", condition);
-			if (query != null) {	
+			if (query.list().size() != 0) {	
 				resource = (Resource) query.list().get(0);
 				return resource;
 			}

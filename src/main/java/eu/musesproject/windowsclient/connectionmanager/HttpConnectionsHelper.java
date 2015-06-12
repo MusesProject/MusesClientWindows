@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.HttpsURLConnection;
 
 public class HttpConnectionsHelper implements Runnable {
@@ -171,7 +173,7 @@ public class HttpConnectionsHelper implements Runnable {
 	}
 	
 	public static String getInStringSeconds(String pollInterval) {
-		int pollIntervalInSeconds = (Integer.parseInt(pollInterval) / 1000) % 60;
-		return Integer.toString(pollIntervalInSeconds);
+		long pollIntervalInSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(pollInterval)) ;
+		return Long.toString(pollIntervalInSeconds);
 	}
 }
