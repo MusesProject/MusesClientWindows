@@ -81,11 +81,4 @@ public class SimpleFeedbackDialog extends JDialog {
 //        UserContextMonitoringController.getInstance().sendUserBehavior(action, decisionId);
         dispose();
     }
-
-    public static void main(String[] args) {
-        SimpleFeedbackDialog dialog = new SimpleFeedbackDialog("Deny", "Insufficient screen lock timeout: seconds\nTime set for screen lock timeout is not sufficient (it should be lower than 30 seconds), while it is an important security mechanism.Without screen lock, other people with access to your device might access to restricted corporate information. MUSES will change this for you. In case you want to change it back, go to Settings > My device (tab) > Automatic screen lock > Restore the desired screen timeout", "-1");
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
 }
