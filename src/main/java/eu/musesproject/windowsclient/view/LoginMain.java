@@ -66,6 +66,7 @@ import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.model.DBManager;
+import eu.musesproject.windowsclient.model.UserCredentials;
 import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
 import eu.musesproject.windowsclient.view.Toast.Style;
 
@@ -161,7 +162,7 @@ public class LoginMain extends Application implements Observer{
 			if (event.getSource() == loginBtn) {
 				if (isPrivacyPolicyAgreementChecked){
 					doLogin(userTextField.getText(),passwordField.getText());
-					//saveUserPasswordInPrefs();
+					saveUserPasswordInDB(userTextField.getText(),passwordField.getText());
 				} else {
 					toastMessage(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
 				}
@@ -227,6 +228,8 @@ public class LoginMain extends Application implements Observer{
 		hbBtn.getChildren().add(loginBtn);
 		grid.add(hbBtn, 0, 10);
 
+		setUsernamePasswordIfSaved();
+		
 		Scene loginScene = new Scene(grid, 600, 650);
 		primaryStage.setScene(loginScene);
 		primaryStage.show();
@@ -274,7 +277,6 @@ public class LoginMain extends Application implements Observer{
 				System.out.println(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				//stopProgress();
 				isLoggedIn = true;
-				//updateLoginInPrefs(true);
 				//setLogoutView(); FIXME
 				toastMessage(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				
@@ -368,23 +370,6 @@ public class LoginMain extends Application implements Observer{
 		return true;
 	}
 
-//	private void updateLoginInPrefs(boolean value) {
-//		SharedPreferences.Editor prefEditor = prefs.edit();	
-//		prefEditor.putBoolean(IS_LOGGED_IN,value);
-//		prefEditor.commit();
-//		Log.d(MusesUtils.LOGIN_TAG, "IS_LOGGED_IN set in preferences with value: "+value);
-//	}
-//	
-//	private boolean checkIfLoggedInPrefs(){
-//		if (prefs.contains(IS_LOGGED_IN)) {
-//			return prefs.getBoolean(IS_LOGGED_IN,false);
-//		} else {
-//			Log.d(MusesUtils.LOGIN_TAG, "No IS_LOGGED_IN found in preferences");
-//		}
-//		return false;
-//		
-//	}
-	
 	private void initSchedulerForPolling() {
 		try {
 			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
@@ -406,36 +391,27 @@ public class LoginMain extends Application implements Observer{
 	}
 
 	
-//	
-//	public void setUsernamePasswordIfSaved(){
-//		if (prefs.contains(USERNAME)) {
-//			userName = prefs.getString(USERNAME, "");
-//			password = prefs.getString(PASSWORD, "");
-//			userNameTxt.setText(userName);
-//			passwordTxt.setText(password);
-//			
-//		} else {
-//			userNameTxt.setText("");
-//			passwordTxt.setText("");
-//			Log.d(MusesUtils.LOGIN_TAG, "No username-pass found in preferences");
-//		}
-//		
+	
+	public void setUsernamePasswordIfSaved(){
+		DBManager dbManager = new DBManager();
+		dbManager.openDB();
+		if (dbManager.isUserAuthenticated()){
+			UserCredentials userCredentials = dbManager.getUserCredentials();
+			if (userCredentials != null){
+				userTextField.setText(userCredentials.getUsername());
+				passwordField.setText(userCredentials.getPassword());
+			}
+		}
+		
 //		// Set rememberCheckBox, if no choice done default to true
 //		isSaveCredentialsChecked = prefs.getBoolean(SAVE_CREDENTIALS, false);
 //		rememberCheckBox.setChecked(isSaveCredentialsChecked);
-//		
-//	}
-//
-//	private void saveUserPasswordInPrefs(){
-//		userName = userNameTxt.getText().toString();
-//		password = passwordTxt.getText().toString();
-//		SharedPreferences.Editor prefEditor = prefs.edit();	
-//		if (isSaveCredentialsChecked){
-//			prefEditor.putString(USERNAME, userName);
-//			prefEditor.putString(PASSWORD, password);
-//			prefEditor.putBoolean(SAVE_CREDENTIALS, isSaveCredentialsChecked);
-//			prefEditor.commit();
-//			
-//		}
-//	}
+		
+	}
+
+	private void saveUserPasswordInDB(String userName, String password){
+		DBManager dbManager = new DBManager();
+		dbManager.openDB();
+		dbManager.insertCredentials("12345678", userName, password);
+	}
 }
