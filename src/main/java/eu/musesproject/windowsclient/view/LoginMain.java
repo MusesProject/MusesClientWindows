@@ -61,9 +61,14 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
+import android.util.Log;
+import eu.musesproject.client.R;
+import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
+import eu.musesproject.windowsclient.model.DBManager;
+import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
 import eu.musesproject.windowsclient.view.Toast.Style;
 
 public class LoginMain extends Application implements Observer{
@@ -74,6 +79,8 @@ public class LoginMain extends Application implements Observer{
 	static PasswordField passwordField;
 	static CheckBox rememberCredentialsBox, agreeTermBox;
 
+	public static boolean isLoggedIn = false;
+	
 	boolean isPrivacyPolicyAgreementChecked = false;
 	boolean isSaveCredentialsChecked = false;
 	
@@ -137,6 +144,23 @@ public class LoginMain extends Application implements Observer{
 		userContextMonitoringController = UserContextMonitoringController.getInstance();
 //		userContextMonitoringController.connectToServer(); // FIXME Until spring is not imeplemented
 		initSchedulerForPolling();
+		onResume();
+		
+	}
+
+	private void onResume() {
+		DBManager dbManager = new DBManager();
+		dbManager.openDB();
+		boolean isActive = dbManager.isSilentModeActive();
+		dbManager.closeDB();
+		if (!isActive) {
+			// FIXME what should be done here??
+			
+//			topLayout.removeAllViews();
+//			topLayout.addView(loginView);
+//			topLayout.addView(securityQuizView);
+		}
+		
 	}
 
 	private void initSchedulerForPolling() {
@@ -275,7 +299,8 @@ public class LoginMain extends Application implements Observer{
 				showDialog();
 				setLogoutView();
 			} else if (event.getSource() == logoutBtn) {
-				setLoginView();
+				UserContextEventHandler.getInstance().logout();
+				//setLoginView(); // FIXME
 			} 
 		}
 
@@ -298,8 +323,7 @@ public class LoginMain extends Application implements Observer{
 			//startProgress();
 			userContextMonitoringController.login(userName, password);
 		} else {
-			System.out.println(LabelsAndText.EMPTY_LOGIN_FIELD_TOAST);
-			//toastMessage(getResources().getString(R.string.empty_login_fields_msg));
+			toastMessage(LabelsAndText.EMPTY_LOGIN_FIELD_TOAST);
 			
 		}
 	}
@@ -331,19 +355,30 @@ public class LoginMain extends Application implements Observer{
 		if (this.o == o) {
 			switch (actionResponse) {
 			case MusesUICallbacksHandler.LOGIN_SUCCESSFUL:
-				System.out.println("Login was successful..");
-				//System.out.println(msg.getData().get(JSONIdentifiers.AUTH_MESSAGE).toString());
+				System.out.println(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				//stopProgress();
+				isLoggedIn = true;
+				//updateLoginInPrefs(true);
 				//setLogoutView(); FIXME
+				toastMessage(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
+				
 				break;
 			case MusesUICallbacksHandler.LOGIN_UNSUCCESSFUL:
-				System.out.println("Login was unsuccessful..");
+				System.out.println(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
+				//stopProgress();
+				isLoggedIn = false;
+				//updateLoginInPrefs(false);
 				//setLoginView(); FIXME
+				toastMessage(properties.getProperty(JSONIdentifiers.AUTH_MESSAGE));
 				break;
 			default:
 				System.out.println(APP_TAG+" Unknown Error!, updating prefs..");
+				//stopProgress();
+				isLoggedIn = false;
+				//updateLoginInPrefs(false);
+				setLoginView();
+				toastMessage(LabelsAndText.UNKNOW_ERROR_TOAST);
 				break;
-				
 			}
 		}	
 		
