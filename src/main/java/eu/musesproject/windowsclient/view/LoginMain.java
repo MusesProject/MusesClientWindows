@@ -61,10 +61,13 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.sun.scenario.Settings;
+
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
+import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.model.DBManager;
 import eu.musesproject.windowsclient.model.UserCredentials;
 import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
@@ -412,6 +415,6 @@ public class LoginMain extends Application implements Observer{
 	private void saveUserPasswordInDB(String userName, String password){
 		DBManager dbManager = new DBManager();
 		dbManager.openDB();
-		dbManager.insertCredentials("12345678", userName, password);
+		dbManager.insertCredentials(SettingsSensor.getMacAddress(), userName, password);
 	}
 }
