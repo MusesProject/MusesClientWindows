@@ -61,8 +61,6 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
-import android.util.Log;
-import eu.musesproject.client.R;
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
 import eu.musesproject.windowsclient.connectionmanager.AlarmReceiver;
@@ -92,13 +90,6 @@ public class LoginMain extends Application implements Observer{
 	public static void main(String[] args) {
 		RMI.startRMI();
 		launch(args);
-	}
-
-	private void regiterCallbacks() {
-		MusesUICallbacksHandler uiCallbacksHandler = new MusesUICallbacksHandler();
-    	ActuatorController.getInstance().registerCallback(uiCallbacksHandler);
-		uiCallbacksHandler.addObserver(this);
-		setObservable(uiCallbacksHandler);
 	}
 
 	public void setObservable(Observable o){
@@ -163,26 +154,25 @@ public class LoginMain extends Application implements Observer{
 		
 	}
 
-	private void initSchedulerForPolling() {
-		try {
-			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
-					.withIdentity("poll_job").build();
-			Trigger pollTrigger = TriggerBuilder
-					.newTrigger()
-					.withSchedule(
-							SimpleScheduleBuilder.simpleSchedule()
-									.withIntervalInSeconds(AlarmReceiver.POLL_INTERVAL).repeatForever())
-					.build();
-			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-			Scheduler scheduler = schedulerFactory.getScheduler();
-			scheduler.start();
-			scheduler.scheduleJob(pollJob, pollTrigger);
+	final EventHandler<ActionEvent> actionEventListener = new EventHandler<ActionEvent>() {
 
-		} catch (SchedulerException e) {
-			e.printStackTrace();
+		@Override
+		public void handle(final ActionEvent event) {
+			if (event.getSource() == loginBtn) {
+				if (isPrivacyPolicyAgreementChecked){
+					doLogin(userTextField.getText(),passwordField.getText());
+					//saveUserPasswordInPrefs();
+				} else {
+					toastMessage(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
+				}
+			} else if (event.getSource() == logoutBtn) {
+				UserContextEventHandler.getInstance().logout();
+				//setLoginView(); // FIXME
+			} 
 		}
-	}
 
+	};
+	
 	public void setLoginView() {
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -272,81 +262,7 @@ public class LoginMain extends Application implements Observer{
         Scene logoutScene = new Scene(grid, 600, 550);
         primaryStage.setScene(logoutScene);
 	}
-
-
-	final EventHandler<ActionEvent> actionEventListener = new EventHandler<ActionEvent>() {
-
-		@Override
-		public void handle(final ActionEvent event) {
-			if (event.getSource() == loginBtn) {
-				if (isPrivacyPolicyAgreementChecked){
-					doLogin(userTextField.getText(),passwordField.getText());
-					//saveUserPasswordInPrefs();
-				} else {
-					System.out.println(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
-					toastMessage(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
-					//toastMessage(getResources().getString(R.string.make_sure_privacy_policy_read_txt));
-				}
-				
-				// RMI rmi;
-				// try {
-				// rmi = new RMI();
-				// rmi.sendResponseToMusesAwareApp("accepted");;
-				// } catch (RemoteException e) {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-				showDialog();
-				setLogoutView();
-			} else if (event.getSource() == logoutBtn) {
-				UserContextEventHandler.getInstance().logout();
-				//setLoginView(); // FIXME
-			} 
-		}
-
-	};
 	
-
-	private void toastMessage(String makeSurePrivacyPolicyToast) {
-    	final JFrame frame = new JFrame();
-    	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    	frame.setSize(new Dimension(500, 300));
-    	Toast.makeText(frame, makeSurePrivacyPolicyToast, Style.SUCCESS).display();
-	}
-
-	/**
-	 * Check the login fields and Then tries login to the server
-	 */
-
-	public void doLogin(String userName, String password) {
-		if (checkLoginInputFields(userName, password)) {
-			//startProgress();
-			userContextMonitoringController.login(userName, password);
-		} else {
-			toastMessage(LabelsAndText.EMPTY_LOGIN_FIELD_TOAST);
-			
-		}
-	}
-
-	private void showDialog() {
-		Stage dialogStage = new Stage();
-		Button okBtn = new Button(LabelsAndText.OK);
-		Text warningTxt = new Text(LabelsAndText.WARNING);
-		Text feedbackTxt = new Text("This is some test feedback");
-		feedbackTxt.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
-
-		dialogStage.initModality(Modality.WINDOW_MODAL);
-		dialogStage.setScene(new Scene(VBoxBuilder.create()
-				.children(warningTxt, feedbackTxt, okBtn).alignment(Pos.CENTER)
-				.padding(new Insets(5)).build()));
-		dialogStage.show();
-		okBtn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				
-			}
-		});
-	}
 
 	@Override
 	public void update(Observable o, Object msg) {
@@ -384,6 +300,57 @@ public class LoginMain extends Application implements Observer{
 		
 	}
 	
+	/**
+	 * Starts the progress bar when user try to login
+	 */
+	private void startProgress(){
+//		progressDialog = new ProgressDialog(MainActivity.this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
+//		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//		progressDialog.setTitle(getResources().getString(
+//				R.string.logging_in));
+//		progressDialog.setMessage(getResources().getString(
+//				R.string.wait));
+//		progressDialog.setCancelable(true);
+//		progressDialog.show();
+	}
+	
+	/**
+	 * Stops the progress bar when a reply is received from server
+	 */
+	
+	private void stopProgress(){
+//		if (progressDialog != null){
+//			progressDialog.dismiss();
+//		}
+	}
+	
+	private void regiterCallbacks() {
+		MusesUICallbacksHandler uiCallbacksHandler = new MusesUICallbacksHandler();
+    	ActuatorController.getInstance().registerCallback(uiCallbacksHandler);
+		uiCallbacksHandler.addObserver(this);
+		setObservable(uiCallbacksHandler);
+	}
+	
+	private void toastMessage(String makeSurePrivacyPolicyToast) {
+    	final JFrame frame = new JFrame();
+    	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    	frame.setSize(new Dimension(500, 300));
+    	Toast.makeText(frame, makeSurePrivacyPolicyToast, Style.SUCCESS).display();
+	}
+
+	/**
+	 * Check the login fields and Then tries login to the server
+	 */
+
+	public void doLogin(String userName, String password) {
+		if (checkLoginInputFields(userName, password)) {
+			//startProgress();
+			userContextMonitoringController.login(userName, password);
+		} else {
+			toastMessage(LabelsAndText.EMPTY_LOGIN_FIELD_TOAST);
+			
+		}
+	}
 	
 	/**
 	 * Check input fields are not empty before sending it for authentication
@@ -400,6 +367,45 @@ public class LoginMain extends Application implements Observer{
 		} else return false;
 		return true;
 	}
+
+//	private void updateLoginInPrefs(boolean value) {
+//		SharedPreferences.Editor prefEditor = prefs.edit();	
+//		prefEditor.putBoolean(IS_LOGGED_IN,value);
+//		prefEditor.commit();
+//		Log.d(MusesUtils.LOGIN_TAG, "IS_LOGGED_IN set in preferences with value: "+value);
+//	}
+//	
+//	private boolean checkIfLoggedInPrefs(){
+//		if (prefs.contains(IS_LOGGED_IN)) {
+//			return prefs.getBoolean(IS_LOGGED_IN,false);
+//		} else {
+//			Log.d(MusesUtils.LOGIN_TAG, "No IS_LOGGED_IN found in preferences");
+//		}
+//		return false;
+//		
+//	}
+	
+	private void initSchedulerForPolling() {
+		try {
+			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
+					.withIdentity("poll_job").build();
+			Trigger pollTrigger = TriggerBuilder
+					.newTrigger()
+					.withSchedule(
+							SimpleScheduleBuilder.simpleSchedule()
+									.withIntervalInSeconds(AlarmReceiver.POLL_INTERVAL).repeatForever())
+					.build();
+			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+			Scheduler scheduler = schedulerFactory.getScheduler();
+			scheduler.start();
+			scheduler.scheduleJob(pollJob, pollTrigger);
+
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
 //	
 //	public void setUsernamePasswordIfSaved(){
 //		if (prefs.contains(USERNAME)) {
