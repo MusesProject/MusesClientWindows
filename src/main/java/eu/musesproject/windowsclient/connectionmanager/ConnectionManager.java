@@ -77,7 +77,7 @@ public class ConnectionManager implements IConnectionManager {
 		if (cert.isEmpty() || cert.length() < 1000){
 			callBacks.statusCb(Statuses.CONNECTION_FAILED, DetailedStatuses.INCORRECT_CERTIFICATE, 0);
 			System.out.println(APP_TAG+ " Connect: Incorrect certificate!");
-			return;
+//			return; FIXME commented until ssl is not fixed
 		} 
 		
 		if (NetworkChecker.isInternetConnected()) {
