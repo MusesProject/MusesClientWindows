@@ -79,7 +79,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	private static Map<Integer, JSONObject> pendingJSONRequest;// to be able to handle 'data send failed'... so we can resend data
 	private static Map<Integer, JSONObject> failedJSONRequest;// to be able to handle 'data send failed'... so we can resend data
 
-	private String imei;
+	private String macAddress;
 	private String userName;
 	private String tmpLoginUserName;
 	private String tmpLoginPassword;
@@ -187,7 +187,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				requestHolder.getRequestTimeoutTimer().start();
 				mapOfPendingRequests.put(requestHolder.getId(), requestHolder);
 				// create the JSON request and send it to the server
-				JSONObject requestObject = JSONManager.createJSON(getImei(), getUserName(), requestHolder.getId(), RequestType.ONLINE_DECISION, action, properties, contextEvents);
+				JSONObject requestObject = JSONManager.createJSON(getMacAddress(), getUserName(), requestHolder.getId(), RequestType.ONLINE_DECISION, action, properties, contextEvents);
 				sendRequestToServer(requestObject);
 			}
 			else if(serverStatus == Statuses.ONLINE && !isUserAuthenticated) {
@@ -242,7 +242,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
         // send the current user feedback to the server
 		if(serverStatus == Statuses.ONLINE && isUserAuthenticated) {
-			JSONObject userBehaviorJSON = JSONManager.createUserBehaviorJSON(getImei(), getUserName(), action.getActionType(), decisionId);
+			JSONObject userBehaviorJSON = JSONManager.createUserBehaviorJSON(getMacAddress(), getUserName(), action.getActionType(), decisionId);
 			sendRequestToServer(userBehaviorJSON);
 		}
 		else {
@@ -270,7 +270,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		String deviceId;
 		dbManager.openDB();
 		if((deviceId = dbManager.getDevId()) == null || deviceId.isEmpty()) {
-			deviceId = getImei();
+			deviceId = getMacAddress();
 		}
 		dbManager.closeDB();
 
@@ -280,7 +280,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		}
 		else {
 			dbManager.openDB();
-			isUserAuthenticated = dbManager.isUserAuthenticated(getImei(), tmpLoginUserName, tmpLoginPassword);
+			isUserAuthenticated = dbManager.isUserAuthenticated(getMacAddress(), tmpLoginUserName, tmpLoginPassword);
 			dbManager.closeDB();
 			ActuatorController.getInstance().sendLoginResponse(isUserAuthenticated, LabelsAndText.LOGIN_LOCAL_TOAST, -1);
 			if (isUserAuthenticated){
@@ -304,7 +304,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
         // try to log in locally
 		dbManager.openDB();
-		isUserAuthenticated = dbManager.isUserAuthenticated(getImei(), userName, password);
+		isUserAuthenticated = dbManager.isUserAuthenticated(getMacAddress(), userName, password);
 		boolean sensorConfigExists = dbManager.hasSensorConfig();
 		dbManager.closeDB();
 
@@ -312,7 +312,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
         if(serverStatus == Statuses.ONLINE) {
         	tmpLoginUserName = userName;
         	tmpLoginPassword = password;
-        	JSONObject requestObject = JSONManager.createLoginJSON(userName, password, getImei());
+        	JSONObject requestObject = JSONManager.createLoginJSON(userName, password, getMacAddress());
             sendRequestToServer(requestObject);
         }
 
@@ -337,7 +337,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * Method to request a configuration update
 	 */
 	private void sendConfigSyncRequest() {
-		JSONObject configSyncRequest = JSONManager.createConfigSyncJSON(getImei(), SettingsSensor.getOSVersion(), getUserName());
+		JSONObject configSyncRequest = JSONManager.createConfigSyncJSON(getMacAddress(), SettingsSensor.getOSVersion(), getUserName());
 		sendRequestToServer(configSyncRequest);
 	}
 
@@ -346,7 +346,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 */
 	public void logout() {
 		if(serverStatus == Statuses.ONLINE) {
-			JSONObject logoutJSON = JSONManager.createLogoutJSON(getUserName(), getImei());
+			JSONObject logoutJSON = JSONManager.createLogoutJSON(getUserName(), getMacAddress());
 			sendRequestToServer(logoutJSON);
 		}
 		else {
@@ -442,7 +442,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				}
 
 				// 4.4. create a json for
-				JSONObject requestObject = JSONManager.createJSON(getImei(), getUserName(), -1, RequestType.ONLINE_DECISION, action, actionProperties, contextEvents);
+				JSONObject requestObject = JSONManager.createJSON(getMacAddress(), getUserName(), -1, RequestType.ONLINE_DECISION, action, actionProperties, contextEvents);
 
 				// 4.5. send this json to the server
 				sendRequestToServer(requestObject);
@@ -516,7 +516,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
                     updateServerOnlineAndUserAuthenticated();
 					if(isAuthenticatedRemotely) {
 						dbManager.openDB();
-						dbManager.insertCredentials(getImei(), tmpLoginUserName, tmpLoginPassword);
+						dbManager.insertCredentials(getMacAddress(), tmpLoginUserName, tmpLoginPassword);
 						dbManager.closeDB();
 						// clear the credentials in the fields
 						userName = tmpLoginUserName;
@@ -691,11 +691,11 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
         }
     }
 
-    public String getImei() {
-		if(imei == null || imei.equals("")) {
-			this.imei ="1337"; // TODO how to get an device ID?
+    public String getMacAddress() {
+		if(macAddress == null || macAddress.equals("")) {
+			this.macAddress = SettingsSensor.getMacAddress();
 		}
-		return imei;
+		return macAddress;
 	}
 
     public boolean isUserAuthenticated() {
