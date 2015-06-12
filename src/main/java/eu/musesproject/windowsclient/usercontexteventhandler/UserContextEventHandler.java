@@ -25,14 +25,6 @@ package eu.musesproject.windowsclient.usercontexteventhandler;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-
 import eu.musesproject.client.model.RequestType;
 import eu.musesproject.client.model.actuators.ActuationInformationHolder;
 import eu.musesproject.client.model.decisiontable.Action;
@@ -41,23 +33,20 @@ import eu.musesproject.client.model.decisiontable.Request;
 import eu.musesproject.client.model.decisiontable.Resource;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
-import eu.musesproject.windowsclient.connectionmanager.ConnectionManager;
-import eu.musesproject.windowsclient.connectionmanager.DetailedStatuses;
-import eu.musesproject.windowsclient.connectionmanager.IConnectionCallbacks;
-import eu.musesproject.windowsclient.connectionmanager.RequestHolder;
-import eu.musesproject.windowsclient.connectionmanager.RequestTimeoutTimer;
-import eu.musesproject.windowsclient.connectionmanager.Statuses;
+import eu.musesproject.windowsclient.connectionmanager.*;
 import eu.musesproject.windowsclient.contextmonitoring.JSONManager;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.decisionmaker.DecisionMaker;
-import eu.musesproject.windowsclient.model.ActionProperty;
-import eu.musesproject.windowsclient.model.Configuration;
-import eu.musesproject.windowsclient.model.DBManager;
-import eu.musesproject.windowsclient.model.Property;
-import eu.musesproject.windowsclient.model.ResourceCreator;
-import eu.musesproject.windowsclient.model.SensorConfiguration;
+import eu.musesproject.windowsclient.model.*;
 import eu.musesproject.windowsclient.view.LabelsAndText;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Class UserContextEventHandler. Singleton
@@ -561,29 +550,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 					ActuatorController.getInstance().sendLoginResponse(false, authMessage, -1);
 				}
 				else if(requestType.equals(RequestType.CONFIG_UPDATE)) {
-                	/*
-                	 *  sensor configuration
-                	 *  1.1 load config items from JSON
-                	 *  1.2 insert config items in db
-                	 *  1.3 notify sensors about the new configuration
-                	 */
-					// 1.1 load config items from JSON
-					List<SensorConfiguration> configList = JSONManager.getSensorConfig(receivedData);
-					// 1.2 insert config items in db
-					boolean sensorConfigAlreadyExists;
-					dbManager.openDB();
-					sensorConfigAlreadyExists = dbManager.hasSensorConfig();
-					dbManager.closeDB();
-					if(!sensorConfigAlreadyExists) {
-						dbManager.openDB();
-						for(SensorConfiguration configItem : configList) {
-							dbManager.insertSensorConfiguration(configItem);
-						}
-						dbManager.closeDB();
-						// 1.3 notify sensors about the new configuration
-						UserContextMonitoringController.getInstance().onSensorConfigurationChanged();
-					}
-
                 	/*
                 	 *  trials configuration
                 	 *  2.1 load config from JSON

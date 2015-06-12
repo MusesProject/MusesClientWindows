@@ -73,18 +73,11 @@ public class SensorController {
         if(!isCollectingData) {
             System.out.println(TAG + " | SC - 2. data collection in enabled");
             List<String> enabledSensor = new ArrayList<String>();
-            boolean sensorConfigExists = false;
-            dbManager.openDB();
-            sensorConfigExists = dbManager.hasSensorConfig();
-            dbManager.closeDB();
 
             // just start the sensors if there is a configuration for them
             // check for sensorConfigExists later
             if(true/*sensorConfigExists*/) {
                 System.out.println(TAG + " | SC - 3. config exists");
-                dbManager.openDB();
-                enabledSensor = dbManager.getAllEnabledSensorTypes();
-                dbManager.closeDB();
                 enabledSensor.add("CONTEXT_SENSOR_APP");
                 enabledSensor.add("CONTEXT_SENSOR_CONNECTIVITY");
                 enabledSensor.add("CONTEXT_SENSOR_DEVICE_PROTECTION");
@@ -100,6 +93,7 @@ public class SensorController {
     }
 
     private void enableMockedSensors() throws IOException {
+        System.out.println(TAG + " | enableMockedSensors");
         activeSensors.put(MockUpAppSensor.TYPE, new MockUpAppSensor());
         activeSensors.put(MockUpDeviceProtectionSensor.TYPE, new MockUpDeviceProtectionSensor());
 
@@ -110,24 +104,17 @@ public class SensorController {
     }
 
     private void startAndConfigureSensors(List<String> enabledSensor) throws IOException {
-//		Log.d(MusesUtils.TEST_TAG, "SC - startAndConfigureSensors");
-		
-    	for (String sensorType : enabledSensor) {
-    		ISensor sensor;
-//        	dbManager.openDB();
-//    		List<SensorConfiguration> configItems = dbManager.getAllSensorConfigItemsBySensorType(sensorType);
-//        	dbManager.closeDB();
-    		
-        	sensor = createSensor(sensorType);
-        	if(sensor == null) {
-        		continue;
-        	}
+        for (String sensorType : enabledSensor) {
+            ISensor sensor;
 
-//    		Log.d(MusesUtils.TEST_TAG, "SC - config test: sensor type="+sensor.getClass().getSimpleName() + ", no. config items="+configItems.size());
-//    		sensor.configure(configItems);
-    		sensor.enable();
-    		activeSensors.put(sensorType, sensor);
-		}
+            sensor = createSensor(sensorType);
+            if(sensor == null) {
+                continue;
+            }
+
+            sensor.enable();
+            activeSensors.put(sensorType, sensor);
+        }
 
         for (ISensor sensor : activeSensors.values()) {
             sensor.addContextListener(contextEventBus);
