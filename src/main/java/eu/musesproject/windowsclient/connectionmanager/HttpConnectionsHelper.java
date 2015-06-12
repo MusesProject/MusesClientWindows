@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class HttpConnectionsHelper implements Runnable {
+public class HttpConnectionsHelper extends ConnectionManager implements Runnable {
 
 	private HttpsURLConnection urlConnection;
 	private Request request;
@@ -140,6 +140,7 @@ public class HttpConnectionsHelper implements Runnable {
 			httpResponse = new HttpResponse(responseCode, requestMethod, 
 														 payloadResponse.toString(), responseHeader, isMorePackets);
 			serverResponse.setResponse(httpResponse);
+			setCommandNotOngoing();
 			return serverResponse;
 
 		} catch (IOException e) {

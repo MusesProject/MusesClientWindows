@@ -231,11 +231,11 @@ public class ConnectionManager implements IConnectionManager {
 	}
 	
 	
-	private void setCommandOngoing() {
+	protected void setCommandOngoing() {
 		mCommandOngoing.set(1);	
 	}
 	
-	private void setCommandNotOngoing() {	// FIXME Check how it is done in MusesClient should be called after request
+	protected void setCommandNotOngoing() {	// FIXME Check how it is done in MusesClient should be called after request
 		mCommandOngoing.set(0);	
 	}
 	

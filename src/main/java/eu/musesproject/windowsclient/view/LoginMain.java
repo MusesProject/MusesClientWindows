@@ -41,12 +41,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javax.swing.JFrame;
@@ -60,8 +58,6 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
-
-import com.sun.scenario.Settings;
 
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
@@ -136,8 +132,6 @@ public class LoginMain extends Application implements Observer{
 		
 		setLoginView();
 		regiterCallbacks();
-		userContextMonitoringController = UserContextMonitoringController.getInstance();
-//		userContextMonitoringController.connectToServer(); // FIXME Until spring is not imeplemented
 		initSchedulerForPolling();
 		onResume();
 		
