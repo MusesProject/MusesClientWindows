@@ -1432,13 +1432,13 @@ public class DBManager {
 	 * @return Decision
 	 */
 
-	public List<Decision> getAllDecisionsWithCondition(String condition) {
+	public List<Decision> getAllDecisionsWithCondition() {
 		List<Decision> decisionList = new ArrayList<Decision>();
 		Session session = null;
 		Query query = null;
 		try {
 			session = getSessionFactory().openSession();
-			query = session.getNamedQuery("Decision.findByCondition").setString("condition", condition);
+			query = session.getNamedQuery("Decision.findAllWithCondition");
 			if (query.list().size() != 0) {
 				decisionList = query.list();
 				return decisionList;

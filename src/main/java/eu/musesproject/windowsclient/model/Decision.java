@@ -34,6 +34,7 @@ import java.sql.Timestamp;
 	@NamedQuery(name="Decision.findAll", query="SELECT d FROM Decision d"),
 	@NamedQuery(name="Decision.findById", query="SELECT d FROM Decision d where d.id = :id"),
 	@NamedQuery(name="Decision.findByCondition", query="SELECT d FROM Decision d where d.condition = :condition"),
+	@NamedQuery(name="Decision.findAllWithCondition", query="SELECT d FROM Decision d where d.condition IS NOT NULL"),
 	@NamedQuery(name="Decision.findByNameAndCondition", query="SELECT d FROM Decision d where d.name = :name and d.condition = :condition")
 })
 public class Decision implements Serializable {
@@ -48,6 +49,10 @@ public class Decision implements Serializable {
 	private Timestamp modification;
 
 	private String name;
+	
+	private String decision_id;
+	
+	private int solving_risktreatment;
 
 	public Decision() {
 	}
@@ -82,6 +87,22 @@ public class Decision implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDecision_id() {
+		return decision_id;
+	}
+
+	public void setDecision_id(String decision_id) {
+		this.decision_id = decision_id;
+	}
+
+	public int getSolving_risktreatment() {
+		return solving_risktreatment;
+	}
+
+	public void setSolving_risktreatment(int solving_risktreatment) {
+		this.solving_risktreatment = solving_risktreatment;
 	}
 
 }
