@@ -14,8 +14,8 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                         <encoding>ISO-8859-1</encoding>
                     </configuration>
                 </plugin>
@@ -64,29 +64,6 @@
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <JavaFX-Version>2.2.3</JavaFX-Version>
-                                <Main-Class>eu.musesproject.windowsclient.view.LoginMain</Main-Class>
-                                <implementation-version>1.0</implementation-version>
-                                <JavaFX-Application-Class>eu.musesproject.windowsclient.view.LoginMain</JavaFX-Application-Class>
-                                <JavaFX-Class-Path>
-                                    <!-- list all your dependencies here -->
-                                </JavaFX-Class-Path>
-                                <!-- The artifactId (name) of the jfxrt.jar ... see dependency system
-                                    scope -->
-                                <Class-Path>${java.home}/lib/jfxrt.jar</Class-Path>
-                            </manifestEntries>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                            </manifest>
-                        </archive>
-                    </configuration>
                 </plugin>
                 <plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
