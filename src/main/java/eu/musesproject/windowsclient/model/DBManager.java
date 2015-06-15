@@ -23,6 +23,9 @@ package eu.musesproject.windowsclient.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder.In;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -32,6 +35,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+
 import eu.musesproject.windowsclient.view.MusesUtils;
 
 public class DBManager {
@@ -557,15 +561,15 @@ public class DBManager {
 	 * @param decisionTable
 	 */
 
-	public long addDecisionTable(Decisiontable decisionTable){
-		long id = -1;
+	public int addDecisionTable(Decisiontable decisionTable){
+		int id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	id = (Long) session.save(decisionTable);
+		    	id = (Integer) session.save(decisionTable);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -764,15 +768,15 @@ public class DBManager {
 	}
 
 
-	public long addOfflineAction(Action action){
-		long id = -1;
+	public int addOfflineAction(Action action){
+		int id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	id = (Long) session.save(action);
+		    	id = (Integer) session.save(action);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -810,15 +814,15 @@ public class DBManager {
 		}
 	}
 	
-	public long addOfflineActionProperty(ActionProperty actionProperty) {
-		long id = -1;
+	public int addOfflineActionProperty(ActionProperty actionProperty) {
+		int id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	id = (Long) session.save(actionProperty);
+		    	id = (Integer) session.save(actionProperty);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
@@ -1223,15 +1227,15 @@ public class DBManager {
 
 	// Context Event related queries
 
-	public long addContextEvent(ContextEvent event) {
-		long id = -1;
+	public int addContextEvent(ContextEvent event) {
+		int id = -1;
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
 		    try {
 		    	trans = session.beginTransaction();
-		    	id = (Long) session.save(event);
+		    	id = (Integer) session.save(event);
 		        trans.commit();
 		    } catch (Exception e) {
 		        if (trans!=null) trans.rollback();
