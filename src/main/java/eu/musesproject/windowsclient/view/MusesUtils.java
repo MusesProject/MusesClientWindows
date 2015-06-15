@@ -1,5 +1,8 @@
 package eu.musesproject.windowsclient.view;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /*
  * #%L
  * MUSES Client
@@ -23,6 +26,9 @@ package eu.musesproject.windowsclient.view;
 public class MusesUtils {
 
 	public static String serverCertificate = "";
+	private static Locale currentLocale;
+	private static ResourceBundle messages;
+	
 	public static String getCertificateFromSDCard()  {
 		serverCertificate = ""; // FIXME
 //		String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -56,5 +62,17 @@ public class MusesUtils {
 //		}
 		return settings;
 	}
+
+	public static ResourceBundle getResourceBundle() {
+		if (messages == null){
+			currentLocale = new Locale(LoginMain.language, LoginMain.country);
+			messages = ResourceBundle.getBundle("eu.musesproject.windowsclient.view.MessagesBundle", currentLocale);
+			return messages;
+		} else {
+			return messages;
+		}
+	}
+	
+	
     
 }

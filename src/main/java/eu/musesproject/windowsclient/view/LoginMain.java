@@ -21,9 +21,11 @@ package eu.musesproject.windowsclient.view;
  */
 
 import java.awt.Dimension;
+import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -75,12 +77,27 @@ public class LoginMain extends Application implements Observer{
 	
 	private Observable o;
 	
+	public static String language;
+	public static String country;
+	private static Locale currentLocale;
+	private static ResourceBundle messages;
 	private UserContextMonitoringController userContextMonitoringController;
 
 
 	public static void main(String[] args) {
+		setupLocale(args);
 		RMI.startRMI();
 		launch(args);
+	}
+
+	private static void setupLocale(String[] args) {
+        if (args.length != 2) {
+            language = new String("en");
+            country = new String("US");
+        } else {
+            language = new String(args[0]);
+            country = new String(args[1]);
+        }
 	}
 
 	public void setObservable(Observable o){
@@ -90,22 +107,22 @@ public class LoginMain extends Application implements Observer{
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		primaryStage.setTitle(LabelsAndText.MUSES_TITLE);
+		primaryStage.setTitle(MusesUtils.getResourceBundle().getString("app_name"));
 		
 		String musesIconURL = LoginMain.class.getClassLoader().getResource("muses_icon.png").toString();
 		Image musesIcon = new Image(musesIconURL);
 		primaryStage.getIcons().add(musesIcon);
 
-		loginBtn = new Button(LabelsAndText.LOGIN_LABEL);
+		loginBtn = new Button(MusesUtils.getResourceBundle().getString("login_button_txt"));
 		loginBtn.setStyle("-fx-background-color: grey; -fx-text-fill: white;");
 
-		logoutBtn = new Button(LabelsAndText.LOGOUT);
+		logoutBtn = new Button(MusesUtils.getResourceBundle().getString("logout_button_txt"));
 		logoutBtn.setStyle("-fx-background-color: grey; -fx-text-fill: white;");
 
 		loginBtn.setOnAction(actionEventListener);
 		logoutBtn.setOnAction(actionEventListener);
 
-		rememberCredentialsBox = new CheckBox(LabelsAndText.REMEMBER_MY_LOGIN);
+		rememberCredentialsBox = new CheckBox(MusesUtils.getResourceBundle().getString("remember_my_login_txt"));
 		rememberCredentialsBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
@@ -113,7 +130,7 @@ public class LoginMain extends Application implements Observer{
 			}
 		});
 		
-		agreeTermBox = new CheckBox(LabelsAndText.AGREE_TO_POLICY);
+		agreeTermBox = new CheckBox(MusesUtils.getResourceBundle().getString("agree_term_condition_txt"));
 		agreeTermBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
@@ -155,7 +172,7 @@ public class LoginMain extends Application implements Observer{
 						saveUserPasswordInDB(userTextField.getText(),passwordField.getText());
 					}
 				} else {
-					toastMessage(LabelsAndText.MAKE_SURE_PRIVACY_POLICY_TOAST);
+					toastMessage(MusesUtils.getResourceBundle().getString("make_sure_privacy_policy_read_txt"));
 				}
 			} else if (event.getSource() == logoutBtn) {
 				UserContextEventHandler.getInstance().logout();
@@ -171,43 +188,43 @@ public class LoginMain extends Application implements Observer{
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
-		Text scenetitle = new Text(LabelsAndText.LOGIN_LABEL);
+		Text scenetitle = new Text(MusesUtils.getResourceBundle().getString("login_button_txt"));
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 30));
 		scenetitle.setStroke(Color.PURPLE);
 		scenetitle.setFill(Color.MAGENTA);
 		grid.add(scenetitle, 0, 0, 2, 1);
 
-		Label description = new Label(LabelsAndText.TITLE_SUBTEXT);
+		Label description = new Label(MusesUtils.getResourceBundle().getString("login_detail_view_txt"));
 		description.setWrapText(true);
 		grid.add(description, 0, 1);
 
-		Text userName = new Text(LabelsAndText.USERNAME);
+		Text userName = new Text(MusesUtils.getResourceBundle().getString("username_txt"));
 		userName.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
 		grid.add(userName, 0, 2);
 
 		userTextField = new TextField();
-		userTextField.setPromptText(LabelsAndText.PROMT_TXT_USERNAME);
+		userTextField.setPromptText(MusesUtils.getResourceBundle().getString("hint_txt_userid"));
 		userTextField.setMinHeight(20);
 		;
 		grid.add(userTextField, 0, 3);
 
-		Text password = new Text(LabelsAndText.PASSWORD);
+		Text password = new Text(MusesUtils.getResourceBundle().getString("password_txt"));
 		password.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
 		grid.add(password, 0, 4);
 
 		passwordField = new PasswordField();
-		passwordField.setPromptText(LabelsAndText.PROMT_TXT_PASSWORD);
+		passwordField.setPromptText(MusesUtils.getResourceBundle().getString("hint_txt_password"));
 		passwordField.setMinHeight(20);
 		grid.add(passwordField, 0, 5);
 
 
 		grid.add(rememberCredentialsBox, 0, 6);
 
-		Text privacyPolicy = new Text(LabelsAndText.PRIVACY_POLICY_LABEL);
+		Text privacyPolicy = new Text(MusesUtils.getResourceBundle().getString("privacy_policy_view_txt"));
 		privacyPolicy.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
 		grid.add(privacyPolicy, 0, 7);
 
-		Label policy = new Label(LabelsAndText.PRIVACY_POLICY);
+		Label policy = new Label(MusesUtils.getResourceBundle().getString("privacy_policy_detail_txt"));
 		policy.setWrapText(true);
 		grid.add(policy, 0, 8);
 
@@ -233,21 +250,21 @@ public class LoginMain extends Application implements Observer{
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 		
-        Text scenetitle = new Text(LabelsAndText.LOGIN_LABEL);
+        Text scenetitle = new Text(MusesUtils.getResourceBundle().getString("login_button_txt"));
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 30));
         scenetitle.setStroke(Color.PURPLE);
         scenetitle.setFill(Color.MAGENTA);
         grid.add(scenetitle, 0, 0, 2, 1);
 		
-        Text userName = new Text(LabelsAndText.LOGGED_IN + userTextField.getText());
+        Text userName = new Text(MusesUtils.getResourceBundle().getString("logged_in_info_txt") + userTextField.getText());
         userName.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
         grid.add(userName, 0, 2);
         
         String serverStatusText = "";
         if (Statuses.CURRENT_STATUS == Statuses.ONLINE){
-        	serverStatusText = LabelsAndText.SERVER_STATUS + LabelsAndText.ONLINE;
+        	serverStatusText = MusesUtils.getResourceBundle().getString("current_com_status_pre") + MusesUtils.getResourceBundle().getString("current_com_status_2");
         }else {
-        	serverStatusText = LabelsAndText.SERVER_STATUS + LabelsAndText.OFFLINE;
+        	serverStatusText = MusesUtils.getResourceBundle().getString("current_com_status_pre") + MusesUtils.getResourceBundle().getString("current_com_status_3");
         }
         Text password = new Text(serverStatusText);
         password.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
@@ -364,7 +381,7 @@ public class LoginMain extends Application implements Observer{
 			//startProgress();
 			userContextMonitoringController.login(userName, password);
 		} else {
-			toastMessage(LabelsAndText.EMPTY_LOGIN_FIELD_TOAST);
+			toastMessage(MusesUtils.getResourceBundle().getString("empty_login_fields_msg"));
 			
 		}
 	}
