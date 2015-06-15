@@ -1,5 +1,9 @@
 package eu.musesproject.windowsclient.view;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -66,11 +70,18 @@ public class MusesUtils {
 	public static ResourceBundle getResourceBundle() {
 		if (messages == null){
 			currentLocale = new Locale(LoginMain.language, LoginMain.country);
-			messages = ResourceBundle.getBundle("eu.musesproject.windowsclient.view.MessagesBundle", currentLocale);
-			return messages;
-		} else {
-			return messages;
-		}
+            File file = new File("resources/MessagesBundle.properties");  
+            ClassLoader loader=null;
+            try {
+            	URL[] urls = {file.toURI().toURL()};  
+                loader = new URLClassLoader(urls); 
+                messages = ResourceBundle.getBundle("MessagesBundle", Locale.getDefault(), loader);
+                return messages;
+            } catch (MalformedURLException ex) {
+            	ex.getLocalizedMessage();
+            }
+		} 
+		return messages;
 	}
 	
 	
