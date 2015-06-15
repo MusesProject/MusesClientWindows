@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -745,7 +743,7 @@ public class DBManager {
 	}
 
 
-	public void addAction(Action action){
+	public long addAction(Action action){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -765,6 +763,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return action.getId();
 	}
 
 
@@ -923,26 +922,36 @@ public class DBManager {
 	 * @param riskTreatment
 	 */
 
-	public void addRiskTreatment(Risktreatment riskTreatment){
+	public long addRiskTreatment(Risktreatment riskTreatment){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
 		    Transaction trans = null;
-		    try {
-		    	trans = session.beginTransaction();
-		    	session.save(riskTreatment);
-		        trans.commit();
-		    } catch (Exception e) {
-		        if (trans!=null) trans.rollback();
-		        e.printStackTrace(); 
-		    } finally {
-		    	if (session!=null) session.close();
+		    
+		    Risktreatment riskTreatmentInDb = getRiskTreatmentFromDescription(riskTreatment.getTextualdescription().replaceAll("'", "\\'"));
+		    
+		    if (riskTreatmentInDb.getId() == 0){
+		    	logger.log(Level.DEBUG,  "Risktreatment not found, inserting a new one...");
+		    	try {
+			    	trans = session.beginTransaction();
+			    	session.save(riskTreatment);
+			        trans.commit();
+			    } catch (Exception e) {
+			        if (trans!=null) trans.rollback();
+			        e.printStackTrace(); 
+			    } finally {
+			    	if (session!=null) session.close();		    	
+			    }
+			    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
+		    }else{
+		    	logger.log(Level.DEBUG,  "Risktreatment found, returning the existing one..."
+						+ riskTreatmentInDb.getId());
 		    }
-		    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
 		} catch (RuntimeException re) {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return riskTreatment.getId();
 
 	}
 
@@ -972,7 +981,7 @@ public class DBManager {
 	 * @param resourceType
 	 */
 
-	public void addResourceType(Resourcetype resourceType){
+	public long addResourceType(Resourcetype resourceType){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -992,6 +1001,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return resourceType.getId();
 	}
 
 	/**
@@ -999,7 +1009,7 @@ public class DBManager {
 	 * @param resource
 	 */
 
-	public void addResource(Resource resource){
+	public long addResource(Resource resource){
 		int size = controlDB("before");
 		Resource resourceInDb = getResourceFromPathAndCondition(resource.getPath(), resource.getCondition());
 		if (resourceInDb.getId()==0){
@@ -1027,8 +1037,9 @@ public class DBManager {
 		}else{
 			logger.log(Level.INFO,"Resource found, returning the existing one..."+resourceInDb.getId());
 			controlDB("after "+ resourceInDb.getId());
+			return resourceInDb.getId();
 		}
-
+		return resource.getId();
 
 	}
 
@@ -1058,7 +1069,7 @@ public class DBManager {
 	 * @param riskCommunication
 	 */
 
-	public void addRiskCommunication(Riskcommunication riskCommunication){
+	public long addRiskCommunication(Riskcommunication riskCommunication){
 		Riskcommunication riskCommunicationInDb = getRiskCommunicationFromTreatmentId(riskCommunication.getRisktreatmentId());
 		if (riskCommunicationInDb.getId()==0){
 			logger.log(Level.INFO, "RiskCommunication not found, inserting a new one...");
@@ -1083,7 +1094,9 @@ public class DBManager {
 			}
 		}else{
 			logger.log(Level.INFO, "RiskCommunication found, returning the existing one...");
+			return riskCommunicationInDb.getId();
 		}
+		return riskCommunication.getId();
 
 
 	}
@@ -1112,7 +1125,7 @@ public class DBManager {
 	 * @param role
 	 */
 
-	public void addRole(Role role){
+	public long addRole(Role role){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -1132,6 +1145,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return role.getId();
 	}
 
 	/**
@@ -1139,7 +1153,7 @@ public class DBManager {
 	 * @param role
 	 */
 
-	public void addSubject(Subject subject){
+	public long addSubject(Subject subject){
 		try {
 			logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
 		    Session session = getSessionFactory().openSession();
@@ -1159,6 +1173,7 @@ public class DBManager {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
 		}
+		return subject.getId();
 	}
 
 
@@ -1529,7 +1544,7 @@ public class DBManager {
 	}
 
 
-	public void addDecision(Decision decision) {
+	public long addDecision(Decision decision) {
 		Decision decisionInDb = getDecisionFromNameAndCondition(decision.getName(), decision.getCondition());
 		if (decisionInDb.getId()==0){
 			logger.log(Level.INFO,"Decision not found, inserting a new one...");
@@ -1552,10 +1567,12 @@ public class DBManager {
 				logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 				throw re;
 			}
-
+			return decision.getId();
 		}else{
 			logger.log(Level.INFO, "Decision found, returning the existing one..."+decisionInDb.getId());
+			return decisionInDb.getId();
 		}
+
 
 	}
 
