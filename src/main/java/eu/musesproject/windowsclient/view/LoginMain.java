@@ -40,6 +40,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -205,7 +206,7 @@ public class LoginMain extends Application implements Observer{
 		userTextField = new TextField();
 		userTextField.setPromptText(MusesUtils.getResourceBundle().getString("hint_txt_userid"));
 		userTextField.setMinHeight(20);
-		;
+
 		grid.add(userTextField, 0, 3);
 
 		Text password = new Text(MusesUtils.getResourceBundle().getString("password_txt"));
@@ -225,8 +226,10 @@ public class LoginMain extends Application implements Observer{
 		grid.add(privacyPolicy, 0, 7);
 
 		Label policy = new Label(MusesUtils.getResourceBundle().getString("privacy_policy_detail_txt"));
-		policy.setWrapText(true);
-		grid.add(policy, 0, 8);
+		ScrollPane policyScrollPane = new ScrollPane();
+		policyScrollPane.setContent(policy);
+		policyScrollPane.setPrefSize(240, 300);
+		grid.add(policyScrollPane, 0, 8);
 
 		grid.add(agreeTermBox, 0, 9);
 
