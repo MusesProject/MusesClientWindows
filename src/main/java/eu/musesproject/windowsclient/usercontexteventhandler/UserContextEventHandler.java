@@ -25,14 +25,6 @@ package eu.musesproject.windowsclient.usercontexteventhandler;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-
 import eu.musesproject.client.model.RequestType;
 import eu.musesproject.client.model.actuators.ActuationInformationHolder;
 import eu.musesproject.client.model.decisiontable.Action;
@@ -41,23 +33,21 @@ import eu.musesproject.client.model.decisiontable.Request;
 import eu.musesproject.client.model.decisiontable.Resource;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.actuators.ActuatorController;
-import eu.musesproject.windowsclient.connectionmanager.ConnectionManager;
-import eu.musesproject.windowsclient.connectionmanager.DetailedStatuses;
-import eu.musesproject.windowsclient.connectionmanager.IConnectionCallbacks;
-import eu.musesproject.windowsclient.connectionmanager.RequestHolder;
-import eu.musesproject.windowsclient.connectionmanager.RequestTimeoutTimer;
-import eu.musesproject.windowsclient.connectionmanager.Statuses;
+import eu.musesproject.windowsclient.connectionmanager.*;
 import eu.musesproject.windowsclient.contextmonitoring.JSONManager;
 import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
 import eu.musesproject.windowsclient.decisionmaker.DecisionMaker;
-import eu.musesproject.windowsclient.model.ActionProperty;
-import eu.musesproject.windowsclient.model.Configuration;
-import eu.musesproject.windowsclient.model.DBManager;
-import eu.musesproject.windowsclient.model.Property;
-import eu.musesproject.windowsclient.model.ResourceCreator;
+import eu.musesproject.windowsclient.model.*;
 import eu.musesproject.windowsclient.securitypolicyreceiver.RemotePolicyReceiver;
 import eu.musesproject.windowsclient.view.LabelsAndText;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Class UserContextEventHandler. Singleton
@@ -318,17 +308,13 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * Method to try to login with existing credentials in the database
 	 */
 	public void autoLogin() {
-		// TODO how are they stored now? Since we don't have shared preferences
-//		if(userName.isEmpty() || password.isEmpty()) {
-//			return; // user wasn't logged in before
-//		}
-		String password = "dummy"; // todo remove
+		String password = "";
+		if(userName == null || userName.isEmpty() || password.isEmpty()) {
+			return; // user wasn't logged in before
+		}
 
         // try to log in locally
-		dbManager.openDB();
 		isUserAuthenticated = dbManager.isUserAuthenticated(getMacAddress(), userName, password);
-		boolean sensorConfigExists = dbManager.hasSensorConfig();
-		dbManager.closeDB();
 
         //try to log in remotely
         if(serverStatus == Statuses.ONLINE) {
@@ -341,16 +327,13 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		updateServerOnlineAndUserAuthenticated();
 
         // decide, whether to start the context monitoring or to request for a proper configuration
-		if(sensorConfigExists) {
-			manageMonitoringComponent();
-		}
-		else {
-			sendConfigSyncRequest();
-		}
+		manageMonitoringComponent();
 	}
 
 	public void manageMonitoringComponent() {
+		System.out.println("manageMonitoringComponent");
 		if(isUserAuthenticated) {
+			System.out.println("is authenticated = true, start sensors now");
 			UserContextMonitoringController.getInstance().startContextObservation();
 		}
 	}
@@ -516,6 +499,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				// identify the request type
 				String requestType = JSONManager.getRequestType(receivedData);
 				logger.debug("receiveCb(); requestType=" + requestType);
+				System.out.println("receiveCb(); requestType=" + requestType);
 
 				if(requestType.equals(RequestType.UPDATE_POLICIES)) {
 					RemotePolicyReceiver.getInstance().updateJSONPolicy(receivedData);
@@ -553,6 +537,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
                         resendFailedJSONRequests();
 						updateServerOnlineAndUserAuthenticated();
 						sendConfigSyncRequest();
+						manageMonitoringComponent();
 					}
 					ActuatorController.getInstance().sendLoginResponse(isAuthenticatedRemotely, authMessage, -1);
 				}
