@@ -54,6 +54,7 @@ public class AppSensor implements ISensor {
     // context property keys
     public static final String PROPERTY_KEY_ID 					= "id";
     public static final String PROPERTY_KEY_APP_NAME 			= "appname";
+    public static final String PROPERTY_KEY_PACKAGE_NAME		= "packagename";
     public static final String PROPERTY_KEY_APP_VERSION			= "appversion";
     public static final String PROPERTY_KEY_BACKGROUND_PROCESS 	= "backgroundprocess";
 
@@ -91,6 +92,7 @@ public class AppSensor implements ISensor {
         contextEvent.setType(TYPE);
         contextEvent.setTimestamp(System.currentTimeMillis());
         contextEvent.addProperty(PROPERTY_KEY_APP_NAME, appName);
+        contextEvent.addProperty(PROPERTY_KEY_PACKAGE_NAME, appName);
         contextEvent.addProperty(PROPERTY_KEY_APP_VERSION, String.valueOf(appVersion));
         contextEvent.addProperty(PROPERTY_KEY_BACKGROUND_PROCESS, runningServicesNames.toString());
         contextEvent.generateId();
