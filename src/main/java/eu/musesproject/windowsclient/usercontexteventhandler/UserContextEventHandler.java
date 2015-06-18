@@ -151,7 +151,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			dbManager = new DBManager();
 		}
 
-		dbManager.openDB();
 		Configuration config = dbManager.getConfigurations();
 		/* Check if config is available */
 		if (config == null) {
@@ -160,7 +159,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			dbManager.insertConnectionProperties();
 		}
 		config = dbManager.getConfigurations();
-		dbManager.closeDB();
 		return config;
 	}
 
@@ -176,21 +174,23 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * @param contextEvents {@link ContextEvent}
 	 */
 	public void send(Action action, Map<String, String> properties, List<ContextEvent> contextEvents) {
+		System.out.println(TAG + " | send(Action action, Map<String, String> properties, List<ContextEvent> contextEvents)");
 		logger.debug("send(Action action, Map<String, String> properties, List<ContextEvent> contextEvents)");
 		Decision decision = retrieveDecision(action, properties, contextEvents);
 
 		if(decision != null) { // local decision found
+			System.out.println(TAG + " | local decision found");
 			logger.debug("local decision found");
 
 			ActuatorController.getInstance().showFeedback(new ActuationInformationHolder(decision, action, properties));
             if(action.isRequestedByMusesAwareApp() && action.isMusesAwareAppRequiresResponse()) {
-				logger.debug("send feedback to MUSES aware app");
+				System.out.println(TAG + " | send feedback to MUSES aware app");
 
 			    ActuatorController.getInstance().sendFeedbackToMUSESAwareApp(decision);
             }
 		}
 		else { // if there is no local decision, send a request to the server
-			logger.debug("no local decision found");
+			System.out.println(TAG + " | no local decision found");
 			if(serverStatus == Statuses.ONLINE && isUserAuthenticated) { // if the server is online, request a decision
 				// temporary store the information so that the decision can be made after the server responded with
 				// an database update (new policies are sent from the server to the client and stored in the database)
@@ -201,6 +201,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				mapOfPendingRequests.put(requestHolder.getId(), requestHolder);
 				// create the JSON request and send it to the server
 				JSONObject requestObject = JSONManager.createJSON(getMacAddress(), getUserName(), requestHolder.getId(), RequestType.ONLINE_DECISION, action, properties, contextEvents);
+				System.out.println(TAG + " | " + requestObject.toString());
 				sendRequestToServer(requestObject);
 			}
 			else if(serverStatus == Statuses.ONLINE && !isUserAuthenticated) {
@@ -280,20 +281,16 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		}
 
 		String deviceId;
-		dbManager.openDB();
 		if((deviceId = dbManager.getDevId()) == null || deviceId.isEmpty()) {
 			deviceId = getMacAddress();
 		}
-		dbManager.closeDB();
 
 		if(serverStatus == Statuses.ONLINE) {
 			JSONObject requestObject = JSONManager.createLoginJSON(tmpLoginUserName, tmpLoginPassword, deviceId);
 			sendRequestToServer(requestObject);
 		}
 		else {
-			dbManager.openDB();
 			isUserAuthenticated = dbManager.isUserAuthenticated(getMacAddress(), tmpLoginUserName, tmpLoginPassword);
-			dbManager.closeDB();
 			ActuatorController.getInstance().sendLoginResponse(isUserAuthenticated, LabelsAndText.LOGIN_LOCAL_TOAST, -1);
 			if (isUserAuthenticated){
 				sendConfigSyncRequest();
@@ -308,8 +305,14 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 	 * Method to try to login with existing credentials in the database
 	 */
 	public void autoLogin() {
-		String password = "";
-		if(userName == null || userName.isEmpty() || password.isEmpty()) {
+		UserCredentials credentials = dbManager.getUserCredentials();
+		if(credentials == null) {
+			return;
+		}
+
+		userName = credentials.getUsername();
+		String password = credentials.getPassword();
+		if(userName == null || userName.isEmpty() || password== null || password.isEmpty()) {
 			return; // user wasn't logged in before
 		}
 
@@ -362,6 +365,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 		isUserAuthenticated = false;
         isAuthenticatedRemotely = false;
 		updateServerOnlineAndUserAuthenticated();
+		UserContextMonitoringController.getInstance().stopContextObservation();
 	}
 
 	/**
@@ -377,7 +381,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			if(dbManager == null) {
 				dbManager = new DBManager();
 			}
-			dbManager.openDB();
 
 			int actionId = (int) dbManager.addOfflineAction(DBEntityParser.transformActionToEntityAction(action));
 			for(Map.Entry<String, String> entry : properties.entrySet()) {
@@ -396,7 +399,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 					dbManager.addProperty(property);
 				}
 			}
-			dbManager.closeDB();
 		}
 	}
 
@@ -425,7 +427,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			}
 
 			// 3. get a list of all stored actions
-            dbManager.openDB();
 			for (eu.musesproject.windowsclient.model.Action entityAction : dbManager.getOfflineActionList()) {
 				Action action = DBEntityParser.transformAction(entityAction);
 
@@ -452,7 +453,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 				// 4.5. send this json to the server
 				sendRequestToServer(requestObject);
 			}
-            dbManager.closeDB();
 		}
 	}
 
@@ -508,7 +508,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 					int requestId = JSONManager.getRequestId(receivedData);
 					logger.debug("request_id from the json is " + requestId);
 
-					if(mapOfPendingRequests != null && mapOfPendingRequests.containsKey(requestId)) { // this should ne
+					if(mapOfPendingRequests != null && mapOfPendingRequests.containsKey(requestId)) {
 						RequestHolder requestHolder = mapOfPendingRequests.get(requestId);
 						requestHolder.getRequestTimeoutTimer().cancel();
 						mapOfPendingRequests.remove(requestId);
@@ -524,9 +524,10 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
                     String authMessage = JSONManager.getAuthMessage(receivedData);
                     updateServerOnlineAndUserAuthenticated();
 					if(isAuthenticatedRemotely) {
-						dbManager.openDB();
 						dbManager.insertCredentials(getMacAddress(), tmpLoginUserName, tmpLoginPassword);
-						dbManager.closeDB();
+
+						UserCredentials u = dbManager.getUserCredentials();
+
 						// clear the credentials in the fields
 						userName = tmpLoginUserName;
 						tmpLoginUserName = "";
@@ -565,9 +566,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 					connectionConfig.setSilentMode(isSilentModeActivated ? 1 : 0);
 					// 2.2 & 3.2 insert new config in the db
 					if(!connectionConfig.toString().isEmpty()) {
-						dbManager.openDB();
 						dbManager.insertConfiguration(connectionConfig);
-						dbManager.closeDB();
 						// 3.3 update the connection manager
 						connectionManager.setTimeout(connectionConfig.getTimeout());
 						connectionManager.setPolling(connectionConfig.getPollingEnabled());
@@ -608,9 +607,7 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 			}
             else if(status == Statuses.DATA_SEND_OK) {
                 if(detailedStatus == DetailedStatuses.SUCCESS) {
-                    dbManager.openDB();
                     dbManager.resetStoredContextEventTables();
-                    dbManager.closeDB();
 
                     pendingJSONRequest.remove(dataId);
 					logger.debug("data send ok.removed item from pendingJSONRequest, size=" + pendingJSONRequest.size());
@@ -691,11 +688,13 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 
 	public String getUserName() {
 		if(isUserAuthenticated) {
-			if(userName == null || userName.equals("")) {
-				return userName;
+		UserCredentials credentials = dbManager.getUserCredentials();
+		userName = credentials.getUsername();
+			if(userName == null || userName.isEmpty()) {
+				return "unknown";
 			}
 			else {
-				return "unknown";
+				return userName;
 			}
 		}
 		else {
