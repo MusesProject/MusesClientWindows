@@ -102,8 +102,8 @@ public class UserActionGenerator {
 		Map<String, String> properties = new HashMap<String, String>();
         if(contextEventTrigger.getType().equals(AppSensor.TYPE)) {
         	properties.put(AppSensor.PROPERTY_KEY_APP_NAME, contextEventTrigger.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME));
-        	properties.put("package", "");
-        	properties.put("version", "");
+        	properties.put("packagename", contextEventTrigger.getProperties().get(AppSensor.PROPERTY_KEY_APP_NAME));
+        	properties.put("version", contextEventTrigger.getProperties().get(AppSensor.PROPERTY_KEY_APP_VERSION));
         }
         else if(contextEventTrigger.getType().equals(RecursiveFileSensor.TYPE)) {
         	contextEventTrigger.addProperty("resourceType", "null");
