@@ -52,7 +52,7 @@ public class RemotePolicyReceiver {
 	
 	public int updateJSONPolicy(String jsonPolicy){
 		logger.debug( "[receiveJSONPolicy]");
-		String policy = null;
+		JSONObject policy = null;
 		Decisiontable decisionTableElement = null;
 		
 		
@@ -62,13 +62,13 @@ public class RemotePolicyReceiver {
         if((jsonPolicy != null) && (!jsonPolicy.equals(""))) {
     		try{		
     			JSONObject rootJSON = new JSONObject(jsonPolicy);		
-    			policy = rootJSON.getString(JSONIdentifiers.DEVICE_POLICY);
+    			policy = rootJSON.getJSONObject(JSONIdentifiers.DEVICE_POLICY);
     			
-    			JSONObject policyJSON = new JSONObject(policy);
+//    			JSONObject policyJSON = new JSONObject(policy);
     			
     			//Create decision table entry containing action, resource, subject and decision
-    			String files = policyJSON.getString(JSONIdentifiers.POLICY_SECTION_FILES);    			
-    			JSONObject filesJSON = new JSONObject(files);
+				JSONObject filesJSON = policy.getJSONObject(JSONIdentifiers.POLICY_SECTION_FILES);
+//				JSONObject filesJSON = new JSONObject(files);
     			
     			decisionTableElement = DevicePolicyHelper.getInstance().getDecisionTable(filesJSON);
     			
