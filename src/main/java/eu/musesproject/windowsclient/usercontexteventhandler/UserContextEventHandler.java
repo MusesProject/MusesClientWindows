@@ -513,8 +513,6 @@ public class UserContextEventHandler implements RequestTimeoutTimer.RequestTimeo
 						requestHolder.getRequestTimeoutTimer().cancel();
 						mapOfPendingRequests.remove(requestId);
 
-						logger.debug("Removing action: " + JSONManager.getActionType(receivedData) + " from the pending requests");
-						System.out.println(TAG + "| Removing action: " + JSONManager.getActionType(receivedData));
 						send(requestHolder.getAction(), requestHolder.getActionProperties(), requestHolder.getContextEvents());
 					}
 				}
