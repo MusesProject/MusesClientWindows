@@ -22,6 +22,8 @@ public class SimpleFeedbackDialog extends JDialog {
         getRootPane().setDefaultButton(buttonDetails);
         this.setLocationRelativeTo(null);
         this.setLocation((int) (getLocation().getX() - (100)), (int) (getLocation().getY() - (100)));
+        dialogBodyView.setLineWrap(true);
+        this.setSize(300,200);
 
         buttonDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -74,7 +76,7 @@ public class SimpleFeedbackDialog extends JDialog {
         dialogBodyView.setLineWrap(true);
         buttonDetails.hide();
 
-        this.setSize(getWidth(), getHeight() * 2);
+//        this.setSize(getWidth(), getHeight() * 2);
     }
 
     private void onCancel() {
