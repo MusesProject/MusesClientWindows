@@ -498,16 +498,4 @@ public class JSONManager {
 			return "";
 		}
 	}
-
-	public static String getActionType(String jsonString){
-		try {
-			JSONObject requestJSON = new JSONObject(jsonString);
-			JSONObject actionJSON = requestJSON.getJSONObject("action");
-			String actionType = actionJSON.getString("type");
-			return actionType;
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return "";
-		}
-	}
 }
