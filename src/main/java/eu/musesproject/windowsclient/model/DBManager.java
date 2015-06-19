@@ -1071,7 +1071,7 @@ public class DBManager {
 
 	public long addRiskCommunication(Riskcommunication riskCommunication){
 		Riskcommunication riskCommunicationInDb = getRiskCommunicationFromTreatmentId(riskCommunication.getRisktreatmentId());
-		if (riskCommunicationInDb.getId()==0){
+		if ((riskCommunicationInDb == null)||(riskCommunicationInDb.getId()==0)){
 			logger.log(Level.INFO, "RiskCommunication not found, inserting a new one...");
 			try {
 				logger.log(Level.INFO, MUSES_TAG + ":persisting object instance");
