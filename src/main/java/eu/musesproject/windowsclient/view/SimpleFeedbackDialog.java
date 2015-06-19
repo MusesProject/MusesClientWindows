@@ -15,6 +15,7 @@ public class SimpleFeedbackDialog extends JDialog {
     private String decisionId;
 
     public SimpleFeedbackDialog(String title, String body, String decisionId) {
+        System.out.println("SimpleFeedbackDialog(String title, String body, String decisionId)");
         this.decisionId = decisionId;
         setContentPane(contentPane);
         setModal(true);
