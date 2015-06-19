@@ -930,7 +930,7 @@ public class DBManager {
 		    
 		    Risktreatment riskTreatmentInDb = getRiskTreatmentFromDescription(riskTreatment.getTextualdescription().replaceAll("'", "\\'"));
 		    
-		    if (riskTreatmentInDb.getId() == 0){
+		    if ((riskTreatmentInDb == null)||(riskTreatmentInDb.getId() == 0)){
 		    	logger.log(Level.DEBUG,  "Risktreatment not found, inserting a new one...");
 		    	try {
 			    	trans = session.beginTransaction();
