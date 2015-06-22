@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.musesproject</groupId>
 	<artifactId>windowsclient</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>windows_client</name>
 	<description>Muses Windows Client</description>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>2.2</javafx.version>
-        <exec.mainClass>eu.musesproject.windowsclient.view.LoginMain</exec.mainClass>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<javafx.version>2.2</javafx.version>
+		<exec.mainClass>eu.musesproject.windowsclient.view.LoginMain</exec.mainClass>
+	</properties>
 
 
 	<build>
@@ -84,6 +84,54 @@
 							</manifest>
 						</archive>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>1.4</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<shadedArtifactAttached>true</shadedArtifactAttached>
+						<shadedClassifierName>shaded</shadedClassifierName>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.bluestemsoftware.open.maven.plugin</groupId>
+					<artifactId>launch4j-plugin</artifactId>
+					<version>1.5.0.0</version>
+					<executions>
+						<!-- Command-line exe -->
+						<execution>
+							<id>l4j-cli</id>
+							<phase>package</phase>
+							<goals>
+								<goal>launch4j</goal>
+							</goals>
+							<configuration>
+								<headerType>console</headerType>
+								<outfile>target/win_muses.exe</outfile>
+								<jar>target/${artifactId}-${version}-shaded.jar</jar>
+								<errTitle>App Err</errTitle>
+								<classPath>
+									<mainClass>eu.musesproject.windowsclient.view.LoginMain</mainClass>
+								</classPath>
+								<jre>
+									<minVersion>1.6.0</minVersion>
+									<maxVersion>1.8.0</maxVersion>
+									<initialHeapSize>128</initialHeapSize>
+									<maxHeapSize>1024</maxHeapSize>
+								</jre>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

@@ -254,7 +254,7 @@ public class ConnectionManager implements IConnectionManager {
 				});
 		System.setProperty("javax.net.ssl.trustStore", "./keystore.jks");
 		System.setProperty("javax.net.ssl.keyStore", "./keystore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+		System.setProperty("javax.net.ssl.keyStorePassword", "muses11");
 	}
 
 	

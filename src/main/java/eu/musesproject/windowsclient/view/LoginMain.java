@@ -64,8 +64,8 @@ public class LoginMain extends Application implements Observer{
 
 	private Observable o;
 
-	public static String language;
-	public static String country;
+	public static String language = "en";
+	public static String country = "US";
 	private static Locale currentLocale;
 	private static ResourceBundle messages;
 	private UserContextMonitoringController userContextMonitoringController;
@@ -172,6 +172,7 @@ public class LoginMain extends Application implements Observer{
 	};
 
 	public void setLoginView() {
+		dbtest();
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -227,7 +228,7 @@ public class LoginMain extends Application implements Observer{
 		hbBtn.getChildren().add(loginBtn);
 		grid.add(hbBtn, 0, 10);
 
-		setUsernamePasswordIfSaved();
+		//setUsernamePasswordIfSaved();
 
 		Scene loginScene = new Scene(grid, 600, 650);
 		primaryStage.setScene(loginScene);
@@ -417,4 +418,23 @@ public class LoginMain extends Application implements Observer{
 		dbManager.openDB();
 		dbManager.insertCredentials(SettingsSensor.getMacAddress(), userName, password);
 	}
+	
+	private void dbtest(){
+		UserCredentials userCredentials = null;
+		DBManager dbManager = new DBManager();
+		dbManager.openDB();
+		dbManager.insertCredentials(SettingsSensor.getMacAddress(), "test", "test");
+		
+		if (dbManager.isUserAuthenticated()){
+			userCredentials = dbManager.getUserCredentials();
+			if (userCredentials != null){
+				System.out.println("DBTest: "+userCredentials.getUsername()+ " " + userCredentials.getPassword());
+			}
+		}
+		
+		if (dbManager.isUserAuthenticated()){
+			dbManager.deleteUserCredentials(userCredentials.getUsername());;
+		}
+	}
+	
 }

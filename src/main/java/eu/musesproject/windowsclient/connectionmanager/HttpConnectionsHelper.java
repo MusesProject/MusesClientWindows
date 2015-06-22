@@ -23,7 +23,6 @@ package eu.musesproject.windowsclient.connectionmanager;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
@@ -42,6 +41,7 @@ public class HttpConnectionsHelper extends ConnectionManager implements Runnable
 	private static String cookieHeader = "";
 	
 	public static final boolean ENABLE_COOKIE = true;
+	private static final String APP_TAG = "APP_TAG";
 	private URL url;
 	private URI uri;
 
@@ -143,7 +143,8 @@ public class HttpConnectionsHelper extends ConnectionManager implements Runnable
 			setCommandNotOngoing();
 			return serverResponse;
 
-		} catch (IOException e) {
+		} catch (Exception e) {
+			System.out.println(APP_TAG + " doSecurePost: " + e.toString());
 		}
 		return serverResponse;
 	}
