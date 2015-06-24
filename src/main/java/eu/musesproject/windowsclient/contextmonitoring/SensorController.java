@@ -25,6 +25,7 @@ import eu.musesproject.client.model.decisiontable.Action;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.sensors.*;
 import eu.musesproject.windowsclient.model.DBManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import java.util.Map;
  */
 public class SensorController {
     private static final String TAG = SensorController.class.getSimpleName();
+    private static Logger logger = Logger.getLogger(SensorController.class);
 
     private static SensorController sensorController = null;
     private final ContextEventBus contextEventBus = new ContextEventBus();
@@ -96,6 +98,7 @@ public class SensorController {
         System.out.println(TAG + " | enableMockedSensors");
         activeSensors.put(MockUpAppSensor.TYPE, new MockUpAppSensor());
         activeSensors.put(MockUpDeviceProtectionSensor.TYPE, new MockUpDeviceProtectionSensor());
+        activeSensors.put(MockUpPackageSensor.TYPE, new MockUpPackageSensor());
 
         for (ISensor sensor : activeSensors.values()) {
             sensor.addContextListener(contextEventBus);
@@ -104,6 +107,7 @@ public class SensorController {
     }
 
     private void startAndConfigureSensors(List<String> enabledSensor) throws IOException {
+//        enableMockedSensors();
         for (String sensorType : enabledSensor) {
             ISensor sensor;
 
@@ -223,7 +227,8 @@ public class SensorController {
 
         @Override
         public void onEvent(ContextEvent contextEvent) {
-            System.out.println(contextEvent.getType()+" --> "+contextEvent.getProperties());
+            System.out.println(TAG + " " + contextEvent.getType()+" --> "+contextEvent.getProperties() +" ||| event size="+lastFiredContextEvents.size());
+            logger.debug(TAG + " " + contextEvent.getType() + " --> " + contextEvent.getProperties() + " ||| event size=" + lastFiredContextEvents.size());
         	/*
              * Workflow of creating an action and sending it to the server
              *

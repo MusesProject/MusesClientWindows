@@ -45,7 +45,7 @@ public class MockUpAppSensor implements ISensor {
     public static final String TYPE = "CONTEXT_SENSOR_APP";
 
     // time in milliseconds when the sensor polls information
-    private static int OBSERVATION_INTERVALL = 10000;
+    private static int OBSERVATION_INTERVALL = 13000;
 
     // maximal number of how many background services are stored if a context event is fired
     private static final int MAX_SHOWN_BACKGROUND_SERVICES = 1;
@@ -53,6 +53,7 @@ public class MockUpAppSensor implements ISensor {
     // context property keys
     public static final String PROPERTY_KEY_ID 					= "id";
     public static final String PROPERTY_KEY_APP_NAME 			= "appname";
+    public static final String PROPERTY_KEY_PACKAGE_NAME		= "packagename";
     public static final String PROPERTY_KEY_APP_VERSION			= "appversion";
     public static final String PROPERTY_KEY_BACKGROUND_PROCESS 	= "backgroundprocess";
 
@@ -84,12 +85,16 @@ public class MockUpAppSensor implements ISensor {
     private void createContextEvent(String appName, String appVersion) {
         // get the running services
         List<String> runningServicesNames = new ArrayList<String>();
+        runningServicesNames.add("torrent");
+        runningServicesNames.add("Gmail");
+        runningServicesNames.add("dropbox");
 
         // create the context event
         ContextEvent contextEvent = new ContextEvent();
         contextEvent.setType(TYPE);
         contextEvent.setTimestamp(System.currentTimeMillis());
         contextEvent.addProperty(PROPERTY_KEY_APP_NAME, appName);
+        contextEvent.addProperty(PROPERTY_KEY_PACKAGE_NAME, appName);
         contextEvent.addProperty(PROPERTY_KEY_APP_VERSION, String.valueOf(appVersion));
         contextEvent.addProperty(PROPERTY_KEY_BACKGROUND_PROCESS, runningServicesNames.toString());
         contextEvent.generateId();
@@ -142,7 +147,7 @@ public class MockUpAppSensor implements ISensor {
         private Void doInBackground() throws IOException {
             while (sensorEnabled) {
                 try {
-                    createContextEvent("Windows", "8.1");
+                    createContextEvent("torrent", "2.2");
                     Thread.sleep(OBSERVATION_INTERVALL);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

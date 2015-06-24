@@ -46,7 +46,7 @@ public class MockUpDeviceProtectionSensor implements ISensor {
 	public static final String TYPE = "CONTEXT_SENSOR_DEVICE_PROTECTION";
 
 	// time in milliseconds when the sensor polls information
-	private static int OBSERVATION_INTERVALL = 1000;
+	private static int OBSERVATION_INTERVALL = 10000;
 
 	// context property keys
 	public static final String PROPERTY_KEY_ID 							    = "id";
@@ -89,46 +89,37 @@ public class MockUpDeviceProtectionSensor implements ISensor {
 	}
 
 	private void createContextEvent() throws IOException {
-        // create context event
+		System.out.println(TAG + " | createContextEvent");
+		// create context event
 		ContextEvent contextEvent = new ContextEvent();
 		contextEvent.setType(TYPE);
 		contextEvent.setTimestamp(System.currentTimeMillis());
-        contextEvent.addProperty(PROPERTY_KEY_IS_PASSWORD_PROTECTED, String.valueOf(true));
+        contextEvent.addProperty(PROPERTY_KEY_IS_PASSWORD_PROTECTED, String.valueOf(false));
         contextEvent.addProperty(PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED, String.valueOf(false));
-        contextEvent.addProperty(PROPERTY_KEY_IS_SCREEN_LOCKED, String.valueOf(true));
+        contextEvent.addProperty(PROPERTY_KEY_IS_SCREEN_LOCKED, String.valueOf(false));
 		contextEvent.generateId();
 
 
 		if(contextEventHistory.size() > 0) {
 			ContextEvent previousContext = contextEventHistory.get(contextEventHistory.size() - 1);
 			// fire new context event if a connectivity context field changed
-			if(!identicalContextEvent(previousContext, contextEvent)) {
-				// add context event to the context event history
-				contextEventHistory.add(contextEvent);
-				if(contextEventHistory.size() > CONTEXT_EVENT_HISTORY_SIZE) {
-					contextEventHistory.remove(0);
-				}
+			// add context event to the context event history
+			contextEventHistory.add(contextEvent);
+			if(contextEventHistory.size() > CONTEXT_EVENT_HISTORY_SIZE) {
+				contextEventHistory.remove(0);
+			}
 
-				if (contextEvent != null && listener != null) {
-					debug(contextEvent);
-					listener.onEvent(contextEvent);
-				}
+			if (contextEvent != null && listener != null) {
+				listener.onEvent(contextEvent);
 			}
 		}
 		else {
 			contextEventHistory.add(contextEvent);
 			if (contextEvent != null && listener != null) {
-				debug(contextEvent);
 				listener.onEvent(contextEvent);
 			}
 		}
 
-	}
-
-	public void debug(ContextEvent contextEvent) {
-		for (Entry<String, String> set : contextEvent.getProperties().entrySet()) {
-			//Log.d(TAG, set.getKey() + " = " + set.getValue());
-		}
 	}
 
 	private boolean identicalContextEvent(ContextEvent oldEvent, ContextEvent newEvent) {
