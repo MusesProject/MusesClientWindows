@@ -1,6 +1,8 @@
 package eu.musesproject.windowsclient.view;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -56,14 +58,28 @@ public class MusesUtils {
 	
 	public static  String getMusesConf() {
 		String settings = "sweoffice.mooo.com";
-//		try {
-//			BufferedReader reader = new BufferedReader(new FileReader(
-//					Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator +"muses.conf"));
-//			settings = reader.readLine();
-//			reader.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader("muses.conf"));
+		    try {
+		        StringBuilder sb = new StringBuilder();
+		        String line = br.readLine();
+
+		        while (line != null) {
+		            sb.append(line);
+		            sb.append(System.lineSeparator());
+		            line = br.readLine();
+		        }
+		        settings = sb.toString();
+		        settings = settings.replaceAll("\n", "");
+		        settings = settings.replaceAll("\r", "");
+		        System.out.println("muses config file found with settings: "+settings);
+		    } finally {
+		        br.close();
+		    }
+			
+		} catch (Exception e) {
+			return settings;
+		}
 		return settings;
 	}
 

@@ -136,18 +136,20 @@ public class AlarmReceiver implements Job {
     	int interval = Integer.parseInt(HttpConnectionsHelper.getInStringSeconds(Integer.toString(AlarmReceiver.POLL_INTERVAL)));
     	
     	if (jobExecutionContext != null){
-    		try {
-    			Trigger updateTrigger = TriggerBuilder
-    					.newTrigger()
-    					.withSchedule(
-    							SimpleScheduleBuilder.simpleSchedule()
-    							.withIntervalInSeconds(interval).repeatForever())
-    							.build();
-    			Trigger oldTrigger = jobExecutionContext.getTrigger();
-    			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-    			scheduler.rescheduleJob(oldTrigger.getKey(), updateTrigger);
-    		} catch (SchedulerException e) {
-    			e.printStackTrace();
+    		if (interval != CURRENT_POLL_INTERVAL) {
+    			try {
+    				Trigger updateTrigger = TriggerBuilder
+    						.newTrigger()
+    						.withSchedule(
+    								SimpleScheduleBuilder.simpleSchedule()
+    								.withIntervalInSeconds(interval).repeatForever())
+    								.build();
+    				Trigger oldTrigger = jobExecutionContext.getTrigger();
+    				Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+    				scheduler.rescheduleJob(oldTrigger.getKey(), updateTrigger);
+    			} catch (SchedulerException e) {
+    				e.printStackTrace();
+    			}
     		}
     	} else{
     		initSchedulerForPolling(interval);
@@ -199,6 +201,7 @@ public class AlarmReceiver implements Job {
     
 	
 	private void initSchedulerForPolling(int pollInterval) {
+		System.out.println("Initiating schedule for polling..");
 		try {
 			JobDetail pollJob = JobBuilder.newJob(AlarmReceiver.class)
 					.withIdentity("poll_job").build();

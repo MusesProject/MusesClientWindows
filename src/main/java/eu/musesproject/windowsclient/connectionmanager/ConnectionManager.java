@@ -23,6 +23,8 @@ package eu.musesproject.windowsclient.connectionmanager;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.musesproject.windowsclient.contextmonitoring.JSONManager;
+
 public class ConnectionManager implements IConnectionManager {
 
 	private static String URL;
@@ -137,7 +139,7 @@ public class ConnectionManager implements IConnectionManager {
 		String dataIdStr = "";
 		dataIdStr = Integer.toString(dataId);
 		setCommandOngoing();
-		System.out.println(APP_TAG + " ConnManager=> send data to server with request type: "/*+JSONManager.getRequestType(data) FIXME update this after Christoph commit*/);
+		System.out.println(APP_TAG + " ConnManager=> send data to server with request type: "+JSONManager.getRequestType(data) + " and data: "+data);
 		startHttpThread(DATA, URL, 	POLL_INTERVAL, data, dataIdStr); 
 	}
 
