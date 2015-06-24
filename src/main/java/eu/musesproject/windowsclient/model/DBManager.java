@@ -416,7 +416,7 @@ public class DBManager {
 		    } finally {
 		    	if (session!=null) session.close();
 		    }
-		    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
+		    logger.log(Level.INFO, MUSES_TAG + ":connection propeties persisted successfully.");
 		} catch (RuntimeException re) {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
@@ -439,7 +439,7 @@ public class DBManager {
 		    } finally {
 		    	if (session!=null) session.close();
 		    }
-		    logger.log(Level.INFO, MUSES_TAG + ":persist successful");
+		    logger.log(Level.INFO, MUSES_TAG + ":configuration persist successful");
 		} catch (RuntimeException re) {
 			logger.log(Level.ERROR, MUSES_TAG + ":persist failed"+ re);
 			throw re;
