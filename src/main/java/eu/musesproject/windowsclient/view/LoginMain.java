@@ -20,14 +20,21 @@ package eu.musesproject.windowsclient.view;
  * #L%
  */
 
-import eu.musesproject.client.model.JSONIdentifiers;
-import eu.musesproject.windowsclient.actuators.ActuatorController;
-import eu.musesproject.windowsclient.connectionmanager.Statuses;
-import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
-import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
-import eu.musesproject.windowsclient.model.DBManager;
-import eu.musesproject.windowsclient.model.UserCredentials;
-import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
+import java.awt.AWTException;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Properties;
+import java.util.ResourceBundle;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -37,7 +44,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -46,8 +58,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javax.swing.ImageIcon;
 
-import java.util.*;
+import eu.musesproject.client.model.JSONIdentifiers;
+import eu.musesproject.windowsclient.actuators.ActuatorController;
+import eu.musesproject.windowsclient.connectionmanager.Statuses;
+import eu.musesproject.windowsclient.contextmonitoring.UserContextMonitoringController;
+import eu.musesproject.windowsclient.contextmonitoring.sensors.SettingsSensor;
+import eu.musesproject.windowsclient.model.DBManager;
+import eu.musesproject.windowsclient.model.UserCredentials;
+import eu.musesproject.windowsclient.usercontexteventhandler.UserContextEventHandler;
 
 public class LoginMain extends Application implements Observer{
 	private static final String APP_TAG = "APP_TAG";
@@ -78,6 +99,54 @@ public class LoginMain extends Application implements Observer{
 		setupLocale(args);
 		RMI.startRMI();
 		launch(args);
+	}
+
+	private void addToSystemTray() {
+		System.out.println("Adding app to system tray..");
+		
+		TrayIcon trayIcon = null;
+		SystemTray tray = null;
+		URL musesIconURL = LoginMain.class.getClassLoader().getResource("muses_icon.png");
+		if (SystemTray.isSupported()) {
+			 tray = SystemTray.getSystemTray();
+	         ActionListener listener = new ActionListener() {
+				@Override
+				public void actionPerformed(java.awt.event.ActionEvent arg0) {
+					System.out.println("tray clicked..");
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							primaryStage.show();
+						}
+					});
+				}
+	         };
+	         PopupMenu popup = new PopupMenu();
+	         MenuItem defaultItem = new MenuItem("open");
+	         defaultItem.addActionListener(listener);
+	         popup.add(defaultItem);
+	         /// ... add other items
+	         // construct a TrayIcon
+	         trayIcon = new TrayIcon(new ImageIcon(musesIconURL).getImage(), "MUSES App",popup);
+	         trayIcon.setImageAutoSize(true);// Autosize icon base on space
+	         // set the TrayIcon properties
+	         trayIcon.addActionListener(listener);
+	         try {
+	             tray.add(trayIcon);
+	             trayIcon.displayMessage("MUSES App","Muses v1.1",TrayIcon.MessageType.INFO);
+	         } catch (AWTException e) {
+	             System.err.println(e);
+	         }
+	         // ...
+	     } else {
+	    	 System.err.println("System tray not supported.");
+	     }
+	     // ...
+	     // some time later
+	     // the application state has changed - update the image
+	     if (trayIcon != null) {
+	         trayIcon.setImage(new ImageIcon(musesIconURL).getImage());
+	     }
 	}
 
 	private static void setupLocale(String[] args) {
@@ -171,6 +240,9 @@ public class LoginMain extends Application implements Observer{
 	};
 
 	public void setLoginView() {
+		
+		addToSystemTray();
+		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -231,6 +303,15 @@ public class LoginMain extends Application implements Observer{
 		Scene loginScene = new Scene(grid, 600, 650);
 		primaryStage.setScene(loginScene);
 		primaryStage.show();
+		
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                System.out.println("Stage is closing");
+                primaryStage.close();
+            }
+        }); 
+		
 	}
 
 	public void setLogoutView() {

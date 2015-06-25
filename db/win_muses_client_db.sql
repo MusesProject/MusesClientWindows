@@ -88,7 +88,7 @@ CREATE TABLE risktreatment ( id INTEGER PRIMARY KEY,textualdescription VARCHAR(1
 INSERT INTO risktreatment VALUES(1,'You are trying to disable accessibility, which is an important security mechanism for MUSES.
  This can cause the device having a lower level of security. MUSES will change this for you. In case you want to change it back, go to Settings > System (tab) > Accesibility > Services > MUSES and disable it');
 DROP TABLE IF EXISTS role;
-CREATE TABLE role ( id INTEGER PRIMARY KEY,description VARCHAR(255) NOT NULL,modification TIMESTAMP NOT NULL);
+CREATE TABLE role ( id INTEGER PRIMARY KEY,description VARCHAR(1024) NOT NULL,modification TIMESTAMP NOT NULL);
 DROP TABLE IF EXISTS sensor_configuration;
 CREATE TABLE sensor_configuration	 ( id INTEGER PRIMARY KEY,sensor_type VARCHAR(45) NOT NULL,key VARCHAR(45) NOT NULL,value VARCHAR(45) NOT NULL);
 INSERT INTO sensor_configuration VALUES(1,'CONTEXT_SENSOR_DEVICE_PROTECTION','trustedav','com.avast.android.mobilesecurity');
