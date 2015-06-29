@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.musesproject</groupId>
 	<artifactId>windowsclient</artifactId>
-	<version>0.1.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>windows_client</name>
 	<description>Muses Windows Client</description>
 
