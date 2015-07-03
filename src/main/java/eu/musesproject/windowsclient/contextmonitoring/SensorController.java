@@ -86,7 +86,7 @@ public class SensorController {
                 enabledSensor.add("CONTEXT_SENSOR_PACKAGE");
                 enabledSensor.add("CONTEXT_SENSOR_FILE_ACCESS");
                 enabledSensor.add("CONTEXT_SENSOR_FILEOBSERVER");
-                enabledSensor.add("CONTEXT_SENSOR_EMAIL");
+                //enabledSensor.add("CONTEXT_SENSOR_EMAIL");
                 startAndConfigureSensors(enabledSensor);
 
                 isCollectingData = true;

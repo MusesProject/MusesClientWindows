@@ -32,11 +32,11 @@ namespace Sensors
         public void Update()
         {
             // fake test info
-            subject = "test";
-            receivers = "r_1@a.com; r_2@b.com";
-            cc = "cc_1@a.com; cc_2@b.com";
-            bcc = "bcc_1@a.com; bcc_2@b.com";
-            attachments = "c:\\tmp\\test.txt; d:\\t.pdf";
+            //subject = "test";
+            //receivers = "r_1@a.com; r_2@b.com";
+            //cc = "cc_1@a.com; cc_2@b.com";
+            //bcc = "bcc_1@a.com; bcc_2@b.com";
+            //attachments = "c:\\tmp\\test.txt; d:\\t.pdf";
         }
     }
 }
