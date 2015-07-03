@@ -58,7 +58,7 @@ public class DeviceProtectionSensor implements ISensor {
     public static final String PROPERTY_KEY_IS_PASSWORD_PROTECTED 		    = "ispasswordprotected";
     public static final String PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED 	    = "istrustedantivirusinstalled";
     public static final String PROPERTY_KEY_SCREEN_TIMEOUT_IN_SECONDS 	    = "screentimeoutinseconds";
-    public static final String PROPERTY_KEY_IS_SCREEN_LOCKED         	    = "isscreanlocked";
+    public static final String PROPERTY_KEY_IS_SCREEN_LOCKED         	    = "isscreenlocked";
 	//public static final String PROPERTY_KEY_IS_ROOTED 					= "isrooted";
 	//public static final String PROPERTY_KEY_IS_ROOT_PERMISSION_GIVEN 	    = "isrootpermissiongiven";
 	//public static final String PROPERTY_KEY_IP_ADRESS 					= "ipaddress";
