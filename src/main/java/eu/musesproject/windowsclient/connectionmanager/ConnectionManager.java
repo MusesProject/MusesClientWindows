@@ -24,6 +24,7 @@ package eu.musesproject.windowsclient.connectionmanager;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.musesproject.windowsclient.contextmonitoring.JSONManager;
+import eu.musesproject.windowsclient.view.MusesUtils;
 
 public class ConnectionManager implements IConnectionManager {
 
@@ -251,7 +252,7 @@ public class ConnectionManager implements IConnectionManager {
 
 					public boolean verify(String hostname,
 							javax.net.ssl.SSLSession sslSession) {
-						return hostname.equals(IP);
+						return hostname.equals(MusesUtils.getMusesConf());
 					}
 				});
 		System.setProperty("javax.net.ssl.trustStore", "./keystore.jks");
