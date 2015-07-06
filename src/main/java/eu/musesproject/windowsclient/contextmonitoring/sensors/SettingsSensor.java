@@ -2,8 +2,6 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 /**
  * Created by christophstanik on 6/9/15.
@@ -24,9 +22,7 @@ public class SettingsSensor {
                 sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
             }
             return sb.toString();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (SocketException e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "error";
