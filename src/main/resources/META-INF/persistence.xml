@@ -24,7 +24,7 @@
 		<class>eu.musesproject.windowsclient.model.UserCredentials</class>
 
 		<properties>
-			<property name="javax.persistence.jdbc.url" value="jdbc:h2:~/muses_client" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:~/muses_windows_client" />
 			<property name="javax.persistence.jdbc.user" value="muses" />
 			<property name="javax.persistence.jdbc.password" value="muses11" />
 			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

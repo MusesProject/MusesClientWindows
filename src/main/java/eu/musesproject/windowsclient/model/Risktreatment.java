@@ -41,6 +41,7 @@ public class Risktreatment implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 
+	@Column (length = 1500)
 	private String textualdescription;
 
 	public Risktreatment() {
