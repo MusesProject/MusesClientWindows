@@ -20,8 +20,6 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
  * #L%
  */
 
-//import eu.musesproject.client.contextmonitoring.ContextListener;
-//import eu.musesproject.client.db.entity.SensorConfiguration;
 import eu.musesproject.contextmodel.ContextEvent;
 import eu.musesproject.windowsclient.contextmonitoring.ContextListener;
 
@@ -29,6 +27,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.jna.*;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.win32.*;
+
 
 /**
  * @author alirezaalizadeh
@@ -46,7 +49,7 @@ public class AppSensor implements ISensor {
     public static final String TYPE = "CONTEXT_SENSOR_APP";
 
     // time in milliseconds when the sensor polls information
-    private static int OBSERVATION_INTERVALL = 1000;
+    private static int OBSERVATION_INTERVALL = 100;
 
     // maximal number of how many background services are stored if a context event is fired
     private static final int MAX_SHOWN_BACKGROUND_SERVICES = 1;
@@ -148,10 +151,17 @@ public class AppSensor implements ISensor {
         	String previousApp = "";
 
             while (sensorEnabled) {
+                byte[] windowText = new byte[512];
+                PointerType hwnd = User32.INSTANCE.GetForegroundWindow(); // then you can call it!
+                User32.INSTANCE.GetWindowTextA(hwnd, windowText, 512);
+
                 // request for sensor information from sensors REST service
-                Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
-                String foregroundTaskAppName = sensorInfo.get(PROPERTY_KEY_APP_NAME);
-                String appVersion = sensorInfo.get(PROPERTY_KEY_APP_VERSION);
+                //Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
+                String foregroundTaskAppName = Native.toString(windowText);
+                System.out.println(foregroundTaskAppName);
+                //sensorInfo.get(PROPERTY_KEY_APP_NAME);
+                String appVersion = "0.0";
+                //sensorInfo.get(PROPERTY_KEY_APP_VERSION);
 
                 try {
                     // and set the start time of the first application
