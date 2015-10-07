@@ -9,9 +9,9 @@ package eu.musesproject.windowsclient.contextmonitoring.sensors;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.jna.*;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.win32.*;
 
 /**
  * @author alirezaalizadeh
@@ -66,7 +70,7 @@ public class AppSensor implements ISensor {
 
     // holds a value that indicates if the sensor is enabled or disabled
     private boolean sensorEnabled;
-    
+
     public AppSensor() {
         init();
     }
@@ -148,11 +152,18 @@ public class AppSensor implements ISensor {
         	String previousApp = "";
 
             while (sensorEnabled) {
+                byte[] windowText = new byte[512];
+                PointerType hwnd = User32.INSTANCE.GetForegroundWindow(); // then you can call it!
+                User32.INSTANCE.GetWindowTextA(hwnd, windowText, 512);
                 // request for sensor information from sensors REST service
-                Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
-                String foregroundTaskAppName = sensorInfo.get(PROPERTY_KEY_APP_NAME);
-                String appVersion = sensorInfo.get(PROPERTY_KEY_APP_VERSION);
-
+                // Map<String, String> sensorInfo = RESTController.requestSensorInfo(TYPE);
+                // String foregroundTaskAppName = sensorInfo.get(PROPERTY_KEY_APP_NAME);
+                // String appVersion = sensorInfo.get(PROPERTY_KEY_APP_VERSION);
+                String foregroundTaskAppName = Native.toString(windowText);
+                System.out.println(foregroundTaskAppName);
+                //sensorInfo.get(PROPERTY_KEY_APP_NAME);
+                String appVersion = "0.0";
+                //sensorInfo.get(PROPERTY_KEY_APP_VERSION);
                 try {
                     // and set the start time of the first application
                     if(previousApp.equals("")) {
