@@ -77,7 +77,7 @@ public class LoginMain extends Application implements Observer{
 	static TextField userTextField;
 	static PasswordField passwordField;
 	static CheckBox rememberCredentialsBox, agreeTermBox;
-
+	static boolean isSystemTrayAdded =false; 
 	public static boolean isLoggedIn = false;
 
 	boolean isPrivacyPolicyAgreementChecked = false;
@@ -95,7 +95,6 @@ public class LoginMain extends Application implements Observer{
 	public static void main(String[] args) {
 		System.setProperty("javafx.macosx.embedded", "true");
 		java.awt.Toolkit.getDefaultToolkit();
-
 		setupLocale(args);
 		RMI.startRMI();
 		launch(args);
@@ -116,7 +115,6 @@ public class LoginMain extends Application implements Observer{
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							primaryStage.show();
 						}
 					});
 				}
@@ -241,7 +239,10 @@ public class LoginMain extends Application implements Observer{
 
 	public void setLoginView() {
 		
-		addToSystemTray();
+		if (!isSystemTrayAdded){
+			addToSystemTray();
+			isSystemTrayAdded = true;
+		}
 		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);

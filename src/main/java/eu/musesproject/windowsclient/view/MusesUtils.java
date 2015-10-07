@@ -72,7 +72,6 @@ public class MusesUtils {
 		        settings = sb.toString();
 		        settings = settings.replaceAll("\n", "");
 		        settings = settings.replaceAll("\r", "");
-		        System.out.println("muses config file found with settings: "+settings);
 		    } finally {
 		        br.close();
 		    }

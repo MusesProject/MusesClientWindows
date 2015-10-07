@@ -145,6 +145,7 @@ public class HttpConnectionsHelper extends ConnectionManager implements Runnable
 
 		} catch (Exception e) {
 			System.out.println(APP_TAG + " doSecurePost: " + e.toString());
+			e.printStackTrace();
 		}
 		return serverResponse;
 	}

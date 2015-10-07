@@ -9,7 +9,7 @@
             <generator class="identity" />
         </id>
         <property name="description" type="string">
-            <column name="description" length="1024" not-null="true" />
+            <column name="description" length="1500" not-null="true" />
         </property>
         <property name="modification" type="timestamp">
             <column name="modification" length="19" not-null="true" />

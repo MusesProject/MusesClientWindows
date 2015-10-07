@@ -3,6 +3,7 @@ package eu.musesproject.windowsclient.securitypolicyreceiver;
 
 import eu.musesproject.client.model.JSONIdentifiers;
 import eu.musesproject.windowsclient.model.*;
+
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -215,7 +216,13 @@ public class DevicePolicyHelper {
 		try {
 			//Decision id generated at the server side
 			System.out.println(actionJSON.toString());
-			int serverDecisionId = actionJSON.getInt("decision");
+			String serverDecisionId = null;
+			try {
+				serverDecisionId = actionJSON.getString("decision");
+			} catch (Exception e) {
+				//e.printStackTrace();
+				serverDecisionId = "null";
+			}
 			logger.debug("Server decision id:"+serverDecisionId);
 			decision.setDecision_id(String.valueOf(serverDecisionId));
 			if (actionJSON.toString().contains("\""+JSONIdentifiers.POLICY_PROPERTY_ALLOW+"\"")){
