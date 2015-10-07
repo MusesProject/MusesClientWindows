@@ -46,7 +46,7 @@ public class JSONManager {
 	/**
 	 * creates the JSON object that will be sent to the server via the {@link eu.musesproject.windowsclient.connectionmanager.ConnectionManager}
 	 * @param requestType {@link RequestType}
-     * @param action {@link Action}
+     * @param action {@link Action}c
 	 * @param properties {@link Map} < String ,  String >
 	 * @param contextEvents {@link ContextEvent}
 	 * @return {@link JSONObject}
@@ -232,7 +232,7 @@ public class JSONManager {
 			configSyncSONObject.put(JSONIdentifiers.AUTH_USERNAME, userName);
 			configSyncSONObject.put(JSONIdentifiers.AUTH_DEVICE_ID, deviceId);
 			configSyncSONObject.put(JSONIdentifiers.OPERATING_SYSTEM_VERSION, osVersion);
-			configSyncSONObject.put(JSONIdentifiers.OPERATING_SYSTEM, "Android");
+			configSyncSONObject.put(JSONIdentifiers.OPERATING_SYSTEM, "Windows");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
