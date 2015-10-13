@@ -17,6 +17,7 @@ public class SimpleFeedbackDialog extends JDialog {
     private JLabel dialogTitleView;
     private String[] splitBody;
     private String decisionId;
+    private String body;
 
     public SimpleFeedbackDialog(String title, String body, String decisionId) {
         System.out.println("SimpleFeedbackDialog(String title, String body, String decisionId)");
@@ -57,6 +58,7 @@ public class SimpleFeedbackDialog extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        this.body = body;
         fillWithContent(title, body);
     }
 
@@ -76,11 +78,19 @@ public class SimpleFeedbackDialog extends JDialog {
     }
 
     private void onDetails() {
-        dialogBodyView.setText(splitBody[1]);
+        try {
+            dialogBodyView.setText(splitBody[1]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("No details found. show the main text");
+            if(body != null && !body.isEmpty()) {
+                dialogBodyView.setText(body);
+            }
+            else {
+                dialogBodyView.setText(splitBody[0]);
+            }
+        }
         dialogBodyView.setLineWrap(true);
         buttonDetails.hide();
-
-//        this.setSize(getWidth(), getHeight() * 2);
     }
 
     private void onCancel() {
