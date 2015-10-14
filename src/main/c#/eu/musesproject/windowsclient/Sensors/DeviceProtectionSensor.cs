@@ -19,12 +19,14 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Management;
 using System.DirectoryServices;
+using ContextEntities;
 
 namespace Sensors
 {
@@ -36,12 +38,22 @@ namespace Sensors
         public int screentimeoutinseconds { get; set; }
         public bool isscreanlocked { get; set; }
 
+        public List<AVProduct> avlist { get; set; }
+
+        public DeviceProtectionSensor()
+        {
+            avlist = new List<AVProduct>();
+        }
         public void Update()
         {
             istrustedantivirusinstalled = IsAntivirusInstalled();
             screentimeoutinseconds = GetScreenTimeout();
             ispasswordprotected = IsPasswordProtected();
             isscreanlocked = IsScreanLocked();
+            if (!istrustedantivirusinstalled)
+            {
+                istrustedantivirusinstalled = IsIsAntivirusInstalledOld();
+            }
         }
 
         private bool IsPasswordProtected()
@@ -96,13 +108,49 @@ namespace Sensors
             return timeout.ToInt32();
         }
 
-        private bool IsAntivirusInstalled()
+        private bool IsIsAntivirusInstalledOld()
         {
             var wmipathstr = @"\\" + Environment.MachineName + @"\root\SecurityCenter";
             try
             {
                 var searcher = new ManagementObjectSearcher(wmipathstr, "SELECT * FROM AntivirusProduct");
-                ManagementObjectCollection instances = searcher.Get();
+                var instances = searcher.Get();
+                foreach (ManagementObject item in instances)
+                {
+                    var tmp = new AVProduct { name = item["displayName"].ToString() };
+                    var state = item["productState"].ToString();
+                    tmp.state = (state == "266240" || state == "262144") ? AVState.updated : AVState.expired;
+                    if (avlist.FindIndex(product => product.name == tmp.name) < 0)
+                    {
+                        avlist.Add(tmp);       
+                    }
+                    
+                }
+                return instances.Count > 0;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return false;            
+        }
+
+        private bool IsAntivirusInstalled()
+        {
+            var wmipathstr = @"\\" + Environment.MachineName + @"\root\SecurityCenter2";
+            try
+            {
+                var searcher = new ManagementObjectSearcher(wmipathstr, "SELECT * FROM AntivirusProduct");
+                var instances = searcher.Get();
+                foreach (ManagementObject item in instances)
+                {
+                    var tmp = new AVProduct { name = item["displayName"].ToString() };
+                    var state = item["productState"].ToString();
+                    tmp.state = (state == "266240" || state == "262144") ? AVState.updated : AVState.expired;                    
+                    avlist.Add(tmp);
+                }
                 return instances.Count > 0;
             }
 
