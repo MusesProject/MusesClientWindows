@@ -59,7 +59,8 @@ public class DeviceProtectionSensor implements ISensor {
     public static final String PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED 	    = "istrustedantivirusinstalled";
     public static final String PROPERTY_KEY_SCREEN_TIMEOUT_IN_SECONDS 	    = "screentimeoutinseconds";
     public static final String PROPERTY_KEY_IS_SCREEN_LOCKED         	    = "isscreenlocked";
-	//public static final String PROPERTY_KEY_IS_ROOTED 					= "isrooted";
+    public static final String PROPERTY_KEY_AV_LIST         	            = "avlist";
+    //public static final String PROPERTY_KEY_IS_ROOTED 					= "isrooted";
 	//public static final String PROPERTY_KEY_IS_ROOT_PERMISSION_GIVEN 	    = "isrootpermissiongiven";
 	//public static final String PROPERTY_KEY_IP_ADRESS 					= "ipaddress";
 	//public static final String PROPERTY_KEY_MUSES_DATABASE_EXISTS 		= "musesdatabaseexists";
@@ -110,6 +111,13 @@ public class DeviceProtectionSensor implements ISensor {
         contextEvent.addProperty(PROPERTY_KEY_IS_PASSWORD_PROTECTED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_PASSWORD_PROTECTED)));
         contextEvent.addProperty(PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_TRUSTED_AV_INSTALLED)));
         contextEvent.addProperty(PROPERTY_KEY_IS_SCREEN_LOCKED, String.valueOf(sensorInfo.get(PROPERTY_KEY_IS_SCREEN_LOCKED)));
+
+        try {
+            contextEvent.addProperty(PROPERTY_KEY_AV_LIST, String.valueOf(sensorInfo.get(PROPERTY_KEY_AV_LIST)));
+        }catch (Exception ex){
+
+        }
+
 
 //      contextEvent.addProperty(PROPERTY_KEY_IS_ROOTED, String.valueOf(checkDeviceRooted()));
 //		contextEvent.addProperty(PROPERTY_KEY_IS_ROOT_PERMISSION_GIVEN, String.valueOf(checkRootPermissionGiven()));
