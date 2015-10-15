@@ -109,7 +109,7 @@ public class DecisionMaker {
 													entry.getKey()
 													.length() - 2);
 						 System.out.println("2.1 Value: "+value);
-						 if ((propKey.contains("installedapps"))&&(!propEntry.getValue().contains(value))){
+						 if ((propKey.contains("installedapps"))&&(!propEntry.getValue().toLowerCase().contains(value))){
 							System.out.println("3.installedapps Match!");
 							match = true;
 						 }else if (propEntry.getValue().contains(value)){
