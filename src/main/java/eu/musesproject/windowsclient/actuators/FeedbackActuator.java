@@ -22,8 +22,10 @@ package eu.musesproject.windowsclient.actuators;
 
 import eu.musesproject.client.model.actuators.ResponseInfoAP;
 import eu.musesproject.client.model.decisiontable.Decision;
+import eu.musesproject.windowsclient.view.FeedbackDialog;
 import eu.musesproject.windowsclient.view.SimpleFeedbackDialog;
 
+import javax.swing.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -75,7 +77,7 @@ public class FeedbackActuator implements IFeedbackActuator {
     private void createSimpleFeedbackDialog(Decision decision) {
         try {
             String dialogBody = decision.getRiskCommunication().getRiskTreatment()[0].getTextualDescription();
-            new SimpleFeedbackDialog(decision.getName(), dialogBody, decision.getDecision_id()).setVisible(true);
+            new FeedbackDialog(new JFrame(), decision.getName(), dialogBody, decision.getDecision_id()).setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
