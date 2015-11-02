@@ -35,58 +35,63 @@ import eu.musesproject.windowsclient.actuators.ActuatorController;
 public class FeedbackDialog extends JDialog{
     private static final long serialVersionUID = 1L;
     private String[] splitBody;
-    private JTextPane textPane;
     private String decisionId;
 
+    private JTextPane textPane;
+    private JButton buttonDetail;
+    private JButton buttonCancel;
+    private JPanel buttonPane;
+    private JLabel titleLabel ;
+
     public FeedbackDialog(JFrame parent, String title, String message, String decisionId) {
-        super(parent, title);
-        System.out.println("creating feedback window..");
-        // set the position of the window
+        super(parent, "");
         this.decisionId = decisionId;
 
+        // set the position of the window
         final Toolkit toolkit = Toolkit.getDefaultToolkit();
         final Dimension screenSize = toolkit.getScreenSize();
         int x = (screenSize.width - getWidth()) / 2;
         int y = (screenSize.height - getHeight()) / 2;
         setLocation(x, y);
 
-        // Create a message
-        buildSplitedMessage(message);
-        //JDialog dialog = optionPane.createDialog(null, "Width 100");
-        textPane= new JTextPane();
-        textPane.setText(splitBody[0]);
+        titleLabel = new JLabel(title);
+        titleLabel .setHorizontalAlignment(SwingConstants.CENTER);
+        getContentPane().add(titleLabel, BorderLayout.BEFORE_FIRST_LINE);
 
+        // split and fill message
+        fillTextPaneMessage(message);
         JScrollPane scrollPane = new JScrollPane(textPane);
-
-        // get content pane, which is usually the
-        // Container of all the dialog's components.
         getContentPane().add(scrollPane);
 
         // Create buttons
-        JPanel buttonPane = new JPanel();
-        JButton buttonCancel = new JButton("Cancel");
-        JButton buttonDetail = new JButton("Details");
+        buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonCancel = new JButton("Cancel");
+        buttonDetail = new JButton("Details");
         buttonPane.add(buttonDetail);
         buttonPane.add(buttonCancel);
+
         // set action listener on the buttons
         buttonCancel.addActionListener(new CancelActionListener());
         buttonDetail.addActionListener(new DetailActionListener());
+
         getContentPane().add(buttonPane, BorderLayout.PAGE_END);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
         pack();
-        setSize(400, 200);
-        //setVisible(true);
+        setSize(300, 200);
     }
 
-    private void buildSplitedMessage(String message) {
+    private void fillTextPaneMessage(String message) {
+        textPane= new JTextPane();
         try {
-            splitBody = message.split("--");
-
-        }catch (Exception ex){
+            splitBody = message.split("\\n");
+        } catch (NullPointerException e) {
             splitBody = new String[2];
             splitBody[0] = message;
-            splitBody[1] = "";
+            splitBody[1] = message;
         }
+        textPane.setText(splitBody[0]);
+        textPane.setEditable(false);
     }
 
     // override the createRootPane inherited by the JDialog, to create the rootPane.
@@ -126,7 +131,13 @@ public class FeedbackDialog extends JDialog{
 
         //show details and dispose of the window.
         public void actionPerformed(ActionEvent e) {
-            textPane.setText(splitBody[0] + " " + splitBody[1]);
+            textPane.setText(splitBody[1]);
+            buttonDetail.hide();
         }
     }
+
+//    public static void main(String[] args) {
+//        String msg = "This is the general message \n this is the detail message";
+//        new FeedbackDialog(new JFrame(), "title", msg, "1").setVisible(true);
+//    }
 }
