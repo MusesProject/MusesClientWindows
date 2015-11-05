@@ -23,6 +23,8 @@ package eu.musesproject.windowsclient.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
+
 import javax.swing.*;
 
 import eu.musesproject.windowsclient.actuators.ActuatorController;
@@ -47,6 +49,10 @@ public class FeedbackDialog extends JDialog{
         super(parent, "");
         this.decisionId = decisionId;
 
+        URL musesIconURL = LoginMain.class.getClassLoader().getResource("muses_icon.png");
+        Image musesicon = new ImageIcon(musesIconURL).getImage();
+        parent.setIconImage(musesicon);
+
         // set the position of the window
         final Toolkit toolkit = Toolkit.getDefaultToolkit();
         final Dimension screenSize = toolkit.getScreenSize();
@@ -54,10 +60,14 @@ public class FeedbackDialog extends JDialog{
         int y = (screenSize.height - getHeight()) / 2;
         setLocation(x, y);
 
+        if(title.equalsIgnoreCase("STRONG_DENY")){
+        	title = "DENY";
+        }
+        
+        
         titleLabel = new JLabel(title);
         titleLabel .setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(titleLabel, BorderLayout.BEFORE_FIRST_LINE);
-
         // split and fill message
         fillTextPaneMessage(message);
         JScrollPane scrollPane = new JScrollPane(textPane);
@@ -69,7 +79,7 @@ public class FeedbackDialog extends JDialog{
         buttonDetail = new JButton("Details");
         buttonPane.add(buttonDetail);
         buttonPane.add(buttonCancel);
-
+        
         // set action listener on the buttons
         buttonCancel.addActionListener(new CancelActionListener());
         buttonDetail.addActionListener(new DetailActionListener());
