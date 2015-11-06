@@ -23,7 +23,6 @@ package eu.musesproject.windowsclient.actuators;
 import eu.musesproject.client.model.actuators.ResponseInfoAP;
 import eu.musesproject.client.model.decisiontable.Decision;
 import eu.musesproject.windowsclient.view.FeedbackDialog;
-import eu.musesproject.windowsclient.view.SimpleFeedbackDialog;
 
 import javax.swing.*;
 import java.util.LinkedList;
@@ -77,7 +76,12 @@ public class FeedbackActuator implements IFeedbackActuator {
     private void createSimpleFeedbackDialog(Decision decision) {
         try {
             String dialogBody = decision.getRiskCommunication().getRiskTreatment()[0].getTextualDescription();
-            new FeedbackDialog(new JFrame(), decision.getName(), dialogBody, decision.getDecision_id()).setVisible(true);
+            if(dialogBody != null && !dialogBody.isEmpty()) {
+                new FeedbackDialog(new JFrame(), decision.getName(), dialogBody, decision.getDecision_id()).setVisible(true);
+            }
+            else {
+                System.out.println("no dialog body attached to the dialog. DIALOG WILL NOT BE SHOWN!");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
