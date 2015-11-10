@@ -59,6 +59,12 @@ public class FeedbackActuator implements IFeedbackActuator {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                try {
+                    decisionQueue.clear();
+                    decisionQueue = new LinkedList<Decision>();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
             decisionQueue.add(decision);
 
